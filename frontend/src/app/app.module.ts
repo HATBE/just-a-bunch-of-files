@@ -8,6 +8,7 @@ import { LoginPageComponent } from './components/pages/auth/login-page/login-pag
 import { FooterComponent } from './components/shared/footer/footer.component';
 import { HeaderComponent } from './components/shared/header/header.component';
 import { IndexPageComponent } from './components/pages/index-page/index-page.component';
+import { ProfilePageComponent } from './components/pages/profile-page/profile-page.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { IndexPageComponent } from './components/pages/index-page/index-page.com
     LoginPageComponent,
     FooterComponent,
     HeaderComponent,
-    IndexPageComponent
+    IndexPageComponent,
+    ProfilePageComponent
   ],
   imports: [
     BrowserModule,

@@ -1,1 +1,106 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --bs-primary-rgb: 63, 106, 208;
+  --bs-primary: #3f6ad0;
+  --bs-dark: #101112;
+  --bs-dark-rgb: 16, 17, 18;
+  --bs-body-font-family: 'Source Sans Pro',sans-serif;
+}
+input:focus,input:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: inherit !important;
+}
+body {
+  background-color: var(--bs-dark);
+  color: #fff;
+  overflow-x: hidden;
+}
+html {
+  scroll-padding-top: 60px;
+}
+.btn-primary {
+  background-color: var(--bs-primary);
+}
+.btn-primary:hover {
+  background-color: var(--bs-primary);
+  opacity: 0.85;
+}
+.btn-outline-primary {
+  color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+.btn-outline-primary:hover {
+  background-color: var(--bs-primary);
+  opacity: 0.85;
+}
+.btn-dark {
+  background-color: var(--bs-dark);
+}
+.btn-dark:hover {
+  background-color: var(--bs-dark);
+  opacity: 0.85;
+}
+a.link-primary {
+  color: var(--bs-primary) !important;
+}
+textarea:focus,
+textarea.form-control:focus,
+input.form-control:focus,
+input[type=text]:focus,
+input[type=password]:focus,
+input[type=email]:focus,
+input[type=number]:focus,
+[type=text].form-control:focus,
+[type=password].form-control:focus,
+[type=email].form-control:focus,
+[type=tel].form-control:focus,
+[contenteditable].form-control:focus {
+  box-shadow: none;
+}
+input.bg-secondary::placeholder, textarea.bg-secondary::placeholder {
+  color: var(--bs-light) !important;
+  opacity: 0.4;
+}
+input, textarea {
+  outline: none;
+  border: none !important;
+}
+.hover-primary:hover {
+  transition-duration: .2s;
+  color: var(--bs-primary) !important;
+}
+.hover-dark:hover {
+  color: var(--bs-dark);
+  transition-duration: .2s;
+}
+.text-shadow {
+  text-shadow: 2px 5px 10px #000;
+}
+h1,h2,h3,h4,h5,h6 {
+  font-weight: bold;
+  user-select: none;
+}
+.badge {
+  user-select: none;
+}
+.main-title {
+  text-align: center;
+  text-transform: uppercase;
+  user-select: none;
+}
+.card {
+  outline: none;
+  border: none;
+}
+label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  user-select: none;
+}
+.btn {
+  padding-left: 45px !important;
+  padding-right: 45px !important;
+}
+.d-inline-block {
+  display: inline-block;
+}
