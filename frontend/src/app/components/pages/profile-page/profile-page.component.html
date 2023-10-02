@@ -2,13 +2,39 @@
 
   <div class="row g-3">
 
-    <div class="col-12 col-md-4" *ngFor="let i of [1,2,3,4,5]">
-      <div class="overflow-hidden ratio ratio-1x1">
-        <img src="https://images.placeholders.dev/?width=1920&height=1080" class="object-fit-cover w-100">
+    <div class="col-12">
+      <div class="card bg-dark rounded overflow-hidden shadow text-light">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-4 col-sm-3 co-md-2 col-xl-1">
+              <div class="overflow-hidden ratio ratio-1x1 rounded">
+                <img draggable="false" src="https://images.placeholders.dev/?width=1920&height=1080" class="object-fit-cover w-100 user-select-none">
+              </div>
+            </div>
+            <div class="col-8 col-sm-9 co-md-10 col-xl-11 d-flex flex-column justify-content-center">
+              <h5>HATBE</h5>
+              <p>I am the short bio of hatbe</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4 col-xl-3" *ngFor="let bike of bikes">
+      <div class="card bg-dark rounded overflow-hidden shadow text-light">
+        <div class="card-body p-0">
+          <div class="overflow-hidden ratio ratio-1x1">
+            <img draggable="false" src="https://images.placeholders.dev/?width=1920&height=1080" class="object-fit-cover w-100 user-select-none">
+          </div>
+
+          <div class="p-3">
+            <h5>{{bike.name}}</h5>
+            <p class="fw-normal">{{bike.make}} {{bike.model}} {{bike.year}}</p>
+          </div>
+        </div>
       </div>
     </div>
 
   </div>
-
 
 </div>
