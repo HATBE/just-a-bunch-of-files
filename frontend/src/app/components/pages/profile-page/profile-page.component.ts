@@ -9,24 +9,22 @@ export class ProfilePageComponent implements OnInit {
 
   bikes = [
     {
-      img: '/assets/gsr750.jpg',
-      name: 'Blue Beast',
-      make: 'Suzuki',
-      model: 'GSR 750',
-      year: '2013',
-      acquired: 2023,
-      destroyed: null,
-      sold: null
-    },
-    {
       img: '/assets/xj6.jpg',
       name: 'Black Beast',
       make: 'Yamaha',
       model: 'XJ6NA',
       year: '2009',
-      acquired: 2021,
-      destroyed: null,
-      sold: null
+      fromyear: 2023,
+      toyear: null,
+    },
+    {
+      img: '/assets/gsr750.jpg',
+      name: 'Blue Beast',
+      make: 'Suzuki',
+      model: 'GSR 750',
+      year: '2013',
+      fromyear: 2022,
+      toyear: null
     },
     {
       img: '/assets/ninja300.jpg',
@@ -34,9 +32,8 @@ export class ProfilePageComponent implements OnInit {
       make: 'Kawasaki',
       model: 'Ninja 300',
       year: '2013',
-      acquired: 2022,
-      destroyed: null,
-      sold: 2023
+      fromyear: 2022,
+      toyear: 2023
     },
     {
       img: '/assets/mt125.jpg',
@@ -44,9 +41,8 @@ export class ProfilePageComponent implements OnInit {
       make: 'Yamaha',
       model: 'MT-125',
       year: '2021',
-      acquired: 2021,
-      destroyed: null,
-      sold: 2021
+      fromyear: 2021,
+      toyear: 2021
     }
   ]
 
