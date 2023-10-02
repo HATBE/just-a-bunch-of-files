@@ -1,7 +1,7 @@
 :root {
   --bs-primary-rgb: 63, 106, 208;
   --bs-primary: #3f6ad0;
-  --bs-dark: #1E1F21;
+  --bs-dark: #101112;
   --bs-dark-rgb: 16, 17, 18;
   --bs-body-font-family: 'Source Sans Pro',sans-serif;
 }
@@ -11,7 +11,14 @@ input:focus,input:active {
   border-color: inherit !important;
 }
 body {
-  background-color: #051937;
+  background: #005c97; /* fallback for old browsers */
+  background: -webkit-linear-gradient(to left, #005c97, #363795); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to left, #005c97, #363795); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+  min-height: 100%;
+  margin: 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   color: #fff;
   overflow-x: hidden;
 }
@@ -76,7 +83,7 @@ input, textarea {
 .text-shadow {
   text-shadow: 2px 5px 10px #000;
 }
-h1,h2,h3,h4,h5,h6 {
+h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
   font-weight: bold;
   user-select: none;
   margin: 0;
