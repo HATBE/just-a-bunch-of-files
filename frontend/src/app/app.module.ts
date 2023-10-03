@@ -13,6 +13,7 @@ import { HeaderComponent } from './components/shared/header/header.component';
 import { IndexPageComponent } from './components/pages/index-page/index-page.component';
 import { ProfilePageComponent } from './components/pages/profile-page/profile-page.component';
 import { NavbtnComponent } from './components/shared/header/navbtn/navbtn.component';
+import { ResetPwPageComponent } from './components/pages/auth/reset-pw-page/reset-pw-page.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { NavbtnComponent } from './components/shared/header/navbtn/navbtn.compon
     HeaderComponent,
     IndexPageComponent,
     ProfilePageComponent,
-    NavbtnComponent
+    NavbtnComponent,
+    ResetPwPageComponent
   ],
   imports: [
     BrowserModule,
