@@ -1,6 +1,6 @@
 .text-over-img {
   position: absolute;
   top: 0;
-  background-color: rgba(var(--bs-primary-rgb), 0.85);
+  background-color: rgba(var(--bs-primary-rgb), 1);
   border-bottom-right-radius: var(--bs-border-radius);
 }

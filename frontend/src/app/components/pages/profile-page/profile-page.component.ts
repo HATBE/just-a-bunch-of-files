@@ -14,8 +14,8 @@ export class ProfilePageComponent implements OnInit {
       make: 'Yamaha',
       model: 'XJ6NA',
       year: '2009',
-      fromyear: 2023,
-      toyear: null,
+      fromYear: 2023,
+      toYear: null,
     },
     {
       img: '/assets/gsr750.jpg',
@@ -23,8 +23,8 @@ export class ProfilePageComponent implements OnInit {
       make: 'Suzuki',
       model: 'GSR 750',
       year: '2013',
-      fromyear: 2022,
-      toyear: null
+      fromYear: 2022,
+      toYear: null
     },
     {
       img: '/assets/ninja300.jpg',
@@ -32,8 +32,8 @@ export class ProfilePageComponent implements OnInit {
       make: 'Kawasaki',
       model: 'Ninja 300',
       year: '2013',
-      fromyear: 2022,
-      toyear: 2023
+      fromYear: 2022,
+      toYear: 2023
     },
     {
       img: '/assets/mt125.jpg',
@@ -41,10 +41,10 @@ export class ProfilePageComponent implements OnInit {
       make: 'Yamaha',
       model: 'MT-125',
       year: '2021',
-      fromyear: 2021,
-      toyear: 2021
+      fromYear: 2021,
+      toYear: 2021
     }
-  ]
+  ];
 
   constructor() { }
 

@@ -11,8 +11,7 @@ input:focus,input:active {
   border-color: inherit !important;
 }
 body {
-  background: var(--bs-primary);
-
+  background: #0e2130;
   min-height: 100%;
   margin: 0;
   background-repeat: no-repeat;
