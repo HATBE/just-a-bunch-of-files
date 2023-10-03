@@ -65,13 +65,24 @@ input[type=number]:focus,
 [contenteditable].form-control:focus {
   box-shadow: none;
 }
+/* remove ugly bootstrap focus outline/border/shadow*/
+input, input:focus, input:active, textarea, textarea:focus, textarea:active, select, select:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
 input.bg-secondary::placeholder, textarea.bg-secondary::placeholder {
   color: var(--bs-light) !important;
   opacity: 0.4;
 }
-input, textarea {
-  outline: none;
-  border: none !important;
+.form-control, .form-select{
+  background-color: var(--bs-dark) !important;
+  border: 0;
+  border-bottom: var(--bs-light) 1px solid !important;
+  border-radius: 0;
+  color: var(--bs-light) !important;
+}
+.form-control::placeholder, .form-select::placeholder {
+  color: var(--bs-light-text-emphasis) !important;
 }
 .hover-primary:hover {
   transition-duration: .2s;
@@ -110,4 +121,7 @@ label {
 }
 .d-inline-block {
   display: inline-block;
+}
+.w-85 {
+  width: 85%;
 }
