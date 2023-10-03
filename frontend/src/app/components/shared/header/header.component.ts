@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { faMotorcycle, faRightFromBracket, faRightToBracket } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-header',
@@ -6,6 +7,11 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
+  faRightFromBracket = faRightFromBracket;
+  faRightToBracket = faRightToBracket;
+  faMotorcycle = faMotorcycle;
+
+  isLoggedIn: boolean = false;
 
   constructor() { }
 

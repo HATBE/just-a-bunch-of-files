@@ -2,7 +2,29 @@
   <div class="container my-3">
     <div class="card bg-dark rounded overflow-hidden shadow text-light">
       <div class="card-body">
-        <a draggable="false" class="text-decoration-none link-light" routerLink="/"><h1 class="h3">Riders Gallery</h1></a>
+        <nav class="navbar navbar-expand-lg m-0 p-0">
+          <div class="container d-flex justify-content-between align-items-center">
+            <a draggable="false" class="user-select-none navbar-brand" routerLink="/">
+              <h2 class="text-light fw-bold p-0 m-0">
+                Riders Gallery
+              </h2>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+              <ul class="navbar-nav ms-auto" >
+                <ng-container *ngIf="!isLoggedIn">
+                  <app-navbtn [icon]="faRightToBracket" [link]="'/auth/login'" [name]="'Login'"></app-navbtn>
+                  <app-navbtn [icon]="faRightFromBracket" [link]="'/auth/register'" [name]="'Register'"></app-navbtn>
+                </ng-container>
+                <ng-container *ngIf="isLoggedIn">
+                  <app-navbtn [icon]="faMotorcycle" [link]="'/profile/hatbe2113'" [name]="'Profile'"></app-navbtn>
+                </ng-container>
+              </ul>
+            </div>
+          </div>
+        </nav>
       </div>
     </div>
   </div>

@@ -47,6 +47,7 @@ html {
   background-color: var(--bs-dark);
   opacity: 0.85;
 }
+
 a.link-primary {
   color: var(--bs-primary) !important;
 }

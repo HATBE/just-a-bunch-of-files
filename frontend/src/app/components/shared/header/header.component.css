@@ -1,0 +1,24 @@
+header {
+  transition-duration: .2s;
+  color: var(--bs-light);
+}
+nav {
+  overflow: hidden;
+}
+
+.navbar-toggler {
+  border: none;
+  filter: invert(100%);
+  padding: 0;
+  margin: 0;
+}
+.navbar-toggler:focus,
+.navbar-toggler:active,
+.navbar-toggler-icon:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+header {
+  border-color: #525252 !important;
+}
