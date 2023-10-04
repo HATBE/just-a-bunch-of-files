@@ -14,6 +14,9 @@ import { IndexPageComponent } from './components/pages/index-page/index-page.com
 import { ProfilePageComponent } from './components/pages/profile-page/profile-page.component';
 import { NavbtnComponent } from './components/shared/header/navbtn/navbtn.component';
 import { ResetPwPageComponent } from './components/pages/auth/reset-pw-page/reset-pw-page.component';
+import { LoadingSpinnerComponent } from './components/shared/loading-spinner/loading-spinner.component';
+import { PaginationButtonsComponent } from './components/shared/paginations/pagination-buttons/pagination-buttons.component';
+import { PaginationInfoComponent } from './components/shared/paginations/pagination-info/pagination-info.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +28,10 @@ import { ResetPwPageComponent } from './components/pages/auth/reset-pw-page/rese
     IndexPageComponent,
     ProfilePageComponent,
     NavbtnComponent,
-    ResetPwPageComponent
+    ResetPwPageComponent,
+    LoadingSpinnerComponent,
+    PaginationButtonsComponent,
+    PaginationInfoComponent
   ],
   imports: [
     BrowserModule,
