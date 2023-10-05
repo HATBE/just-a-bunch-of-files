@@ -1,12 +1,12 @@
 require('dotenv').config(); // environment variables stored in ".ENV" file
 
-const cors = require('./middleware/cors-handler');
-const logger = require('./middleware/logger');
-const rateLimiter = require('./middleware/rate-limiter');
-const errorHandler = require('./middleware/error-handler');
-const jwtAuth = require('./middleware/jwt-auth');
+const cors = require('./src/middleware/cors-handler');
+const logger = require('./src/middleware/logger');
+const rateLimiter = require('./src/middleware/rate-limiter');
+const errorHandler = require('./src/middleware/error-handler');
+const jwtAuth = require('./src/middleware/jwt-auth');
 
-const routes = require('./routes/routes');
+const routes = require('./src/routes/routes');
 
 const express = require('express');
 const app = express();
