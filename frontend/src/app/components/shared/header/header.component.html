@@ -19,7 +19,8 @@
                   <app-navbtn [icon]="faRightFromBracket" [link]="'/auth/register'" [name]="'Register'"></app-navbtn>
                 </ng-container>
                 <ng-container *ngIf="isLoggedIn">
-                  <app-navbtn [icon]="faMotorcycle" [link]="'/profile/hatbe2113'" [name]="'Profile'"></app-navbtn>
+                  <app-navbtn [icon]="faMotorcycle" [link]="'/profile/' + loggedInUser?.id" [name]="'Profile'"></app-navbtn>
+                  <app-navbtn [icon]="faRightToBracket" [noActive]="true" (click)="logout()" [name]="'Logout'"></app-navbtn>
                 </ng-container>
               </ul>
             </div>

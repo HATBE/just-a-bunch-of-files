@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { faMotorcycle, faRightFromBracket, faRightToBracket } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRightToBracket, faMotorcycle, faRightFromBracket, faRightToBracket } from '@fortawesome/free-solid-svg-icons';
+import { Emitters } from 'src/app/emitters/emitters';
+import { FullUserModel } from 'src/app/models/full-user.model';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -8,14 +11,28 @@ import { faMotorcycle, faRightFromBracket, faRightToBracket } from '@fortawesome
 })
 export class HeaderComponent implements OnInit {
   faRightFromBracket = faRightFromBracket;
+  faLeftFromBracket = faRightToBracket
   faRightToBracket = faRightToBracket;
   faMotorcycle = faMotorcycle;
 
   isLoggedIn: boolean = false;
+  loggedInUser: FullUserModel | null = null;
 
-  constructor() { }
+  constructor(
+    private authService: AuthService  ) { }
 
   ngOnInit(): void {
+    this.authService.getLoggedInUser().subscribe(data => {
+      this.loggedInUser = data.data.user;
+      this.isLoggedIn = true;
+    });
+
+    Emitters.authEmitter.subscribe((auth: boolean) => {
+      this.isLoggedIn = auth;
+    });
   }
 
+  logout() {
+    this.authService.logout();
+  }
 }
