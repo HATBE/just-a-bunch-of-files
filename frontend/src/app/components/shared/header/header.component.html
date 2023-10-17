@@ -19,7 +19,7 @@
                   <app-navbtn [icon]="faRightFromBracket" [link]="'/auth/register'" [name]="'Registrieren'"></app-navbtn>
                 </ng-container>
                 <ng-container *ngIf="isLoggedIn">
-                  <!--<app-navbtn [icon]="faRightToBracket" [link]="'/auth/login'" [name]="'Einloggen'"></app-navbtn>-->
+                  <app-navbtn [icon]="faUsers" [link]="'/users/list'" [name]="'Mitglieder'"></app-navbtn>
                   <app-user-dropdown [loggedInUser]="loggedInUser"></app-user-dropdown>
                 </ng-container>
               </ul>

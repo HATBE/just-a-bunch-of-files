@@ -1,3 +1,17 @@
 .dropdown-toggle {
   line-height: 28px; /* fix random flexbox bug */
 }
+
+.profile-picture-size {
+  max-height: 100px !important;
+  max-width: 100px !important;
+}
+
+@media only screen and (max-width: 992px) {
+  .nav-item {
+    padding-left: 10px;
+  }
+  .dropdown-menu-dark {
+    border: none;
+  }
+}

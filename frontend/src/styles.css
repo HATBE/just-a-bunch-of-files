@@ -126,3 +126,7 @@ label {
 .cursor-pointer {
   cursor: pointer;
 }
+.dropdown-menu-dark {
+  background-color: var(--bs-dark);
+  border: 1px var(--bs-secondary) solid;
+}

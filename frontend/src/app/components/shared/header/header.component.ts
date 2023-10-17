@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { faCog, faGear, faMotorcycle, faRightFromBracket, faRightToBracket, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faGear, faMotorcycle, faRightFromBracket, faRightToBracket, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { Emitters } from 'src/app/emitters/emitters';
 import { FullUserModel } from 'src/app/models/full-user.model';
 import { AuthService } from 'src/app/services/auth.service';
@@ -11,12 +11,8 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class HeaderComponent implements OnInit {
   faRightFromBracket = faRightFromBracket;
-  faLeftFromBracket = faRightToBracket
   faRightToBracket = faRightToBracket;
-  faMotorcycle = faMotorcycle;
-  faCog = faCog;
-  faUser = faUser;
-  faGear = faGear;
+  faUsers = faUsers;
 
   isLoggedIn: boolean = false;
   loggedInUser: FullUserModel | null = null;
