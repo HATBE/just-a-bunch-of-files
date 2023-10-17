@@ -19,7 +19,7 @@ class UsersRepository extends AbstractRepository {
 
     async createUser(email_address, username, password_hash, creation_date) {
         const {res, fields} = await this.sqlQuery(
-            'INSERT INTO users (email_address, bio, username, password_hash, creation_date) VALUES (?, ?, ?, ?)', 
+            'INSERT INTO users (email_address, bio, username, password_hash, creation_date) VALUES (?, ?, ?, ?, ?)', 
             [email_address, 'nothing', username,  password_hash, creation_date]
         );
         return res ? await this.getUserById(res.insertId) : false;

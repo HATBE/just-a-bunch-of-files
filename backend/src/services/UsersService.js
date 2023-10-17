@@ -24,7 +24,7 @@ class UsersService {
         return await usersRepository.doesEmailAddressExists(email_adress);
     }
 
-    async createUser(email_address, username, password_hash) {
+    async createUser(email_address, username, password_hash, model = UsersService.MODELS.FULL_USER_MODEL) {
         const creation_date = Math.round(Date.now() / 1000); // unix timestamp in seconds
         const user = await usersRepository.createUser(email_address, username, password_hash, creation_date);
         return user ? new model(user) : false;
