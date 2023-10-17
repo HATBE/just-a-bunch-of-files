@@ -1,0 +1,12 @@
+<li class="dropdown nav-item">
+  <span class="dropdown-toggle text-decoration-none user-select-none nav-link link-light fw-bold cursor-pointer" data-bs-toggle="dropdown" aria-expanded="false">
+    <span>Account</span>
+  </span>
+  <ul class="dropdown-menu dropdown-menu-dark">
+    <li class="d-flex justify-content-center align-items-center py-2 text-uppercase fw-bold">{{loggedInUser?.username}}</li>
+    <hr class="m-0 py-1">
+    <li><a draggable="false" routerLink="/user/settings" class="dropdown-item"><fa-icon class="me-2" [icon]="faGear"></fa-icon>Einstellungen</a></li>
+    <li><a draggable="false" routerLink="/profile/{{loggedInUser?.id}}" class="dropdown-item"><fa-icon class="me-2" [icon]="faUser"></fa-icon>Profil</a></li>
+    <li><a draggable="false" class="dropdown-item cursor-pointer" (click)="logout()"><fa-icon class="me-2" [icon]="faRightFromBracket"></fa-icon>Logout</a></li>
+  </ul>
+</li>

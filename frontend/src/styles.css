@@ -123,3 +123,6 @@ label {
 .w-85 {
   width: 85%;
 }
+.cursor-pointer {
+  cursor: pointer;
+}

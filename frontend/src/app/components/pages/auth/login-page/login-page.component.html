@@ -4,34 +4,34 @@
       <div class="card bg-dark rounded overflow-hidden shadow text-light">
         <div class="card-body">
           <h3 class="text-center mt-2">Login</h3>
-          <p class="text-center text-secondary">Log in to your account</p>
+          <p class="text-center text-secondary">Logge dich in deinen Account ein</p>
           <div class="d-flex flex-column align-items-center">
             <form class="w-85 mt-5 mb-4" [formGroup]="form" (submit)="onSubmitLogin()">
               <div class="w-100 alert alert-danger" *ngIf="error">
                 <span class="fw-bold">Error!</span> {{error}}
               </div>
               <div class="w-100 alert alert-success" *ngIf="!error && freshLoggedInName != null">
-                <span class="fw-bold">Success!</span> You successfully registerd as <b>{{freshLoggedInName}}</b>.
+                <span class="fw-bold">Success!</span> Du hast dich erfolgreich als <b>{{freshLoggedInName}} eingeloggt</b>.
               </div>
               <div class="mb-3">
                 <label>Username</label>
                 <input formControlName="username" type="text" class="form-control" placeholder="Username">
               </div>
               <div class="mb-3">
-                <label>Password</label>
-                <input id="passwordInput" formControlName="password" type="password" class="form-control" placeholder="Password">
+                <label>Passwort</label>
+                <input id="passwordInput" formControlName="password" type="password" class="form-control" placeholder="Passwort">
               </div>
               <div class="my-4">
                 <button class="w-100 btn btn-primary">
                   <ng-container *ngIf="isLoading"><app-loading-spinner></app-loading-spinner></ng-container>
-                  <ng-container *ngIf="!isLoading">Login</ng-container>
+                  <ng-container *ngIf="!isLoading">Einloggen</ng-container>
                 </button>
               </div>
             </form>
           </div>
           <div class="d-flex justify-content-between">
-            <a draggable="false" class="user-select-none mt-3 d-block link-secondary text-decoration-none" routerLink="/auth/reset-pw">Forgot password?</a>
-            <a draggable="false" class="user-select-none mt-3 d-block link-secondary text-decoration-none" routerLink="/auth/register">Register an account</a>
+            <a draggable="false" class="user-select-none mt-3 d-block link-secondary text-decoration-none" routerLink="/auth/reset-pw">Passwort vergessen?</a>
+            <a draggable="false" class="user-select-none mt-3 d-block link-secondary text-decoration-none" routerLink="/auth/register">Registriere einen Account</a>
           </div>
         </div>
       </div>

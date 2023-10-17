@@ -18,6 +18,8 @@ import { LoadingSpinnerComponent } from './components/shared/loading-spinner/loa
 import { PaginationButtonsComponent } from './components/shared/paginations/pagination-buttons/pagination-buttons.component';
 import { PaginationInfoComponent } from './components/shared/paginations/pagination-info/pagination-info.component';
 import { CreateBikePageComponent } from './components/pages/create-bike-page/create-bike-page.component';
+import { UserSettingsPageComponent } from './components/pages/user-settings-page/user-settings-page.component';
+import { UserDropdownComponent } from './components/shared/header/user-dropdown/user-dropdown.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +35,9 @@ import { CreateBikePageComponent } from './components/pages/create-bike-page/cre
     LoadingSpinnerComponent,
     PaginationButtonsComponent,
     PaginationInfoComponent,
-    CreateBikePageComponent
+    CreateBikePageComponent,
+    UserSettingsPageComponent,
+    UserDropdownComponent,
   ],
   imports: [
     BrowserModule,

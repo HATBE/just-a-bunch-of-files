@@ -1,0 +1,3 @@
+.dropdown-toggle {
+  line-height: 28px; /* fix random flexbox bug */
+}

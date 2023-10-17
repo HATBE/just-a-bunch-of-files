@@ -1,9 +1,5 @@
 header {
-  transition-duration: .2s;
   color: var(--bs-light);
-}
-nav {
-  overflow: hidden;
 }
 
 .navbar-toggler {
@@ -17,8 +13,4 @@ nav {
 .navbar-toggler-icon:focus {
     outline: none;
     box-shadow: none;
-}
-
-header {
-  border-color: #525252 !important;
 }
