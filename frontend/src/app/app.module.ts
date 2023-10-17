@@ -17,6 +17,7 @@ import { ResetPwPageComponent } from './components/pages/auth/reset-pw-page/rese
 import { LoadingSpinnerComponent } from './components/shared/loading-spinner/loading-spinner.component';
 import { PaginationButtonsComponent } from './components/shared/paginations/pagination-buttons/pagination-buttons.component';
 import { PaginationInfoComponent } from './components/shared/paginations/pagination-info/pagination-info.component';
+import { CreateBikePageComponent } from './components/pages/create-bike-page/create-bike-page.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { PaginationInfoComponent } from './components/shared/paginations/paginat
     ResetPwPageComponent,
     LoadingSpinnerComponent,
     PaginationButtonsComponent,
-    PaginationInfoComponent
+    PaginationInfoComponent,
+    CreateBikePageComponent
   ],
   imports: [
     BrowserModule,

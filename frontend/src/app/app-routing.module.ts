@@ -5,6 +5,7 @@ import { LoginPageComponent } from './components/pages/auth/login-page/login-pag
 import { RegisterPageComponent } from './components/pages/auth/register-page/register-page.component';
 import { ProfilePageComponent } from './components/pages/profile-page/profile-page.component';
 import { ResetPwPageComponent } from './components/pages/auth/reset-pw-page/reset-pw-page.component';
+import { CreateBikePageComponent } from './components/pages/create-bike-page/create-bike-page.component';
 
 const routes: Routes = [
   {path: '', component: IndexPageComponent, title: 'Index'},
@@ -14,7 +15,7 @@ const routes: Routes = [
   {path: 'auth/reset-pw', component: ResetPwPageComponent, title: 'Reset PW'},
 
   {path: 'profile/:id', component: ProfilePageComponent, title: 'Profile'},
-
+  {path: 'bike/create', component: CreateBikePageComponent, title: 'Create Bike'},
 
   {path: 'login', redirectTo: 'auth/login'},
   {path: 'register', redirectTo: 'auth/register'},
