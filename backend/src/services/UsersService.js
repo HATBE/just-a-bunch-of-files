@@ -24,25 +24,25 @@ class UsersService {
         return await usersRepository.doesEmailAddressExists(email_adress);
     }
 
-    async createUser(email_address, username, password_hash, model = UsersService.MODELS.FULL_USER_MODEL) {
+    async createUser(email_address, username, password_hash, return_model = UsersService.MODELS.FULL_USER_MODEL) {
         const creation_date = Math.round(Date.now() / 1000); // unix timestamp in seconds
         const user = await usersRepository.createUser(email_address, username, password_hash, creation_date);
-        return user ? new model(user) : false;
+        return user ? new return_model(user) : false;
     }
 
-    async getUserById(id, model = UsersService.MODELS.FULL_USER_MODEL) {
+    async getUserById(id, return_model = UsersService.MODELS.FULL_USER_MODEL) {
         const user = await usersRepository.getUserById(id);
-        return user ? new model(user) : false;
+        return user ? new return_model(user) : false;
     }
 
-    async getUserByEmailAddress(email_address, model = UsersService.MODELS.FULL_USER_MODEL) {
+    async getUserByEmailAddress(email_address, return_model = UsersService.MODELS.FULL_USER_MODEL) {
         const user = await usersRepository.getUserByEmailAddress(email_address);
-        return user ? new model(user) : false;
+        return user ? new return_model(user) : false;
     }
 
-    async getUserByUsername(username, model = UsersService.MODELS.FULL_USER_MODEL) {
+    async getUserByUsername(username, return_model = UsersService.MODELS.FULL_USER_MODEL) {
         const user = await usersRepository.getUserByUsername(username);
-        return user ? new model(user) : false;
+        return user ? new return_model(user) : false;
     }
 
     async verifyPasswords(password, password_hash) {
@@ -50,10 +50,10 @@ class UsersService {
         return false;
     }
 
-    async getAllUsers(page = 1, model = UsersService.MODELS.FULL_USER_MODEL) {
+    async getAllUsers(page = 1, return_model = UsersService.MODELS.FULL_USER_MODEL) {
         const pagination = new Pagination(page, await usersRepository.getUsersCount(), 20);
 
-        const users = await usersRepository.getAllUsers(pagination.getStart(), pagination.getLimit(), model);
+        const users = await usersRepository.getAllUsers(pagination.getStart(), pagination.getLimit());
 
         if(!users || users.length < 1) {
             return false;
@@ -61,7 +61,7 @@ class UsersService {
 
         let userModelArray = [];
         for(let user of users) {
-            userModelArray.push((new model(user)));
+            userModelArray.push((new return_model(user)));
         }
 
         return {users: userModelArray, pagination: pagination.getAsObject()};

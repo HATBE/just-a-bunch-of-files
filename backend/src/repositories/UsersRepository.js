@@ -1,5 +1,4 @@
 const AbstractRepository = require('./AbstractRepository');
-// TODO: make system to use different models and select only the data we need!!!
 class UsersRepository extends AbstractRepository {
     async doesEmailAddressExists(email_address) {
         const {res, fields} = await this.sqlQuery(
