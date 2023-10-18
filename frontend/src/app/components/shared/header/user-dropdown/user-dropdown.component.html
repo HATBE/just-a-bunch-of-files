@@ -10,8 +10,8 @@
       <div class="m-2 h6">{{loggedInUser?.username}}</div>
     </li>
     <hr class="m-0 py-1 text-secondary">
-    <li><a draggable="false" routerLink="/users/profile/{{loggedInUser?.id}}" class="fw-bold dropdown-item"><fa-icon class="me-2" [icon]="faUser"></fa-icon>Profil</a></li>
-    <li><a draggable="false" routerLink="/users/settings" class="fw-bold dropdown-item"><fa-icon class="me-2" [icon]="faGear"></fa-icon>Einstellungen</a></li>
-    <li><a draggable="false" class=" text-danger fw-bold dropdown-item cursor-pointer hover-danger" (click)="logout()"><fa-icon class="me-2" [icon]="faRightFromBracket"></fa-icon>Ausloggen</a></li>
+    <li><a draggable="false" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" routerLink="/users/profile/{{loggedInUser?.id}}" class="fw-bold dropdown-item"><fa-icon class="me-2" [icon]="faUser"></fa-icon>Mein Profil</a></li>
+    <li><a draggable="false" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" routerLink="/users/settings" class="fw-bold dropdown-item"><fa-icon class="me-2" [icon]="faGear"></fa-icon>Einstellungen</a></li>
+    <li><a draggable="false" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class=" text-danger fw-bold dropdown-item cursor-pointer hover-danger" (click)="logout()"><fa-icon class="me-2" [icon]="faRightFromBracket"></fa-icon>Ausloggen</a></li>
   </ul>
 </li>

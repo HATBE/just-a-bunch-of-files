@@ -11,6 +11,11 @@
   background-color: var(--bs-dark) !important;
 }
 
+a.dropdown-item.active {
+  color: var(--bs-primary) !important;
+  background-color: var(--bs-dark);
+}
+
 .profile-picture-size {
   max-height: 80px !important;
   max-width: 80px !important;
@@ -22,5 +27,6 @@
   }
   .dropdown-menu-dark {
     border: none;
+    box-shadow: none !important;
   }
 }

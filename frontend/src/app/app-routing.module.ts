@@ -25,6 +25,7 @@ const routes: Routes = [
   {path: 'login', redirectTo: 'auth/login'},
   {path: 'register', redirectTo: 'auth/register'},
   {path: 'settings', redirectTo: 'users/settings'},
+  {path: 'users', redirectTo: 'users/list'},
   {path: 'profile/:id', redirectTo: '/users/profile/:id'},
   {path: 'p/:id', redirectTo: '/users/profile/:id'},
 

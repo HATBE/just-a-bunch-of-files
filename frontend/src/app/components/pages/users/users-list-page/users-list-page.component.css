@@ -1,6 +1,5 @@
 .user-list-item {
   padding: 10px 0;
-  border-top: 1px white solid;
 }
 .user-list-item:hover {
   background-color: var(--bs-black);
