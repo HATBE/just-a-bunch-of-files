@@ -1,7 +1,57 @@
 <div class="container my-3">
   <div class="card bg-dark rounded overflow-hidden shadow text-light">
     <div class="card-body">
-      Not implemented yet
+      <!-- if loading -->
+      <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+      <!-- if not loading but error -->
+      <ng-container *ngIf="!isLoading && error">
+        <div class="alert alert-danger">
+          {{error}}
+        </div>
+      </ng-container>
+
+      <!-- if not loading and no error -->
+      <ng-container *ngIf="!isLoading && !error">
+
+        <div class="row">
+          <div class="col-12 col-md-9">
+
+            <h2 class="mb-4 h4">Mitglieder</h2>
+
+            <app-pagination-info [itemName]="'User'" [pagination]="pagination" *ngIf="data.users != null && data.users.length > 0 && pagination.maxPages > 1"></app-pagination-info>
+
+            <ng-container *ngFor="let user of data.users">
+
+              <a draggable="false" routerLink="/users/profile/{{user.id}}" class="user-select-none d-flex user-list-item link-light text-decoration-none px-2 rounded">
+                <div class="overflow-hidden ratio ratio-1x1 rounded" style="width: 80px;">
+                  <img draggable="false" class="user-select-none object-fit-cover w-100 ratio-1x1" src="/assets/pb.jpg" alt="">
+                </div>
+                <div class="ms-3">
+                  <div class="d-flex align-items-center">
+                    <span class="fw-bold text-uppercase user-username">{{user.username}}</span>
+                  </div>
+                  <div>
+                    {{user.bio}}
+                  </div>
+                </div>
+              </a>
+
+            </ng-container>
+
+            <app-pagination-buttons [isLoading]="isReLoading" (pageSwitchEvent)="onPageSwitch($event)" [pagination]="pagination" *ngIf="data.users != null && data.users.length > 0 && pagination.maxPages > 1"></app-pagination-buttons>
+
+          </div>
+
+          <div class="col-12 col-md-3">
+
+          Neuste User
+
+          </div>
+        </div>
+
+      </ng-container>
+
     </div>
   </div>
 </div>

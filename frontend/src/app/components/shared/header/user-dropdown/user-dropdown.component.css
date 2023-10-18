@@ -2,9 +2,18 @@
   line-height: 28px; /* fix random flexbox bug */
 }
 
+.dropdown-toggle:hover, .dropdown-item:hover {
+  color: var(--bs-primary) !important;
+  background-color: var(--bs-dark) !important;
+}
+
+.dropdown-item:active {
+  background-color: var(--bs-dark) !important;
+}
+
 .profile-picture-size {
-  max-height: 100px !important;
-  max-width: 100px !important;
+  max-height: 80px !important;
+  max-width: 80px !important;
 }
 
 @media only screen and (max-width: 992px) {

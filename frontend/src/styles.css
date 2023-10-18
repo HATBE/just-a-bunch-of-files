@@ -87,7 +87,15 @@ input.bg-secondary::placeholder, textarea.bg-secondary::placeholder {
   color: var(--bs-primary) !important;
 }
 .hover-dark:hover {
-  color: var(--bs-dark);
+  color: var(--bs-dark) !important;
+  transition-duration: .2s;
+}
+.hover-light:hover {
+  color: var(--bs-light) !important;
+  transition-duration: .2s;
+}
+.hover-danger:hover {
+  color: var(--bs-danger) !important;
   transition-duration: .2s;
 }
 .text-shadow {
