@@ -40,27 +40,7 @@
         </div>
       </div>
 
-      <ng-container *ngIf="bikes">
-        <div class="col-12 col-sm-6 col-md-4 col-xl-3" *ngFor="let bike of bikes">
-          <div class="card bg-dark rounded overflow-hidden shadow text-light">
-            <div class="card-body p-0">
-              <div class="overflow-hidden p-relative">
-                <div class="ratio ratio-1x1">
-                  <img draggable="false" src="{{bike.img}}" class="object-fit-cover w-100 user-select-none">
-                </div>
-                <span class="text-over-img px-2 py-1 user-select-none fw-bold">
-                  {{bike.fromYear}} - {{bike.toYear ? bike.toYear : 'Now' }}
-                </span>
-              </div>
-
-              <div class="p-3">
-                <h5>{{bike.name}}</h5>
-                <p><b>{{bike.make}}</b> {{bike.model}} <i>{{bike.year}}</i></p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </ng-container>
+      <app-bike-list [userId]="data.user.id"></app-bike-list>
 
     </div>
   </ng-container>

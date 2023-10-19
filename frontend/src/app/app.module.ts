@@ -21,6 +21,7 @@ import { CreateBikePageComponent } from './components/pages/bikes/create-bike-pa
 import { UserSettingsPageComponent } from './components/pages/users/user-settings-page/user-settings-page.component';
 import { UserDropdownComponent } from './components/shared/header/user-dropdown/user-dropdown.component';
 import { UsersListPageComponent } from './components/pages/users/users-list-page/users-list-page.component';
+import { BikeListComponent } from './components/shared/bike-list/bike-list.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { UsersListPageComponent } from './components/pages/users/users-list-page
     UserSettingsPageComponent,
     UserDropdownComponent,
     UsersListPageComponent,
+    BikeListComponent,
   ],
   imports: [
     BrowserModule,

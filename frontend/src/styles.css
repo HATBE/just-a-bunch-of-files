@@ -138,3 +138,6 @@ label {
   background-color: var(--bs-dark);
   border: 1px var(--bs-secondary) solid;
 }
+.alert {
+  margin: 0;
+}

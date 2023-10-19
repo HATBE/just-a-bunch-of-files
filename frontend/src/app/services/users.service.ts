@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Router } from '@angular/router';
-import { Emitters } from '../emitters/emitters';
 import { FullUserModel } from '../models/full-user.model';
 import { Pagination } from '../models/pagination.model';
 import { ListUserModel } from '../models/list-user.model';
+import { FullBikeModel } from '../models/full-bike.model';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +16,7 @@ export class UsersService {
   private authHeader = new HttpHeaders({'Authorization': `Bearer ${localStorage.getItem('authtoken')}`});
 
   constructor(
-    private http: HttpClient,
-    private router: Router
+    private http: HttpClient
   ) { }
 
   getUser(id: any) {
@@ -28,4 +27,7 @@ export class UsersService {
     return this.http.get<{status: boolean, data: {users: [ListUserModel], pagination: Pagination}}>(this.apiEndpoint  + "?page=" + page, {headers: this.authHeader});
   }
 
+  getBikesFromUser(id: any, page: number = 1) {
+    return this.http.get<{status: boolean, data: {users: [FullBikeModel], pagination: Pagination}}>(this.apiEndpoint  + id + "/bikes?page=" + page, {headers: this.authHeader});
+  }
 }
