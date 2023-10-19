@@ -8,15 +8,16 @@ class FullBikeModel {
     #fromYear;
     #toYear;
 
-    constructor(user) {
-        if(!user) return;
-        this.#id = user.id;
-        this.#user_id = user.user_id;
-        this.#name = user.name;
-        this.#model = user.model;
-        this.#year = user.year;
-        this.#fromYear = user.fromYear;
-        this.#toYear = user.toYear;
+    constructor(bike) {
+        if(!bike) return;
+        this.#id = bike.id;
+        this.#user_id = bike.user_id;
+        this.#name = bike.name;
+        this.#make = bike.make;
+        this.#model = bike.model;
+        this.#year = bike.year;
+        this.#fromYear = bike.fromYear;
+        this.#toYear = bike.toYear;
     }
 
     getId() {
@@ -29,6 +30,10 @@ class FullBikeModel {
 
     getName() {
         return this.#name;
+    }
+
+    getMake() {
+        return this.#make;
     }
 
     getModel() {
@@ -52,6 +57,7 @@ class FullBikeModel {
             id: this.getId(),
             name: this.getName(),
             user_id: this.getUserId(),
+            make: this.getMake(),
             model: this.getModel(),
             year: this.getYear(),
             toYear: this.getToYear(),

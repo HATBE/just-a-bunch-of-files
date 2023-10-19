@@ -28,7 +28,7 @@ class BikesRepository extends AbstractRepository {
 
     async getBikesFromUser(id, start, limit) {
         const {res, fields} = await this.sqlQuery(
-            'SELECT id, user_id, name, make, model, year, fromYear, toYear FROM bikes WHERE user_id LIKE ? ORDER BY fromYear LIMIT ?, ?',
+            'SELECT id, user_id, name, make, model, year, fromYear, toYear FROM bikes WHERE user_id LIKE ? ORDER BY fromYear DESC, toYear ASC LIMIT ?, ?',
             [id, start, limit]
         );
         return res ? res : false;

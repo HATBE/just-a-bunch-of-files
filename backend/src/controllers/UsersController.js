@@ -63,7 +63,7 @@ class UsersController {
         const {bikes, pagination} = await bikesService.getAllBikesFromUser(id, page, BikesService.MODELS.FULL_BIKE_MODEL);
 
         if(!bikes) {
-            return res.status(404).json({status: false, message: 'Es wurden keine Bikes gefunden!'});
+            return res.status(404).json({status: false, message: 'Dieser User hat noch keine Bikes!'});
         }
 
         let bikesObjectArray = [];

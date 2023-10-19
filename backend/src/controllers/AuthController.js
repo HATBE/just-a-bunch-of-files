@@ -49,7 +49,6 @@ class AuthController {
             return res.status(401).json({status: false, message: `Ungültige Anmeldedaten!`});
         }
 
-        // TODO:
         if(!await usersService.verifyPasswords(password, user.getPasswordHash())) {
             console.warn(`[LOGIN] [WARNING] User "[${user.getId()}]${user.getUsername()}/${user.getEmailAddress()}" tried to login but password was wrong!`);
             return res.status(401).json({status: false, message: 'Ungültige Anmeldedaten!'});

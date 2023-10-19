@@ -54,6 +54,10 @@ class BikesController {
             }
         });
     }
+
+    async deleteBike(id) {
+        res.send('TODO: not implemented yet');
+    }
 }
 
 module.exports = BikesController;

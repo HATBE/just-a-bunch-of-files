@@ -6,5 +6,7 @@ const bikesController = new BikesController();
 const mustAuthorize = require('../middleware/must-authorize')
 
 router.post('/', mustAuthorize, bikesController.postBike);
+router.delete('/:id', mustAuthorize, bikesController.deleteBike);
+
 
 module.exports = router;
