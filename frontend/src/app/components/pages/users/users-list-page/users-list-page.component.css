@@ -1,9 +1,28 @@
+.user-list-item {
+  background-color: initial;
+  transition-duration: .3s;
+}
+
+.user-profile-img {
+  filter: none;
+  transform: scale(1) rotate(0deg);
+  transition-duration: .3s;
+}
+
+.user-profile-img-wrapper {
+  border-radius: initial;
+  transition-duration: .3s;
+}
+
 .user-list-item:hover {
   background-color: var(--bs-black);
-  transition-duration: .2s;
 }
 
 .user-list-item:hover .user-profile-img {
   filter: blur(1.5px);
-  transition-duration: .2s;
+  transform: scale(1.1) rotate(3deg);
+}
+
+.user-list-item:hover .user-profile-img-wrapper {
+  border-radius: 0px !important;
 }
