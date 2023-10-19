@@ -5,8 +5,10 @@
 
   <!-- if not loading but error -->
   <ng-container *ngIf="!isLoading && error">
-    <div class="alert alert-danger">
-      {{error}}
+    <div class="card bg-dark rounded overflow-hidden shadow text-light">
+      <div class="card-body">
+        {{error}}
+      </div>
     </div>
   </ng-container>
 
@@ -28,14 +30,6 @@
                 <p>{{data.user.bio}}</p>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12">
-        <div class="card bg-dark rounded overflow-hidden shadow text-light">
-          <div class="card-body">
-            <h5>Meine Garage</h5>
           </div>
         </div>
       </div>

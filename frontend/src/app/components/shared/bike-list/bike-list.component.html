@@ -1,3 +1,11 @@
+<div class="col-12 mb-3">
+  <div class="card bg-dark rounded overflow-hidden shadow text-light">
+    <div class="card-body">
+      <h5>Meine Garage</h5>
+    </div>
+  </div>
+</div>
+
 <!-- if loading -->
 <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 
@@ -10,9 +18,10 @@
   </div>
 </ng-container>
 
-  <!-- if not loading and no error -->
-  <ng-container *ngIf="!isLoading && !error">
-   <div class="row">
+<!-- if not loading and no error -->
+<ng-container *ngIf="!isLoading && !error">
+
+  <div class="row">
     <div class="col-12 col-sm-6 col-md-4 col-xl-3" *ngFor="let bike of data.bikes">
       <div class="card bg-dark rounded overflow-hidden shadow text-light">
         <div class="card-body p-0">
@@ -21,7 +30,7 @@
               <img draggable="false" src="/assets/pb.jpg" class="object-fit-cover w-100 user-select-none">
             </div>
             <span class="text-over-img px-2 py-1 user-select-none fw-bold">
-              {{bike.fromYear}} - {{bike.toYear ? bike.toYear : 'Now' }}
+              {{bike.fromYear}} - {{bike.toYear ? bike.toYear : 'Heute' }}
             </span>
           </div>
 
@@ -32,5 +41,5 @@
         </div>
       </div>
     </div>
-   </div>
-  </ng-container>
+  </div>
+</ng-container>
