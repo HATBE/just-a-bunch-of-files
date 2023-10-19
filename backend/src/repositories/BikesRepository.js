@@ -17,6 +17,22 @@ class BikesRepository extends AbstractRepository {
         );
         return res ? (res[0] ? res[0] : false) : false;
     }
+
+    async getBikesFromUserCount(id) {
+        const {res, fields} = await this.sqlQuery(
+            'SELECT count(id) as count FROM bikes WHERE user_id LIKE ?',
+            [id]
+        );
+        return res ? (res[0] ? res[0].count : 0) : 0;
+    }
+
+    async getBikesFromUser(id, start, limit) {
+        const {res, fields} = await this.sqlQuery(
+            'SELECT id, user_id, name, make, model, year, fromYear, toYear FROM bikes WHERE user_id LIKE ? ORDER BY fromYear LIMIT ?, ?',
+            [id, start, limit]
+        );
+        return res ? res : false;
+    }
 }
 
 module.exports = BikesRepository;

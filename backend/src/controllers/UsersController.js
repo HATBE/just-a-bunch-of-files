@@ -1,7 +1,9 @@
 const Validators = require('../utils/Validators');
 const UsersService = require('../services/UsersService');
+const BikesService = require('../services/BikesService');
 
 const usersService = new UsersService();
+const bikesService = new BikesService();
 
 class UsersController {
     async getUsers(req, res) {
@@ -48,6 +50,36 @@ class UsersController {
                 user: user.getAsObject(),
             }
         });
+    }
+
+    async getUsersBikes(req, res) {
+        let {id} = req.params;
+        let {page} = req.query;
+
+        if(!Validators.pageNumber(page)) {
+            page = 1;
+        }
+
+        const {bikes, pagination} = await bikesService.getAllBikesFromUser(id, page, BikesService.MODELS.FULL_BIKE_MODEL);
+
+        if(!bikes) {
+            return res.status(404).json({status: false, message: 'Es wurden keine Bikes gefunden!'});
+        }
+
+        let bikesObjectArray = [];
+        for(let bike of bikes) {
+            bikesObjectArray.push(bike.getAsObject());
+        }
+
+        res.status(200).json({
+            status: true,
+            message: 'Bikedaten erfolgreich geladen.',
+            data: {
+                bikes: bikesObjectArray,
+                pagination: pagination
+            }
+        });
+
     }
 }
 
