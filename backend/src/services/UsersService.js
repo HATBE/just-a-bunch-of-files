@@ -51,7 +51,7 @@ class UsersService {
     }
 
     async getAllUsers(page = 1, return_model = UsersService.MODELS.FULL_USER_MODEL) {
-        const pagination = new Pagination(page, await usersRepository.getUsersCount(), 20);
+        const pagination = new Pagination(page, await usersRepository.getUsersCount(), 24);
 
         const users = await usersRepository.getAllUsers(pagination.getStart(), pagination.getLimit());
 

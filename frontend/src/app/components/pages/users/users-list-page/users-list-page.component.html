@@ -1,6 +1,8 @@
 <div class="container my-3">
   <div class="card bg-dark rounded overflow-hidden shadow text-light">
     <div class="card-body">
+      <h2 class="mb-4 h4">Mitglieder</h2>
+
       <!-- if loading -->
       <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 
@@ -11,46 +13,27 @@
         </div>
       </ng-container>
 
-      <!-- if not loading and no error -->
       <ng-container *ngIf="!isLoading && !error">
-
         <div class="row">
-          <div class="col-12 col-md-9">
-
-            <h2 class="mb-4 h4">Mitglieder</h2>
-
-            <app-pagination-info [itemName]="'User'" [pagination]="pagination" *ngIf="data.users != null && data.users.length > 0 && pagination.maxPages > 1"></app-pagination-info>
-
-            <ng-container *ngFor="let user of data.users">
-
-              <a draggable="false" routerLink="/users/profile/{{user.id}}" class="user-select-none d-flex user-list-item link-light text-decoration-none px-2 rounded">
-                <div class="overflow-hidden ratio ratio-1x1 rounded" style="width: 80px;">
-                  <img draggable="false" class="user-select-none object-fit-cover w-100 ratio-1x1" src="/assets/pb.jpg" alt="">
-                </div>
-                <div class="ms-3">
-                  <div class="d-flex align-items-center">
-                    <span class="fw-bold text-uppercase user-username">{{user.username}}</span>
+          <div class="col-12 col-md-8 offset-md-2">
+            <ul class="row g-3 list-unstyled user-list">
+              <app-pagination-info [itemName]="'User'" [pagination]="pagination" *ngIf="data.users != null && data.users.length > 0 && pagination.maxPages > 1"></app-pagination-info>
+              <li class="col-6 col-sm-6 col-md-4 col-xl-3" *ngFor="let user of data.users">
+               <a class="link-light text-decoration-none" routerLink="/users/profile/{{user.id}}">
+                <div class="rounded overflow-hidden user-list-item">
+                  <div class="overflow-hidden ratio-1x1">
+                    <img draggable="false" class="user-select-none object-fit-cover cursor-pointer w-100 user-profile-img" src="/assets/pb.jpg" alt="">
                   </div>
-                  <div>
-                    {{user.bio}}
+                  <div class="text-center p-2">
+                    {{user.username}}
                   </div>
                 </div>
-              </a>
-
-            </ng-container>
-
-            <app-pagination-buttons [isLoading]="isReLoading" (pageSwitchEvent)="onPageSwitch($event)" [pagination]="pagination" *ngIf="data.users != null && data.users.length > 0 && pagination.maxPages > 1"></app-pagination-buttons>
-
+               </a>
+              </li>
+              <app-pagination-buttons [isLoading]="isReLoading" (pageSwitchEvent)="onPageSwitch($event)" [pagination]="pagination" *ngIf="data.users != null && data.users.length > 0 && pagination.maxPages > 1"></app-pagination-buttons>
+            </ul>
           </div>
-
-          <!--<div class="col-12 col-md-3">
-
-          Neuste User
-
-          </div>-->
-        </div>
-
-      </ng-container>
+        </div>      </ng-container>
 
     </div>
   </div>
