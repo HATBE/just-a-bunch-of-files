@@ -24,8 +24,6 @@ export class BikeListComponent implements OnInit {
       next: (data: any) => {
         this.isLoading = false;
         this.data = data.data
-
-        console.log(this.data)
       },
       error: (data: any) => {
         this.error = data.error.message || data.statusText || 'Unknown error';

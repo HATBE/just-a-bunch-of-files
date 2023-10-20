@@ -18,16 +18,11 @@ const routes: Routes = [
 
   {path: 'users/settings', component: UserSettingsPageComponent, title: 'Create Bike'},
   {path: 'users/list', component: UsersListPageComponent, title: 'Create Bike'},
-  {path: 'users/profile/:id', component: UserProfilePageComponent, title: 'Profile'},
+  {path: 'users/profile/:id/:tab', component: UserProfilePageComponent, title: 'Profile'},  // with tab
+  {path: 'users/profile/:id', component: UserProfilePageComponent, title: 'Profile'},       // without tab
+
 
   {path: 'bike/create', component: CreateBikePageComponent, title: 'Settings'},
-
-  {path: 'login', redirectTo: 'auth/login'},
-  {path: 'register', redirectTo: 'auth/register'},
-  {path: 'settings', redirectTo: 'users/settings'},
-  {path: 'users', redirectTo: 'users/list'},
-  {path: 'profile/:id', redirectTo: '/users/profile/:id'},
-  {path: 'p/:id', redirectTo: '/users/profile/:id'},
 
   {path: '**', redirectTo: '/'}
 ];

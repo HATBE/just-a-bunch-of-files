@@ -22,6 +22,10 @@ import { UserSettingsPageComponent } from './components/pages/users/user-setting
 import { UserDropdownComponent } from './components/shared/header/user-dropdown/user-dropdown.component';
 import { UsersListPageComponent } from './components/pages/users/users-list-page/users-list-page.component';
 import { BikeListComponent } from './components/shared/bike-list/bike-list.component';
+import { UserProfileFeedTabComponent } from './components/pages/users/user-profile-page/user-profile-feed-tab/user-profile-feed-tab.component';
+import { UserProfileAboutTabComponent } from './components/pages/users/user-profile-page/user-profile-about-tab/user-profile-about-tab.component';
+import { UserProfileFriendsTabComponent } from './components/pages/users/user-profile-page/user-profile-friends-tab/user-profile-friends-tab.component';
+import { UserProfileBikesTabComponent } from './components/pages/users/user-profile-page/user-profile-bikes-tab/user-profile-bikes-tab.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +46,10 @@ import { BikeListComponent } from './components/shared/bike-list/bike-list.compo
     UserDropdownComponent,
     UsersListPageComponent,
     BikeListComponent,
+    UserProfileFeedTabComponent,
+    UserProfileAboutTabComponent,
+    UserProfileFriendsTabComponent,
+    UserProfileBikesTabComponent,
   ],
   imports: [
     BrowserModule,

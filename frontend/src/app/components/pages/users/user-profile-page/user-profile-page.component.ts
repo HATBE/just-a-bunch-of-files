@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UsersService } from 'src/app/services/users.service';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 
 @Component({
@@ -19,11 +19,14 @@ export class UserProfilePageComponent implements OnInit {
   error: string = '';
   data: any = null;
 
+  tab: string | null =  'feed';
+
   constructor(
     private usersService: UsersService,
+    private router: Router,
     private route: ActivatedRoute,
     private title: Title,
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.isLoading = true;
@@ -45,7 +48,15 @@ export class UserProfilePageComponent implements OnInit {
           }
         });
       }
+
+      if(paramMap.has('tab')) {
+        this.tab = paramMap.get('tab');
+      }
     });
+  }
+
+  switchTab(tab: any) {
+    this.router.navigate([`/users/profile/${this.data.user.id}/${tab}`]);
   }
 
 }

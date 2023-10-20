@@ -11,43 +11,65 @@
 
   <ng-container *ngIf="!isLoading && !error">
 
-    <div class="card bg-dark rounded overflow-hidden shadow text-light mb-3">
-      <div class="card-body d-flex">
-        <div class="overflow-hidden ratio ratio-1x1 rounded profile-picture-size">
-          <img draggable="false" src="/assets/pb.jpg" class="object-fit-cover w-100 user-select-none">
+    <div class="bg-dark card rounded overflow-hidden shadow text-light mb-3">
+      <div class="card-body d-flex flex-column p-0">
+        <div class="profile-card-bg p-3 d-flex align-items-center">
+          <div class="overflow-hidden ratio ratio-1x1 rounded profile-picture-size border border-3 border-dark">
+            <img draggable="false" src="/assets/pb.jpg" class="object-fit-cover w-100 user-select-none">
+          </div>
+          <div class="ms-4 text-shadow">
+            <h4>{{data.user.username}}</h4>
+            <p>{{data.user.bio}}</p>
+          </div>
         </div>
-        <div>
-          <h5>{{data.user.username}}</h5>
-          <p>{{data.user.bio}}</p>
-        </div>
+        <nav>
+          <ul class="nav user-select-none">
+            <li class="nav-item">
+              <div class="nav-link text-light cursor-pointer" (click)="switchTab('feed')">Feed</div>
+            </li>
+            <li class="nav-item">
+              <div class="nav-link text-light cursor-pointer" (click)="switchTab('about')">Über mich</div>
+            </li>
+            <li class="nav-item">
+              <div class="nav-link text-light cursor-pointer" (click)="switchTab('friends')">Freunde</div>
+            </li>
+            <li class="nav-item">
+              <div class="nav-link text-light cursor-pointer" (click)="switchTab('bikes')">Garage</div>
+            </li>
+          </ul>
+        </nav>
       </div>
     </div>
 
-
     <div class="row g-3">
-      <div class="col-12 col-sm-12 col-md-3 col-xl-2">
-        <!-- LEFT -->
-        <div class="card bg-dark rounded overflow-hidden shadow text-light">
-          <div class="card-body">
-            left
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 col-sm-12 col-md-9 col-xl-7">
+      <div class="col-12 col-sm-12 col-md-7 col-xl-9">
         <!-- CENTER -->
         <div class="card bg-dark rounded overflow-hidden shadow text-light">
           <div class="card-body">
-            user feed
+            <div [ngSwitch]="tab">
+              <div *ngSwitchCase="'feed'">
+                <app-user-profile-feed-tab [userId]="data.user.id"></app-user-profile-feed-tab>
+              </div>
+              <div *ngSwitchCase="'about'">
+                <app-user-profile-about-tab [userId]="data.user.id"></app-user-profile-about-tab>
+              </div>
+              <div *ngSwitchCase="'friends'">
+                <app-user-profile-friends-tab [userId]="data.user.id"></app-user-profile-friends-tab>
+              </div>
+              <div *ngSwitchCase="'bikes'">
+                <app-user-profile-bikes-tab [userId]="data.user.id"></app-user-profile-bikes-tab>
+              </div>
+              <div *ngSwitchDefault>Tab not found!</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="col-12 col-sm-12 col-md-9 offset-md-3 offset-xl-0 col-xl-3">
+      <div class="col-12 col-sm-12 col-md-5 col-xl-3">
         <!-- RIGHT -->
         <div class="card bg-dark rounded overflow-hidden shadow text-light">
           <div class="card-body">
-            <app-bike-list [userId]="data.user.id"></app-bike-list>
+            right
           </div>
         </div>
       </div>
