@@ -11,7 +11,7 @@ import { LoginPageComponent } from './components/pages/auth/login-page/login-pag
 import { FooterComponent } from './components/shared/footer/footer.component';
 import { HeaderComponent } from './components/shared/header/header.component';
 import { IndexPageComponent } from './components/pages/index-page/index-page.component';
-import { ProfilePageComponent } from './components/pages/users/profile-page/profile-page.component';
+import { UserProfilePageComponent } from './components/pages/users/user-profile-page/user-profile-page.component';
 import { NavbtnComponent } from './components/shared/header/navbtn/navbtn.component';
 import { ResetPwPageComponent } from './components/pages/auth/reset-pw-page/reset-pw-page.component';
 import { LoadingSpinnerComponent } from './components/shared/loading-spinner/loading-spinner.component';
@@ -31,7 +31,7 @@ import { BikeListComponent } from './components/shared/bike-list/bike-list.compo
     FooterComponent,
     HeaderComponent,
     IndexPageComponent,
-    ProfilePageComponent,
+    UserProfilePageComponent,
     NavbtnComponent,
     ResetPwPageComponent,
     LoadingSpinnerComponent,

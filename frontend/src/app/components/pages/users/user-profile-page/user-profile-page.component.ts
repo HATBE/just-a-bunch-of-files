@@ -4,14 +4,14 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 
 @Component({
-  selector: 'app-profile-page',
-  templateUrl: './profile-page.component.html',
-  styleUrls: ['./profile-page.component.css'],
+  selector: 'app-user-profile-page',
+  templateUrl: './user-profile-page.component.html',
+  styleUrls: ['./user-profile-page.component.css'],
   providers: [
     Title
   ]
 })
-export class ProfilePageComponent implements OnInit {
+export class UserProfilePageComponent implements OnInit {
   isLoading: boolean = false;
 
   id: string | null = '';
@@ -36,7 +36,7 @@ export class ProfilePageComponent implements OnInit {
           next: (data: any) => {
             this.isLoading = false;
             this.data = data.data
-            this.title.setTitle(`Profile of ${this.data.user.username.toUpperCase()}`);
+            this.title.setTitle(`Profile of ${this.data.user.username}`);
           },
           error: (data: any) => {
             this.error = data.error.message || data.statusText || 'Unknown error';

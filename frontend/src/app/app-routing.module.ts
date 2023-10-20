@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { IndexPageComponent } from './components/pages/index-page/index-page.component';
 import { LoginPageComponent } from './components/pages/auth/login-page/login-page.component';
 import { RegisterPageComponent } from './components/pages/auth/register-page/register-page.component';
-import { ProfilePageComponent } from './components/pages/users/profile-page/profile-page.component';
+import { UserProfilePageComponent } from './components/pages/users/user-profile-page/user-profile-page.component';
 import { ResetPwPageComponent } from './components/pages/auth/reset-pw-page/reset-pw-page.component';
 import { CreateBikePageComponent } from './components/pages/bikes/create-bike-page/create-bike-page.component';
 import { UserSettingsPageComponent } from './components/pages/users/user-settings-page/user-settings-page.component';
@@ -18,7 +18,7 @@ const routes: Routes = [
 
   {path: 'users/settings', component: CreateBikePageComponent, title: 'Create Bike'},
   {path: 'users/list', component: UsersListPageComponent, title: 'Create Bike'},
-  {path: 'users/profile/:id', component: ProfilePageComponent, title: 'Profile'},
+  {path: 'users/profile/:id', component: UserProfilePageComponent, title: 'Profile'},
 
   {path: 'bike/create', component: UserSettingsPageComponent, title: 'Settings'},
 

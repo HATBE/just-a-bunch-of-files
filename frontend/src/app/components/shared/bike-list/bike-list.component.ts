@@ -7,7 +7,6 @@ import { UsersService } from 'src/app/services/users.service';
   styleUrls: ['./bike-list.component.css']
 })
 export class BikeListComponent implements OnInit {
-
   @Input() userId: number | null = null;
 
   isLoading: boolean = false;
