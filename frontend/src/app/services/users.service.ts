@@ -30,4 +30,7 @@ export class UsersService {
   getBikesFromUser(id: any, page: number = 1) {
     return this.http.get<{status: boolean, data: {users: [FullBikeModel], pagination: Pagination}}>(this.apiEndpoint  + id + "/bikes?page=" + page, {headers: this.authHeader});
   }
-}
+
+  changePassword(userid: any, oldPassword: string, newPassword: string) {
+    return this.http.patch(this.apiEndpoint + userid + "/password", {oldpassword: oldPassword, newpassword: newPassword}, {headers: this.authHeader});
+  }}

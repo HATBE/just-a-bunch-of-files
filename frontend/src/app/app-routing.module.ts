@@ -16,7 +16,7 @@ const routes: Routes = [
   {path: 'auth/register', component: RegisterPageComponent, title: 'Register'},
   {path: 'auth/reset-pw', component: ResetPwPageComponent, title: 'Reset PW'},
 
-  {path: 'users/settings', component: UserSettingsPageComponent, title: 'Create Bike'},
+  {path: 'users/settings', component: UserSettingsPageComponent, title: 'User settings'},
   {path: 'users/list', component: UsersListPageComponent, title: 'Create Bike'},
   {path: 'users/profile/:id/:tab', component: UserProfilePageComponent, title: 'Profile'},  // with tab
   {path: 'users/profile/:id', component: UserProfilePageComponent, title: 'Profile'},       // without tab

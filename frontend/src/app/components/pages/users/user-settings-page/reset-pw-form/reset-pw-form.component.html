@@ -1,1 +1,29 @@
-<p>reset-pw-form works!</p>
+<h5>Passwort ändern</h5>
+
+<div class="w-100 alert alert-danger" *ngIf="error">
+  <span class="fw-bold">Error!</span> {{error}}
+</div>
+<div class="w-100 alert alert-success" *ngIf="successMessage && !error">
+  <span class="fw-bold">Success!</span> {{successMessage}}
+</div>
+
+<form  [formGroup]="changePasswordForm" (submit)="onSubmitChangePassword()">
+  <div class="mb-2">
+    <label class="form-label">Current password</label>
+    <input formControlName="oldPassword" type="password" class="form-control text-light form-control bg-dark" placeholder="Current password">
+  </div>
+  <div class="mb-2">
+    <label class="form-label">New password</label>
+    <input formControlName="newPassword" type="password" class="form-control text-light form-control bg-dark" placeholder="New password">
+  </div>
+  <div class="mb-2">
+    <label class="form-label">Repeat new password</label>
+    <input formControlName="repeatNewPassword" type="password" class="form-control text-light form-control bg-dark" placeholder="Repeat new password">
+  </div>
+  <div>
+    <button type="submit" class="btn btn-primary">
+      <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+      <span *ngIf="!isLoading">Update password</span>
+    </button>
+  </div>
+</form>
