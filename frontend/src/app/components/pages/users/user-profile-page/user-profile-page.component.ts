@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UsersService } from 'src/app/services/users.service';
 import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-user-profile-page',
@@ -26,6 +27,7 @@ export class UserProfilePageComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private title: Title,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
@@ -56,7 +58,9 @@ export class UserProfilePageComponent implements OnInit {
   }
 
   switchTab(tab: any) {
-    this.router.navigate([`/users/profile/${this.data.user.id}/${tab}`]);
+    // change tab without update (just to have it in the url) (saves network traffic)
+    this.location.replaceState(`/users/profile/${this.data.user.id}/${tab}`);
+    this.tab = tab;
   }
 
 }
