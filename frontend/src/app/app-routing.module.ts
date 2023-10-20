@@ -8,6 +8,7 @@ import { ResetPwPageComponent } from './components/pages/auth/reset-pw-page/rese
 import { CreateBikePageComponent } from './components/pages/bikes/create-bike-page/create-bike-page.component';
 import { UserSettingsPageComponent } from './components/pages/users/user-settings-page/user-settings-page.component';
 import { UsersListPageComponent } from './components/pages/users/users-list-page/users-list-page.component';
+import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
   {path: '', component: IndexPageComponent, title: 'Index'},
@@ -16,13 +17,13 @@ const routes: Routes = [
   {path: 'auth/register', component: RegisterPageComponent, title: 'Register'},
   {path: 'auth/reset-pw', component: ResetPwPageComponent, title: 'Reset PW'},
 
-  {path: 'users/settings', component: UserSettingsPageComponent, title: 'User settings'},
-  {path: 'users/settings/:tab', component: UserSettingsPageComponent, title: 'User settings'},  // <- with tab
-  {path: 'users/list', component: UsersListPageComponent, title: 'Create Bike'},                // <- withOUT tab
-  {path: 'users/profile/:id/:tab', component: UserProfilePageComponent, title: 'Profile'},      // <- with tab
-  {path: 'users/profile/:id', component: UserProfilePageComponent, title: 'Profile'},           // <- withOUT tab
+  {path: 'users/settings', component: UserSettingsPageComponent, title: 'User settings', canActivate: [AuthGuard]},
+  {path: 'users/settings/:tab', component: UserSettingsPageComponent, title: 'User settings', canActivate: [AuthGuard]},  // <- with tab
+  {path: 'users/list', component: UsersListPageComponent, title: 'Create Bike'},                                          // <- withOUT tab
+  {path: 'users/profile/:id/:tab', component: UserProfilePageComponent, title: 'Profile'},                                // <- with tab
+  {path: 'users/profile/:id', component: UserProfilePageComponent, title: 'Profile'},                                     // <- withOUT tab
 
-  {path: 'bike/create', component: CreateBikePageComponent, title: 'Settings'},
+  {path: 'bike/create', component: CreateBikePageComponent, title: 'Settings', canActivate: [AuthGuard]},
 
   {path: '**', redirectTo: '/'}
 ];
