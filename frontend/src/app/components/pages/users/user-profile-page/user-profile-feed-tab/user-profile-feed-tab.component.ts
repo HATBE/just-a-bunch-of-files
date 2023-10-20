@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { faComment, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faComment, faHeart, faHeartCrack } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-user-profile-feed-tab',
@@ -8,6 +8,7 @@ import { faComment, faHeart } from '@fortawesome/free-solid-svg-icons';
 })
 export class UserProfileFeedTabComponent implements OnInit {
   faHeart = faHeart;
+  faHeartCrack = faHeartCrack;
   faComment = faComment
 
   @Input() userId: number | null = null;
