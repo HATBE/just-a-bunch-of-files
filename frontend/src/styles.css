@@ -76,10 +76,8 @@ input.bg-secondary::placeholder, textarea.bg-secondary::placeholder {
   opacity: 0.4;
 }
 .form-control, .form-select{
-  background-color: var(--bs-dark) !important;
+  background-color: var(--bs-black) !important;
   border: 0;
-  border-bottom: var(--bs-light) 1px solid !important;
-  border-radius: 0;
   color: var(--bs-light) !important;
 }
 .form-control::placeholder, .form-select::placeholder {
