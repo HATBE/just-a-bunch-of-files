@@ -24,6 +24,10 @@ class UsersService {
         return await usersRepository.doesEmailAddressExists(email_adress);
     }
 
+    async doesUserIdExist(user_id) {
+        return await usersRepository.doesUserIdExists(user_id);
+    }
+
     async createUser(email_address, username, password_hash, return_model = UsersService.MODELS.FULL_USER_MODEL) {
         const creation_date = Math.round(Date.now() / 1000); // unix timestamp in seconds
         const user = await usersRepository.createUser(email_address, username, password_hash, creation_date);
@@ -65,6 +69,12 @@ class UsersService {
         }
 
         return {users: userModelArray, pagination: pagination.getAsObject()};
+    }
+
+    async changePassword(user_id, password) {
+        const password_hash = await bcrypt.hash(password, await bcrypt.genSalt(10));
+        const change = await usersRepository.changePassword(user_id, password_hash);
+        return change ? true : false;
     }
 }
 

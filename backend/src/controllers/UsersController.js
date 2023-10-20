@@ -1,6 +1,7 @@
 const Validators = require('../utils/Validators');
 const UsersService = require('../services/UsersService');
 const BikesService = require('../services/BikesService');
+const UsersRepository = require('../repositories/UsersRepository');
 
 const usersService = new UsersService();
 const bikesService = new BikesService();
@@ -80,6 +81,58 @@ class UsersController {
             }
         });
 
+    }
+
+    async patchPassword(req, res) {
+        let {id} = req.params;
+
+        const validation = Validators.validateMulti(req.body, [
+            {
+                name: 'newpassword',
+                validateFor: Validators.VALIDATORS.PASSWORD
+            },
+            {
+                name: 'oldpassword',
+                validateFor: Validators.VALIDATORS.PASSWORD
+            }
+        ]);
+
+        if(!validation.status) {
+            return res.status(400).json({status: false, message: validation.message});
+        }
+
+        let {newpassword, oldpassword} = req.body;
+
+        // check if id user exists
+        if(!await usersService.doesUserIdExist(id)) {
+            return res.status(404).json({status: false, message: 'Dieser User wurde nicht gefunden!'});
+        }
+
+        const user = await usersService.getUserById(id, UsersService.MODELS.AUTH_USER_MODEL);
+
+        if(!user) {
+            return res.status(404).json({status: false, message: 'Dieser User wurde nicht gefunden!'});
+        }
+
+        // if you are not logged in as the user: then
+        if((req.user.getId() !== user.getId())) {
+            return res.status(401).json({status: false, message: 'Du bist nicht authorisiert diese aktion durchzuführen!'});
+        }
+
+        if(!await usersService.verifyPasswords(oldpassword, user.getPasswordHash())) {
+            return res.status(401).json({status: false, message: 'Das alte Passwort ist nicht korrekt!'});
+        }
+
+        const change = usersService.changePassword(user.getId(), newpassword);
+
+        if(!change) {
+            return res.status(500).json({status: false, message: 'Unexpected Error!'});
+        }
+
+        res.status(200).json({
+            status: true, 
+            message: 'Das Passwort wurde erfolgreich geändert.',
+        });
     }
 }
 

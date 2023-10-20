@@ -16,6 +16,14 @@ class UsersRepository extends AbstractRepository {
         return res ? (res[0] ? res[0].count >= 1 : false) : false;
     }
 
+    async doesUserIdExists(user_id) {
+        const {res, fields} = await this.sqlQuery(
+            'SELECT count(id) as count FROM users WHERE id LIKE ?', 
+            [user_id]
+        );
+        return res ? (res[0] ? res[0].count >= 1 : false) : false;
+    }
+
     async createUser(email_address, username, password_hash, creation_date) {
         const {res, fields} = await this.sqlQuery(
             'INSERT INTO users (email_address, bio, username, password_hash, creation_date) VALUES (?, ?, ?, ?, ?)', 
@@ -27,7 +35,7 @@ class UsersRepository extends AbstractRepository {
     async getUserById(id) {
         // FullUserModel
         const {res, fields} = await this.sqlQuery(
-            'SELECT id, username, bio, email_address, creation_date FROM users WHERE id LIKE ?',
+            'SELECT id, username, bio, email_address, creation_date, password_hash FROM users WHERE id LIKE ?',
             [id]
         );
         return res ? (res[0] ? res[0] : false) : false;
@@ -43,7 +51,6 @@ class UsersRepository extends AbstractRepository {
     }
 
     async getUserByUsername(username) {
-        // TODO: remove password_hash (it is used currently in authController)
         // FullUserModel
         const {res, fields} = await this.sqlQuery(
             'SELECT id, username, bio, email_address, creation_date, password_hash FROM users WHERE username LIKE ?',
@@ -65,6 +72,14 @@ class UsersRepository extends AbstractRepository {
             [start, limit]
         );
         return res ? res : false;
+    }
+
+    async changePassword(user_id, password_hash) {
+        const {res, fields} = await this.sqlQuery(
+            'UPDATE users SET password_hash = ? WHERE id LIKE ? ',
+            [password_hash, user_id]
+        );
+        return res ? true : false;
     }
 }
 
