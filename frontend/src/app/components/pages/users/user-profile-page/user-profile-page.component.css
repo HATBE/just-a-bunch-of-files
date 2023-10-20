@@ -2,6 +2,7 @@
   max-height: 100px !important;
   max-width: 100px !important;
 }
+
 .profile-card-bg {
   background: #1e3c72;  /* fallback for old browsers */
   background: -webkit-linear-gradient(to right, #2a5298, #1e3c72);  /* Chrome 10-25, Safari 5.1-6 */
@@ -13,3 +14,11 @@
   transition-duration: .2s;
 }
 
+.nav-link.active:hover {
+  color: var(--bs-light) !important;
+  transition-duration: .2s;
+}
+
+.nav-link.active {
+  color: var(--bs-primary) !important;
+}

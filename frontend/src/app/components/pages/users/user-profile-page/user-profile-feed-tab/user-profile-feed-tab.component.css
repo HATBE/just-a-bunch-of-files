@@ -1,0 +1,11 @@
+.profile-picture-size {
+  max-height: 50px !important;
+  max-width: 50px !important;
+}
+
+.ago-text {
+  font-size: 12px;
+}
+.username {
+  line-height: 12px !important;
+}

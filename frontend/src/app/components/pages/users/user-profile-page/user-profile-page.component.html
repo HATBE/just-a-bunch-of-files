@@ -23,18 +23,18 @@
           </div>
         </div>
         <nav>
-          <ul class="nav user-select-none">
+          <ul class="nav user-select-none fw-bold">
             <li class="nav-item">
-              <div class="nav-link text-light cursor-pointer" (click)="switchTab('feed')">Feed</div>
+              <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'feed'}" (click)="switchTab('feed')">Feed</div>
             </li>
             <li class="nav-item">
-              <div class="nav-link text-light cursor-pointer" (click)="switchTab('about')">Über mich</div>
+              <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'about'}" (click)="switchTab('about')">Über mich</div>
             </li>
             <li class="nav-item">
-              <div class="nav-link text-light cursor-pointer" (click)="switchTab('friends')">Freunde</div>
+              <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'friends'}" (click)="switchTab('friends')">Freunde</div>
             </li>
             <li class="nav-item">
-              <div class="nav-link text-light cursor-pointer" (click)="switchTab('bikes')">Garage</div>
+              <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'bikes'}" (click)="switchTab('bikes')">Garage</div>
             </li>
           </ul>
         </nav>
@@ -43,7 +43,7 @@
 
     <div class="row g-3">
       <div class="col-12 col-sm-12 col-md-7 col-xl-9">
-        <!-- CENTER -->
+        <!-- LEFT -->
         <div class="card bg-dark rounded overflow-hidden shadow text-light">
           <div class="card-body">
             <div [ngSwitch]="tab">

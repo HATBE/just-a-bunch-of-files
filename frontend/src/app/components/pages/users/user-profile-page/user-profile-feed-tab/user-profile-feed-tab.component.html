@@ -1,1 +1,28 @@
-Feed
+<h5>Feed</h5>
+<div class="row">
+  <div class="col-12 offset-md-1 col-md-10 offset-xl-3 col-xl-6" *ngFor="let i of [1,2,3,4,5,6,7,8,9]">
+   <div class="post p-3 border-bottom border-secondary">
+    <div class="d-flex align-items-center my-3">
+        <!--TOP-->
+        <div class="overflow-hidden ratio ratio-1x1 rounded profile-picture-size">
+          <img draggable="false" src="/assets/pb.jpg" class="object-fit-cover w-100 user-select-none">
+        </div>
+        <div class="ms-2 text-shadow">
+          <div class="fw-bold username">Username</div>
+          <small class="ago-text">vor 5 Tagen</small>
+        </div>
+    </div>
+    <div>
+      <!--CENTER-->
+      <div class="overflow-hidden ratio ratio-1x1 rounded w-100">
+        <img draggable="false" src="/assets/pb.jpg" class="object-fit-cover w-100 user-select-none">
+      </div>
+    </div>
+    <div class="my-2">
+      <!--BOTTOM-->
+      <button class="btn btn-danger"><fa-icon [icon]="faHeart"></fa-icon></button>
+      <button class="ms-2 btn btn-secondary"><fa-icon [icon]="faComment"></fa-icon></button>
+    </div>
+   </div>
+  </div>
+</div>
