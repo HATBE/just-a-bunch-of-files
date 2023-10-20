@@ -16,11 +16,11 @@ const routes: Routes = [
   {path: 'auth/register', component: RegisterPageComponent, title: 'Register'},
   {path: 'auth/reset-pw', component: ResetPwPageComponent, title: 'Reset PW'},
 
-  {path: 'users/settings', component: CreateBikePageComponent, title: 'Create Bike'},
+  {path: 'users/settings', component: UserSettingsPageComponent, title: 'Create Bike'},
   {path: 'users/list', component: UsersListPageComponent, title: 'Create Bike'},
   {path: 'users/profile/:id', component: UserProfilePageComponent, title: 'Profile'},
 
-  {path: 'bike/create', component: UserSettingsPageComponent, title: 'Settings'},
+  {path: 'bike/create', component: CreateBikePageComponent, title: 'Settings'},
 
   {path: 'login', redirectTo: 'auth/login'},
   {path: 'register', redirectTo: 'auth/register'},

@@ -1,40 +1,57 @@
 <div class="container">
-  <div class="card bg-dark rounded overflow-hidden shadow text-light">
-    <div class="card-body">
-      <!-- TODO:-->
-      <!-- if loading -->
-      <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+  <!-- if loading -->
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 
-      <!-- if not loading but error -->
-      <ng-container *ngIf="!isLoading && error">
-        <div class="alert alert-danger">
-          {{error}}
-        </div>
-      </ng-container>
-
-      <ng-container *ngIf="!isLoading && !error">
-        <div class="row g-3">
-          <div class="col-12 col-sm-12 col-md-4 col-xl-3">
-            <!-- LEFT -->
-            <div>
-              <div class="overflow-hidden ratio-1x1 rounded user-profile-img-wrapper">
-                <img draggable="false" class="user-select-none object-fit-cover w-100 user-profile-img" src="/assets/pb.jpg" alt="">
-              </div>
-              <div>
-                <h5>{{data.user.username}}</h5>
-                <p>{{data.user.bio}}</p>
-              </div>
-            </div>
-            <div>
-              <app-bike-list [userId]="data.user.id"></app-bike-list>
-            </div>
-          </div>
-          <div class="col-12 col-sm-12 col-md-8 col-xl-9">
-            <!-- RIGHT -->
-          </div>
-        </div>
-      </ng-container>
-
+  <!-- if not loading but error -->
+  <ng-container *ngIf="!isLoading && error">
+    <div class="alert alert-danger">
+      {{error}}
     </div>
-  </div>
+  </ng-container>
+
+  <ng-container *ngIf="!isLoading && !error">
+
+    <div class="card bg-dark rounded overflow-hidden shadow text-light mb-3">
+      <div class="card-body d-flex">
+        <div class="overflow-hidden ratio ratio-1x1 rounded profile-picture-size">
+          <img draggable="false" src="/assets/pb.jpg" class="object-fit-cover w-100 user-select-none">
+        </div>
+        <div>
+          <h5>{{data.user.username}}</h5>
+          <p>{{data.user.bio}}</p>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="row g-3">
+      <div class="col-12 col-sm-12 col-md-3 col-xl-2">
+        <!-- LEFT -->
+        <div class="card bg-dark rounded overflow-hidden shadow text-light">
+          <div class="card-body">
+            left
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-12 col-md-9 col-xl-7">
+        <!-- CENTER -->
+        <div class="card bg-dark rounded overflow-hidden shadow text-light">
+          <div class="card-body">
+            user feed
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-12 col-md-9 offset-md-3 offset-xl-0 col-xl-3">
+        <!-- RIGHT -->
+        <div class="card bg-dark rounded overflow-hidden shadow text-light">
+          <div class="card-body">
+            <app-bike-list [userId]="data.user.id"></app-bike-list>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
 </div>

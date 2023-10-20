@@ -1,4 +1,4 @@
-<div class="mt-3">
+<div>
   <div>
     <h5>Meine Garage</h5>
   </div>
@@ -15,7 +15,7 @@
     <ng-container *ngIf="!isLoading && !error">
       <div class="py-2 d-flex" *ngFor="let bike of data.bikes">
         <div style="width: 80px;">
-          <div class="ratio ratio-1x1">
+          <div class="ratio ratio-1x1 rounded overflow-hidden">
             <img draggable="false" src="/assets/pb.jpg" class="object-fit-cover w-100 user-select-none">
           </div>
         </div>
