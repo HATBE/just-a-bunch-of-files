@@ -17,10 +17,10 @@ const routes: Routes = [
   {path: 'auth/reset-pw', component: ResetPwPageComponent, title: 'Reset PW'},
 
   {path: 'users/settings', component: UserSettingsPageComponent, title: 'User settings'},
-  {path: 'users/list', component: UsersListPageComponent, title: 'Create Bike'},
-  {path: 'users/profile/:id/:tab', component: UserProfilePageComponent, title: 'Profile'},  // with tab
-  {path: 'users/profile/:id', component: UserProfilePageComponent, title: 'Profile'},       // without tab
-
+  {path: 'users/settings/:tab', component: UserSettingsPageComponent, title: 'User settings'},  // <- with tab
+  {path: 'users/list', component: UsersListPageComponent, title: 'Create Bike'},                // <- withOUT tab
+  {path: 'users/profile/:id/:tab', component: UserProfilePageComponent, title: 'Profile'},      // <- with tab
+  {path: 'users/profile/:id', component: UserProfilePageComponent, title: 'Profile'},           // <- withOUT tab
 
   {path: 'bike/create', component: CreateBikePageComponent, title: 'Settings'},
 

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UsersService } from 'src/app/services/users.service';
-import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import {Location} from '@angular/common';
 
@@ -24,7 +24,6 @@ export class UserProfilePageComponent implements OnInit {
 
   constructor(
     private usersService: UsersService,
-    private router: Router,
     private route: ActivatedRoute,
     private title: Title,
     private location: Location

@@ -1,7 +1,27 @@
 <div class="container">
   <div class="card bg-dark rounded overflow-hidden shadow text-light">
     <div class="card-body">
-      <app-reset-pw-form></app-reset-pw-form>
+
+      <nav>
+        <ul class="nav user-select-none fw-bold">
+          <li class="nav-item">
+            <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'change-pw'}" (click)="switchTab('change-pw')">Password ändern</div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'null'}" (click)="switchTab('null')">Null</div>
+          </li>
+        </ul>
+      </nav>
+
+      <div [ngSwitch]="tab">
+        <div *ngSwitchCase="'change-pw'">
+          <app-reset-pw-form></app-reset-pw-form>
+        </div>
+        <div *ngSwitchCase="'null'">
+          not implemented
+        </div>
+        <div *ngSwitchDefault>Tab not found!</div>
+      </div>
     </div>
   </div>
 </div>
