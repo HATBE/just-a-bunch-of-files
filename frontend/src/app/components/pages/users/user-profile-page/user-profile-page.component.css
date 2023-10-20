@@ -8,17 +8,3 @@
   background: -webkit-linear-gradient(to right, #2a5298, #1e3c72);  /* Chrome 10-25, Safari 5.1-6 */
   background: linear-gradient(to right, #2a5298, #1e3c72); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
-
-.nav-item:hover {
-  background-color: var(--bs-primary);
-  transition-duration: .2s;
-}
-
-.nav-link.active:hover {
-  color: var(--bs-light) !important;
-  transition-duration: .2s;
-}
-
-.nav-link.active {
-  color: var(--bs-primary) !important;
-}

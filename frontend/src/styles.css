@@ -146,3 +146,17 @@ label {
 .alert {
   margin: 0;
 }
+
+.tab-nav .nav-item:hover {
+  background-color: var(--bs-primary);
+  transition-duration: .2s;
+}
+
+.tab-nav .nav-link.active:hover {
+  color: var(--bs-light) !important;
+  transition-duration: .2s;
+}
+
+.tab-nav .nav-link.active {
+  color: var(--bs-primary) !important;
+}

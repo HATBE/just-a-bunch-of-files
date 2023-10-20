@@ -11,7 +11,7 @@ import {Location} from '@angular/common';
 export class UserSettingsPageComponent implements OnInit {
   isLoading: boolean = false;
 
-  tab: string | null =  'feed';
+  tab: string | null = 'personal';
 
   constructor(
     private route: ActivatedRoute,
