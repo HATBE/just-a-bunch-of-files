@@ -22,6 +22,8 @@ export class UserProfilePageComponent implements OnInit {
 
   tab: string | null =  'feed';
 
+  yourself: boolean = false;
+
   constructor(
     private usersService: UsersService,
     private route: ActivatedRoute,
@@ -41,6 +43,10 @@ export class UserProfilePageComponent implements OnInit {
             this.isLoading = false;
             this.data = data.data
             this.title.setTitle(`Profile of ${this.data.user.username}`);
+
+            if(data.data.user.id == localStorage.getItem('user_id')) {
+              this.yourself = true;
+            }
           },
           error: (data: any) => {
             this.error = data.error.message || data.statusText || 'Unknown error';

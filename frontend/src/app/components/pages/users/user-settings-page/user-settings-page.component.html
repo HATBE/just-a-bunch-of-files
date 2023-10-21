@@ -1,7 +1,7 @@
 <div class="container">
   <div class="card bg-dark rounded overflow-hidden shadow text-light mb-3">
     <div class="card-body">
-      <h5>Settings</h5>
+      <h5>Einstellungen</h5>
     </div>
   </div>
 
@@ -12,10 +12,13 @@
           <nav>
             <ul class="tab-nav nav user-select-none fw-bold d-flex flex-column">
               <li class="nav-item">
-                <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'personal'}" (click)="switchTab('personal')">Persönlich</div>
+                <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'profile'}" (click)="switchTab('profile')">Profil</div>
               </li>
               <li class="nav-item">
                 <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'change-pw'}" (click)="switchTab('change-pw')">Password ändern</div>
+              </li>
+              <li class="nav-item">
+                <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'bikes'}" (click)="switchTab('bikes')">Motorräder</div>
               </li>
             </ul>
           </nav>
@@ -30,8 +33,11 @@
             <div *ngSwitchCase="'change-pw'">
               <app-reset-pw-form></app-reset-pw-form>
             </div>
-            <div *ngSwitchCase="'personal'">
-              Persönlich
+            <div *ngSwitchCase="'bikes'">
+              Bikes
+            </div>
+            <div *ngSwitchCase="'profile'">
+              Profile
             </div>
             <div *ngSwitchDefault>Tab not found!</div>
           </div>
