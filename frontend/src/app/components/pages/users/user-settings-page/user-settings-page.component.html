@@ -8,7 +8,7 @@
   <div class="row g-3">
     <div class="col-12 col-md-3">
       <div class="card bg-dark rounded overflow-hidden shadow text-light">
-        <div class="card-body">
+        <div class="card-body p-0">
           <nav>
             <ul class="tab-nav nav user-select-none fw-bold d-flex flex-column">
               <li class="nav-item">
@@ -18,7 +18,7 @@
                 <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'change-pw'}" (click)="switchTab('change-pw')">Password ändern</div>
               </li>
               <li class="nav-item">
-                <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'bikes'}" (click)="switchTab('bikes')">Motorräder</div>
+                <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'bikes'}" (click)="switchTab('bikes')">Garage</div>
               </li>
             </ul>
           </nav>
@@ -34,7 +34,7 @@
               <app-reset-pw-form></app-reset-pw-form>
             </div>
             <div *ngSwitchCase="'bikes'">
-              Bikes
+              Garage
             </div>
             <div *ngSwitchCase="'profile'">
               Profile

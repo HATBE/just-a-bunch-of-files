@@ -18,15 +18,18 @@
             <div class="overflow-hidden ratio ratio-1x1 rounded profile-picture-size border border-3 border-dark">
               <img draggable="false" src="/assets/pb.jpg" class="object-fit-cover w-100 h-100 user-select-none">
             </div>
-            <div class="ms-4 text-shadow">
+            <div class="ms-4">
               <h4>{{data.user.username}}</h4>
-              <p>{{data.user.bio}}</p>
+              <p>134 Followers - 12 Following</p>
             </div>
           </div>
-          <div *ngIf="yourself">
-            <a routerLink="/users/settings/profile">
-              <button class="btn btn-primary">Bearbeiten</button>
+          <div  class="d-flex flex-column align-items-end">
+            <a draggable="false" *ngIf="yourself" routerLink="/users/settings/profile" class="my-1">
+              <button class="btn btn-primary"><fa-icon [icon]="faPen"></fa-icon></button>
             </a>
+            <span *ngIf="!yourself" class="my-1"><!-- TODO! -->
+              <button class="btn btn-danger"><fa-icon [icon]="faUserPlus"></fa-icon></button>
+            </span>
           </div>
         </div>
         <nav>
