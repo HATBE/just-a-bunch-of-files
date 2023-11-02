@@ -26,7 +26,8 @@ import { UserProfileFeedTabComponent } from './components/pages/users/user-profi
 import { UserProfileAboutTabComponent } from './components/pages/users/user-profile-page/user-profile-about-tab/user-profile-about-tab.component';
 import { UserProfileFriendsTabComponent } from './components/pages/users/user-profile-page/user-profile-friends-tab/user-profile-friends-tab.component';
 import { UserProfileBikesTabComponent } from './components/pages/users/user-profile-page/user-profile-bikes-tab/user-profile-bikes-tab.component';
-import { ResetPwFormComponent } from './components/pages/users/user-settings-page/reset-pw-form/reset-pw-form.component';
+import { ResetPwFormComponent } from './components/pages/users/user-settings-page/reset-pw-form-tab/reset-pw-form-tab.component';
+import { ManageBikesTabComponent } from './components/pages/users/user-settings-page/manage-bikes-tab/manage-bikes-tab.component';
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { ResetPwFormComponent } from './components/pages/users/user-settings-pag
     UserProfileFriendsTabComponent,
     UserProfileBikesTabComponent,
     ResetPwFormComponent,
+    ManageBikesTabComponent,
   ],
   imports: [
     BrowserModule,

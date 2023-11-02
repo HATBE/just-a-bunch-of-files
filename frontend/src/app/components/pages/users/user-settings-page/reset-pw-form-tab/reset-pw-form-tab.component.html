@@ -20,7 +20,7 @@
     <label class="form-label">Neues Passwort wiederholen</label>
     <input formControlName="repeatNewPassword" type="password" class="form-control text-light form-control bg-dark" placeholder="Neues Passwort wiederholen">
   </div>
-  <div>
+  <div class="mt-4">
     <button type="submit" class="btn btn-primary">
       <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
       <span *ngIf="!isLoading">Password ändern</span>

@@ -4,8 +4,8 @@ import { UsersService } from 'src/app/services/users.service';
 
 @Component({
   selector: 'app-reset-pw-form',
-  templateUrl: './reset-pw-form.component.html',
-  styleUrls: ['./reset-pw-form.component.css']
+  templateUrl: './reset-pw-form-tab.component.html',
+  styleUrls: ['./reset-pw-form-tab.component.css']
 })
 export class ResetPwFormComponent implements OnInit {
   isLoading: boolean = false;
