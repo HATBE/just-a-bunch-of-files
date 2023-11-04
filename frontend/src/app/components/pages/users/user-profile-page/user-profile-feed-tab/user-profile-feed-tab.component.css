@@ -10,3 +10,31 @@
 .username {
   line-height: 12px !important;
 }
+
+.post-header {grid-area: post-header;}
+.post-center-left {grid-area: post-center-left;}
+.post-center-right {grid-area: post-center-right;}
+.post-bottom {grid-area: post-bottom;}
+
+.post {
+  display: grid;
+  grid-gap: 10px;
+  grid-template:
+  'post-center-left post-header'
+  'post-center-left post-center-right'
+  'post-center-left post-bottom';
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 60% 40%;
+}
+
+@media screen and (max-width: 1200px) {
+  .post {
+    grid-template:
+    'post-header'
+    'post-center-left'
+    'post-center-right'
+    'post-bottom';
+    grid-template-rows: auto auto auto auto;
+    grid-template-columns: 100%;
+  }
+}
