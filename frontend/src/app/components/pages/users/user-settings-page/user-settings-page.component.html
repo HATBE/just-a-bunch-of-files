@@ -12,13 +12,13 @@
           <nav>
             <ul class="tab-nav nav user-select-none fw-bold d-flex flex-column">
               <li class="nav-item">
-                <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'profile'}" (click)="switchTab('profile')">Profil</div>
+                <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'profile'}" (click)="switchTab('profile')"><fa-icon class="me-1" [icon]="faUser"></fa-icon> Profil</div>
               </li>
               <li class="nav-item">
-                <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'change-pw'}" (click)="switchTab('change-pw')">Password ändern</div>
+                <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'change-pw'}" (click)="switchTab('change-pw')"><fa-icon class="me-1" [icon]="faLock"></fa-icon> Password ändern</div>
               </li>
               <li class="nav-item">
-                <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'bikes'}" (click)="switchTab('bikes')">Garage</div>
+                <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'bikes'}" (click)="switchTab('bikes')"><fa-icon class="me-1" [icon]="faMotorcycle"></fa-icon> Garage</div>
               </li>
             </ul>
           </nav>

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 
 import {Location} from '@angular/common';
+import { faLock, faMotorcycle, faUser } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-user-settings-page',
@@ -9,6 +10,10 @@ import {Location} from '@angular/common';
   styleUrls: ['./user-settings-page.component.css']
 })
 export class UserSettingsPageComponent implements OnInit {
+  faUser = faUser;
+  faLock = faLock;
+  faMotorcycle = faMotorcycle;
+
   isLoading: boolean = false;
 
   tab: string | null = 'profile';
