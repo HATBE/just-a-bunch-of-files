@@ -23,14 +23,6 @@
               <p>134 Followers - 12 Following</p>
             </div>
           </div>
-          <div  class="d-flex flex-column align-items-end">
-            <a draggable="false" *ngIf="yourself" routerLink="/users/settings/profile" class="my-1">
-              <button class="btn btn-primary"><fa-icon [icon]="faPen"></fa-icon></button>
-            </a>
-            <span *ngIf="!yourself" class="my-1"><!-- TODO! -->
-              <button class="btn btn-danger"><fa-icon [icon]="faUserPlus"></fa-icon></button>
-            </span>
-          </div>
         </div>
         <nav>
           <ul class="tab-nav nav user-select-none fw-bold">
@@ -52,6 +44,23 @@
     </div>
 
     <div class="row g-3">
+
+      <div class="col-12 col-sm-12 col-md-5 col-xl-3">
+        <!-- RIGHT -->
+        <div class="card bg-dark rounded overflow-hidden shadow text-light">
+          <div class="card-body">
+            <div>
+              <a draggable="false" *ngIf="yourself" routerLink="/users/settings/profile" class="my-1">
+                <button class="btn btn-primary"><fa-icon [icon]="faPen"></fa-icon> Profil bearbeiten</button>
+              </a>
+              <span *ngIf="!yourself" class="my-1"><!-- TODO! -->
+                <button class="btn btn-success"><fa-icon [icon]="faUserPlus"></fa-icon> User folgen</button>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="col-12 col-sm-12 col-md-7 col-xl-9">
         <!-- LEFT -->
         <div class="card bg-dark rounded overflow-hidden shadow text-light">
@@ -75,14 +84,6 @@
         </div>
       </div>
 
-      <div class="col-12 col-sm-12 col-md-5 col-xl-3">
-        <!-- RIGHT -->
-        <div class="card bg-dark rounded overflow-hidden shadow text-light">
-          <div class="card-body">
-            right
-          </div>
-        </div>
-      </div>
     </div>
 
   </ng-container>

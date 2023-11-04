@@ -16,6 +16,7 @@ export class UserProfileFeedTabComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+
   }
 
 }
