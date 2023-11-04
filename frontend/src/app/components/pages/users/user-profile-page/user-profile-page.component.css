@@ -3,8 +3,21 @@
  width: 100px !important;
 }
 
-.profile-card-bg {
+.profile-card {
   background: #1e3c72;  /* fallback for old browsers */
   background: -webkit-linear-gradient(to right, #2a5298, #1e3c72);  /* Chrome 10-25, Safari 5.1-6 */
   background: linear-gradient(to right, #2a5298, #1e3c72); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media screen and (max-width: 1200px) {
+  .profile-card {
+
+  }
+
+  .follow-button {
+
+  }
 }

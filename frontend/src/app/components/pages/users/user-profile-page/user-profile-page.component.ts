@@ -3,7 +3,7 @@ import { UsersService } from 'src/app/services/users.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import {Location} from '@angular/common';
-import { faAddressBook, faBars, faMotorcycle, faPen, faUserPlus, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faAddressBook, faBars, faCaretLeft, faMotorcycle, faPen, faUserPlus, faUsers } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-user-profile-page',
@@ -20,7 +20,7 @@ export class UserProfilePageComponent implements OnInit {
   faAddressCard = faAddressBook;
   faUsers = faUsers;
   faBars = faBars;
-
+  faCaretLeft = faCaretLeft;
 
   isLoading: boolean = false;
 
