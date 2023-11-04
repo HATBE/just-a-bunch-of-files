@@ -27,16 +27,16 @@
         <nav>
           <ul class="tab-nav nav user-select-none fw-bold">
             <li class="nav-item">
-              <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'feed'}" (click)="switchTab('feed')">Feed</div>
+              <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'feed'}" (click)="switchTab('feed')"><fa-icon class="me-1" [icon]="faBars"></fa-icon> Feed</div>
             </li>
             <li class="nav-item">
-              <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'about'}" (click)="switchTab('about')">Über mich</div>
+              <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'about'}" (click)="switchTab('about')"><fa-icon class="me-1" [icon]="faAddressCard"></fa-icon> Über mich</div>
             </li>
             <li class="nav-item">
-              <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'friends'}" (click)="switchTab('friends')">Freunde</div>
+              <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'friends'}" (click)="switchTab('friends')"><fa-icon class="me-1" [icon]="faUsers"></fa-icon> Freunde</div>
             </li>
             <li class="nav-item">
-              <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'bikes'}" (click)="switchTab('bikes')">Garage</div>
+              <div class="nav-link text-light cursor-pointer" [ngClass]="{'active': tab == 'bikes'}" (click)="switchTab('bikes')"><fa-icon class="me-1" [icon]="faMotorcycle"></fa-icon> Garage</div>
             </li>
           </ul>
         </nav>

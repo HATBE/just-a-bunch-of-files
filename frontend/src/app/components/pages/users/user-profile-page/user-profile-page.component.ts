@@ -3,7 +3,7 @@ import { UsersService } from 'src/app/services/users.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import {Location} from '@angular/common';
-import { faPen, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { faAddressBook, faBars, faMotorcycle, faPen, faUserPlus, faUsers } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-user-profile-page',
@@ -16,6 +16,11 @@ import { faPen, faUserPlus } from '@fortawesome/free-solid-svg-icons';
 export class UserProfilePageComponent implements OnInit {
   faPen = faPen;
   faUserPlus = faUserPlus;
+  faMotorcycle = faMotorcycle;
+  faAddressCard = faAddressBook;
+  faUsers = faUsers;
+  faBars = faBars;
+
 
   isLoading: boolean = false;
 
