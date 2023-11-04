@@ -21,11 +21,11 @@ class Validators {
 
         const checkBodyFields = Validators.checkIfKeysExistsInArray(validationObject, mustBeInArray);
 
-        if(!checkBodyFields.status) return {status: false, message: `There are some fields missing: "${checkBodyFields.res.join('", "')}". Please add them!`};
+        if(!checkBodyFields.status) return {status: false, message: `Es fehlen folgende Felder: "${checkBodyFields.res.join('", "')}". Bitte füge diese hinzu!`};
 
         for(let format of formats) {
             if(!format.validateFor(validationObject[format.name])) {
-                return {status: false, message: `The "${format.name}" has a wrong format`};
+                return {status: false, message: `Das Feld: "${format.name}" hat ein falsches Format!`};
             }
         }
 
