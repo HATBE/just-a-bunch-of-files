@@ -33,18 +33,24 @@
   'post-center-left post-bottom';
   grid-template-rows: auto 1fr auto;
   grid-template-columns: 60% 40%;
-
   border-bottom: 1px var(--bs-secondary) solid;
 }
 
 .post-center-right {
-  overflow: hidden;
-  height: auto;
+  height: 407px;
+  overflow-y: scroll;
 }
 
 .post:last-child {
   border: none;
 }
+
+@media screen and (max-width: 1400px) {
+  .post-center-right {
+    height: 326px;
+  }
+}
+
 
 @media screen and (max-width: 1200px) {
   .post {
@@ -55,6 +61,11 @@
     'post-bottom';
     grid-template-rows: auto auto auto auto;
     grid-template-columns: 100%;
+  }
+
+  .post-center-right {
+    overflow: inherit;
+    height: inherit;
   }
 
   .post-header {
