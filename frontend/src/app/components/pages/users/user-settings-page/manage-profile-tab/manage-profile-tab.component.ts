@@ -18,9 +18,8 @@ export class ManageProfileTabComponent implements OnInit {
     private userService: UsersService,
   ) {
     this.profileSettingsForm = this.formBuilder.group({
-      a: '',
-      b: '',
-      c: ''
+      username: '',
+      email: ''
     });
   }
 
