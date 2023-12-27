@@ -1,0 +1,22 @@
+- [] GET /auth/login
+- [] POST /auth/login
+- [] POST /auth/register
+
+- [] GET /users?page=1&query=term
+- [] GET /users/:userid/:model
+- [] POST /users
+- [] PATCH /users/:userid
+- [] PATCH /users/:userid/password
+- [] DELETE /users/:userid
+
+- [] GET /posts?page=1&query=term
+- [] GET /posts/:postid/:model
+- [] GET /posts/user/:userid?page=1&query=term
+- [] POST /posts
+- [] PATCH /posts/:postid
+- [] DELETE /posts/:postid
+
+- [] GET /bikes/user/:userid/:model
+- [] POST /bikes
+- [] PATCH /bikes/:bikeid
+- [] DELETE /bikes/:bikeid

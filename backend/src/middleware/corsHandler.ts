@@ -1,10 +1,9 @@
-const cors = require('cors');
+import cors from 'cors';
+import { Express } from 'express'
 
-function corsHandler(app) {
-    // cors
+export default function corsHandler(app: Express) {
     app.use('*', cors({
         methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'],
         origin: process.env.URL_FRONTEND || 'https://localhost:4200'
     }));
 }
-module.exports = corsHandler;
