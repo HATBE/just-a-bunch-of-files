@@ -1,0 +1,74 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0" version="29.6.1">
+  <diagram name="Seite-1" id="ornWVSXtOIS0kl2FwLlV">
+    <mxGraphModel dx="1126" dy="428" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="LwVCXZe8OK--BthZo8oG-3" edge="1" parent="1" source="LwVCXZe8OK--BthZo8oG-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="LwVCXZe8OK--BthZo8oG-2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="160" y="250" />
+              <mxPoint x="160" y="250" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LwVCXZe8OK--BthZo8oG-6" edge="1" parent="1" source="LwVCXZe8OK--BthZo8oG-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="LwVCXZe8OK--BthZo8oG-5">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="280" y="240" />
+              <mxPoint x="280" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LwVCXZe8OK--BthZo8oG-10" edge="1" parent="1" source="LwVCXZe8OK--BthZo8oG-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="LwVCXZe8OK--BthZo8oG-9">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="400" y="240" />
+              <mxPoint x="400" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LwVCXZe8OK--BthZo8oG-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="/" vertex="1">
+          <mxGeometry height="60" width="480" x="120" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="LwVCXZe8OK--BthZo8oG-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="/upload" vertex="1">
+          <mxGeometry height="60" width="80" x="120" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="LwVCXZe8OK--BthZo8oG-8" edge="1" parent="1" source="LwVCXZe8OK--BthZo8oG-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="LwVCXZe8OK--BthZo8oG-7">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="300" y="370" />
+              <mxPoint x="300" y="370" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LwVCXZe8OK--BthZo8oG-15" edge="1" parent="1" source="LwVCXZe8OK--BthZo8oG-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="LwVCXZe8OK--BthZo8oG-14">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="370" />
+              <mxPoint x="160" y="370" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LwVCXZe8OK--BthZo8oG-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="/albums" vertex="1">
+          <mxGeometry height="60" width="80" x="240" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="LwVCXZe8OK--BthZo8oG-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="/albums/create" vertex="1">
+          <mxGeometry height="60" width="80" x="240" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="LwVCXZe8OK--BthZo8oG-12" edge="1" parent="1" source="LwVCXZe8OK--BthZo8oG-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="LwVCXZe8OK--BthZo8oG-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LwVCXZe8OK--BthZo8oG-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="/:id" vertex="1">
+          <mxGeometry height="60" width="80" x="360" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="LwVCXZe8OK--BthZo8oG-11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="/:id/edit" vertex="1">
+          <mxGeometry height="60" width="80" x="360" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="LwVCXZe8OK--BthZo8oG-14" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="/albums/:id/edit" vertex="1">
+          <mxGeometry height="60" width="80" x="120" y="400" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
