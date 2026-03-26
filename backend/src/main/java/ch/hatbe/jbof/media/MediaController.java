@@ -1,7 +1,6 @@
 package ch.hatbe.jbof.media;
 
 import ch.hatbe.jbof.media.entity.MediaDtos;
-import ch.hatbe.jbof.media.entity.MediaKind;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -22,27 +21,18 @@ import java.util.UUID;
 public class MediaController {
     private final MediaService service;
 
-    @PostMapping("/images")
-    public MediaDtos.DetailResponse uploadImage(
-            @RequestParam UUID ownerUserId,
+    @PostMapping
+    public MediaDtos.DetailResponse upload(
+            @RequestParam UUID userId,
             @RequestParam(required = false) List<UUID> albumIds,
             @RequestParam("file") MultipartFile file
     ) throws IOException {
-        return service.upload(MediaKind.IMAGE, ownerUserId, albumIds, file);
-    }
-
-    @PostMapping("/videos")
-    public MediaDtos.DetailResponse uploadVideo(
-            @RequestParam UUID ownerUserId,
-            @RequestParam(required = false) List<UUID> albumIds,
-            @RequestParam("file") MultipartFile file
-    ) throws IOException {
-        return service.upload(MediaKind.VIDEO, ownerUserId, albumIds, file);
+        return service.upload(userId, albumIds, file);
     }
 
     @GetMapping
-    public List<MediaDtos.ListResponse> findAll(@RequestParam(required = false) UUID ownerUserId) {
-        return service.findAll(ownerUserId);
+    public List<MediaDtos.ListResponse> findAll(@RequestParam(required = false) UUID userId) {
+        return service.findAll(userId);
     }
 
     @GetMapping("/{fileId}")

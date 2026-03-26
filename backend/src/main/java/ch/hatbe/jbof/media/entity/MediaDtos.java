@@ -1,5 +1,7 @@
 package ch.hatbe.jbof.media.entity;
 
+import ch.hatbe.jbof.user.entity.UserDtos;
+
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -12,7 +14,7 @@ public class MediaDtos {
 
     public record ListResponse(
             UUID fileId,
-            UUID ownerUserId,
+            UserDtos.ListResponse user,
             MediaKind kind,
             String originalFilename,
             String bucket,
@@ -24,7 +26,7 @@ public class MediaDtos {
 
     public record DetailResponse(
             UUID fileId,
-            UUID ownerUserId,
+            UserDtos.ListResponse user,
             MediaKind kind,
             String originalFilename,
             String bucket,

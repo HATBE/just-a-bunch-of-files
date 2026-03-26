@@ -16,26 +16,19 @@ public class UserService {
 
     public UserDtos.ListResponse create(UserDtos.CreateUserRequest request) {
         UsersRecord record = repository.create(request.username());
-        return toResponse(record);
+        return UserMapper.toListResponse(record);
     }
 
     public List<UserDtos.ListResponse> findAll() {
         return repository.findAll()
                 .stream()
-                .map(this::toResponse)
+                .map(UserMapper::toListResponse)
                 .toList();
     }
 
     public UserDtos.ListResponse findById(UUID userId) {
         return repository.findById(userId)
-                .map(this::toResponse)
+                .map(UserMapper::toListResponse)
                 .orElseThrow(() -> new NotFoundException("user not found"));
-    }
-
-    private UserDtos.ListResponse toResponse(UsersRecord record) {
-        return new UserDtos.ListResponse(
-                record.getUserId(),
-                record.getUsername()
-        );
     }
 }

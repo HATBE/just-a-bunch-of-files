@@ -5,7 +5,9 @@ import ch.hatbe.jbof.core.exception.NotFoundException;
 import ch.hatbe.jbof.jooq.tables.records.AlbumsRecord;
 import ch.hatbe.jbof.media.MediaService;
 import ch.hatbe.jbof.media.entity.MediaDtos;
+import ch.hatbe.jbof.user.entity.UserDtos;
 import ch.hatbe.jbof.user.UserRepository;
+import ch.hatbe.jbof.user.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,18 +22,18 @@ public class AlbumService {
     private final MediaService mediaService;
 
     public AlbumDtos.ListResponse create(AlbumDtos.CreateAlbumRequest request) {
-        if (!userRepository.existsById(request.ownerUserId())) {
+        if (!userRepository.existsById(request.userId())) {
             throw new NotFoundException("user not found");
         }
 
-        AlbumsRecord record = repository.create(request.ownerUserId(), request.name());
-        return toListResponse(record);
+        AlbumsRecord record = repository.create(request.userId(), request.name());
+        return AlbumMapper.toListResponse(record, getUserSummary(record.getOwnerUserId()));
     }
 
     public List<AlbumDtos.ListResponse> findAll() {
         return repository.findAll()
                 .stream()
-                .map(this::toListResponse)
+                .map(record -> AlbumMapper.toListResponse(record, getUserSummary(record.getOwnerUserId())))
                 .toList();
     }
 
@@ -41,13 +43,7 @@ public class AlbumService {
 
         List<MediaDtos.ListResponse> files = mediaService.findByAlbumId(albumId);
 
-        return new AlbumDtos.DetailResponse(
-                record.getAlbumId(),
-                record.getOwnerUserId(),
-                record.getName(),
-                record.getCreatedAt(),
-                files
-        );
+        return AlbumMapper.toDetailResponse(record, getUserSummary(record.getOwnerUserId()), files);
     }
 
     public void addFile(UUID albumId, UUID fileId) {
@@ -58,12 +54,9 @@ public class AlbumService {
         mediaService.removeFromAlbum(albumId, fileId);
     }
 
-    private AlbumDtos.ListResponse toListResponse(AlbumsRecord record) {
-        return new AlbumDtos.ListResponse(
-                record.getAlbumId(),
-                record.getOwnerUserId(),
-                record.getName(),
-                record.getCreatedAt()
-        );
+    private UserDtos.ListResponse getUserSummary(UUID userId) {
+        return userRepository.findById(userId)
+                .map(UserMapper::toListResponse)
+                .orElseThrow(() -> new NotFoundException("user not found"));
     }
 }

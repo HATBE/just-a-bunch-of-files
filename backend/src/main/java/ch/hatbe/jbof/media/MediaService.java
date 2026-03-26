@@ -7,7 +7,10 @@ import ch.hatbe.jbof.media.entity.MediaDtos;
 import ch.hatbe.jbof.media.entity.MediaKind;
 import ch.hatbe.jbof.storage.StorageService;
 import ch.hatbe.jbof.user.UserRepository;
+import ch.hatbe.jbof.user.entity.UserDtos;
+import ch.hatbe.jbof.user.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.ResponseInputStream;
@@ -29,25 +32,26 @@ public class MediaService {
     private final StorageService storageService;
 
     public MediaDtos.DetailResponse upload(
-            MediaKind kind,
-            UUID ownerUserId,
+            UUID userId,
             List<UUID> albumIds,
             MultipartFile file
     ) throws IOException {
-        if (!userRepository.existsById(ownerUserId)) {
+        if (!userRepository.existsById(userId)) {
             throw new NotFoundException("user not found");
         }
 
-        validateAlbums(ownerUserId, albumIds);
+        validateAlbums(userId, albumIds);
+
+        MediaKind kind = detectKind(file);
 
         String bucket = bucketFor(kind);
         String key = storageService.upload(bucket, file);
         String contentType = file.getContentType() == null || file.getContentType().isBlank()
-                ? "application/octet-stream"
+                ? MediaType.APPLICATION_OCTET_STREAM_VALUE
                 : file.getContentType();
 
         MediaFilesRecord record = repository.create(
-                ownerUserId,
+                userId,
                 kind.name(),
                 bucket,
                 key,
@@ -65,14 +69,14 @@ public class MediaService {
         return toDetailResponse(record);
     }
 
-    public List<MediaDtos.ListResponse> findAll(UUID ownerUserId) {
-        if (ownerUserId != null && !userRepository.existsById(ownerUserId)) {
+    public List<MediaDtos.ListResponse> findAll(UUID userId) {
+        if (userId != null && !userRepository.existsById(userId)) {
             throw new NotFoundException("user not found");
         }
 
-        return repository.findAll(ownerUserId)
+        return repository.findAll(userId)
                 .stream()
-                .map(this::toListResponse)
+                .map(record -> MediaMapper.toListResponse(record, getUserSummary(record.getOwnerUserId())))
                 .toList();
     }
 
@@ -90,7 +94,7 @@ public class MediaService {
 
         return repository.findByAlbumId(albumId)
                 .stream()
-                .map(this::toListResponse)
+                .map(record -> MediaMapper.toListResponse(record, getUserSummary(record.getOwnerUserId())))
                 .toList();
     }
 
@@ -151,24 +155,31 @@ public class MediaService {
         };
     }
 
+    private MediaKind detectKind(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("file is empty");
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null || contentType.isBlank()) {
+            throw new IllegalArgumentException("content type is missing");
+        }
+
+        if (contentType.startsWith("image/")) {
+            return MediaKind.IMAGE;
+        }
+
+        if (contentType.startsWith("video/")) {
+            return MediaKind.VIDEO;
+        }
+
+        throw new IllegalArgumentException("only image and video uploads are supported");
+    }
+
     private String originalFilename(MultipartFile file) {
         return file.getOriginalFilename() == null || file.getOriginalFilename().isBlank()
                 ? "file"
                 : file.getOriginalFilename();
-    }
-
-    private MediaDtos.ListResponse toListResponse(MediaFilesRecord record) {
-        return new MediaDtos.ListResponse(
-                record.getFileId(),
-                record.getOwnerUserId(),
-                MediaKind.valueOf(record.getKind()),
-                record.getOriginalFilename(),
-                record.getBucket(),
-                record.getObjectKey(),
-                record.getContentType(),
-                record.getSizeBytes(),
-                record.getUploadedAt()
-        );
     }
 
     private MediaDtos.DetailResponse toDetailResponse(MediaFilesRecord record) {
@@ -177,17 +188,12 @@ public class MediaService {
                 .map(album -> new MediaDtos.AlbumReference(album.value1(), album.value2()))
                 .toList();
 
-        return new MediaDtos.DetailResponse(
-                record.getFileId(),
-                record.getOwnerUserId(),
-                MediaKind.valueOf(record.getKind()),
-                record.getOriginalFilename(),
-                record.getBucket(),
-                record.getObjectKey(),
-                record.getContentType(),
-                record.getSizeBytes(),
-                record.getUploadedAt(),
-                albums
-        );
+        return MediaMapper.toDetailResponse(record, getUserSummary(record.getOwnerUserId()), albums);
+    }
+
+    private UserDtos.ListResponse getUserSummary(UUID userId) {
+        return userRepository.findById(userId)
+                .map(UserMapper::toListResponse)
+                .orElseThrow(() -> new NotFoundException("user not found"));
     }
 }

@@ -1,6 +1,7 @@
 package ch.hatbe.jbof.album.entity;
 
 import ch.hatbe.jbof.media.entity.MediaDtos;
+import ch.hatbe.jbof.user.entity.UserDtos;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -10,14 +11,14 @@ import java.util.UUID;
 
 public class AlbumDtos {
     public record CreateAlbumRequest(
-            @NotNull UUID ownerUserId,
+            @NotNull UUID userId,
             @NotBlank String name
     ) {
     }
 
     public record ListResponse(
             UUID albumId,
-            UUID ownerUserId,
+            UserDtos.ListResponse user,
             String name,
             OffsetDateTime createdAt
     ) {
@@ -25,7 +26,7 @@ public class AlbumDtos {
 
     public record DetailResponse(
             UUID albumId,
-            UUID ownerUserId,
+            UserDtos.ListResponse user,
             String name,
             OffsetDateTime createdAt,
             List<MediaDtos.ListResponse> files
