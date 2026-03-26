@@ -1,0 +1,30 @@
+<section class="page">
+  <h1>Upload image</h1>
+
+  <label class="field">
+    <span>User ID</span>
+    <input [ngModel]="userId()" (ngModelChange)="userId.set($event)" type="text" />
+  </label>
+
+  <label class="field">
+    <span>Album IDs (comma separated, optional)</span>
+    <input [ngModel]="albumIds()" (ngModelChange)="albumIds.set($event)" type="text" />
+  </label>
+
+  <label class="field">
+    <span>File</span>
+    <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+  </label>
+
+  <button type="button" (click)="upload()" [disabled]="isUploading()">
+    {{ isUploading() ? 'Uploading...' : 'Upload' }}
+  </button>
+
+  @if (errorMessage()) {
+    <p>{{ errorMessage() }}</p>
+  }
+
+  @if (successMessage()) {
+    <p>{{ successMessage() }}</p>
+  }
+</section>

@@ -1,6 +1,7 @@
 package ch.hatbe.jbof.media;
 
 import ch.hatbe.jbof.jooq.tables.records.MediaFilesRecord;
+import ch.hatbe.jbof.media.entity.MediaProcessingStatus;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.Record2;
@@ -36,15 +37,16 @@ public class MediaRepository {
                 .set(MEDIA_FILES.ORIGINAL_FILENAME, originalFilename)
                 .set(MEDIA_FILES.CONTENT_TYPE, contentType)
                 .set(MEDIA_FILES.SIZE_BYTES, sizeBytes)
+                .set(MEDIA_FILES.PROCESSING_STATUS, MediaProcessingStatus.UPLOADED.name())
                 .returning()
                 .fetchOne();
     }
 
     public List<MediaFilesRecord> findAll(UUID userId) {
-        var query = dsl.selectFrom(MEDIA_FILES);
+        var query = dsl.selectFrom(MEDIA_FILES).where(MEDIA_FILES.PROCESSING_STATUS.eq(MediaProcessingStatus.UPLOADED.name())); // TODO: remove uplaoded and change to PROCESSED
 
         if (userId != null) {
-            return query.where(MEDIA_FILES.OWNER_USER_ID.eq(userId))
+            return query.and(MEDIA_FILES.OWNER_USER_ID.eq(userId))
                     .orderBy(MEDIA_FILES.UPLOADED_AT.desc(), MEDIA_FILES.FILE_ID.asc())
                     .fetch();
         }
@@ -56,6 +58,7 @@ public class MediaRepository {
     public Optional<MediaFilesRecord> findById(UUID fileId) {
         return dsl.selectFrom(MEDIA_FILES)
                 .where(MEDIA_FILES.FILE_ID.eq(fileId))
+                .and(MEDIA_FILES.PROCESSING_STATUS.eq(MediaProcessingStatus.UPLOADED.name())) // TODO: remove uplaoded and change to PROCESSED
                 .fetchOptional();
     }
 
@@ -64,6 +67,7 @@ public class MediaRepository {
                 .from(MEDIA_FILES)
                 .join(ALBUM_MEDIA_FILES).on(ALBUM_MEDIA_FILES.FILE_ID.eq(MEDIA_FILES.FILE_ID))
                 .where(ALBUM_MEDIA_FILES.ALBUM_ID.eq(albumId))
+                .and(MEDIA_FILES.PROCESSING_STATUS.eq(MediaProcessingStatus.UPLOADED.name())) // TODO: remove uplaoded and change to PROCESSED
                 .orderBy(MEDIA_FILES.UPLOADED_AT.desc(), MEDIA_FILES.FILE_ID.asc())
                 .fetchInto(MEDIA_FILES);
     }

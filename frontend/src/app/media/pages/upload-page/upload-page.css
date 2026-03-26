@@ -1,0 +1,14 @@
+.page {
+  display: grid;
+  gap: 16px;
+  max-width: 520px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+input {
+  padding: 8px;
+}

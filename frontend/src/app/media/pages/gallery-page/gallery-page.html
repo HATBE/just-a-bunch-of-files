@@ -1,0 +1,32 @@
+<section class="page">
+  <div class="page-header">
+    <h1>All media</h1>
+    <button type="button" (click)="refresh()" [disabled]="isLoading()">Refresh</button>
+  </div>
+
+  @if (isLoading()) {
+    <p>Loading...</p>
+  } @else if (errorMessage()) {
+    <p>{{ errorMessage() }}</p>
+  } @else if (items().length === 0) {
+    <p>No media found.</p>
+  } @else {
+    <div class="grid">
+      @for (item of items(); track item.fileId) {
+        <article class="card">
+          @if (item.kind === 'IMAGE') {
+            <img [src]="getMediaUrl(item.fileId)" [alt]="item.originalFilename" loading="lazy" />
+          } @else {
+            <video class="media-video" [src]="getMediaUrl(item.fileId)" controls preload="metadata"></video>
+          }
+          <div class="meta">
+            <div>{{ item.originalFilename }}</div>
+            <div>{{ item.kind }}</div>
+            <div>{{ item.user.username }}</div>
+            <div>{{ item.uploadedAt | date: 'medium' }}</div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

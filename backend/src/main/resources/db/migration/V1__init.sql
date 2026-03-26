@@ -22,7 +22,9 @@ create table if not exists media_files (
     content_type varchar(255) not null,
     size_bytes bigint not null,
     uploaded_at timestamptz not null default now(),
-    constraint media_files_kind_check check (kind in ('IMAGE', 'VIDEO'))
+    processing_status varchar(32) not null default 'UPLOADED',
+    constraint media_files_kind_check check (kind in ('IMAGE', 'VIDEO')),
+    constraint media_files_processing_status_check check (processing_status in ('UPLOADED', 'PROCESSING', 'PROCESSED'))
 );
 
 create table if not exists album_media_files (
