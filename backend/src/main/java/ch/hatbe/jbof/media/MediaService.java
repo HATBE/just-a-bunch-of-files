@@ -9,7 +9,13 @@ import ch.hatbe.jbof.storage.StorageService;
 import ch.hatbe.jbof.user.UserRepository;
 import ch.hatbe.jbof.user.entity.UserDtos;
 import ch.hatbe.jbof.user.UserMapper;
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.exif.ExifIFD0Directory;
+import com.drew.metadata.exif.ExifSubIFDDirectory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,11 +23,14 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MediaService {
     private static final String IMAGE_BUCKET = "images";
     private static final String VIDEO_BUCKET = "videos";
@@ -67,6 +76,8 @@ public class MediaService {
                 repository.addToAlbum(albumId, record.getFileId());
             }
         }
+
+        logCapturedAt(file, kind);
 
         return toDetailResponse(record);
     }
@@ -197,5 +208,49 @@ public class MediaService {
         return userRepository.findById(userId)
                 .map(userMapper::toListResponse)
                 .orElseThrow(() -> new NotFoundException("user not found"));
+    }
+
+
+    private void logCapturedAt(MultipartFile file, MediaKind kind) {
+        if (kind != MediaKind.IMAGE) {
+            log.info("Capture timestamp extraction is not implemented yet for {} {}", kind, originalFilename(file));
+            return;
+        }
+
+        try (InputStream inputStream = file.getInputStream()) {
+            Metadata metadata = ImageMetadataReader.readMetadata(inputStream);
+            Date capturedAt = readCapturedAt(metadata);
+
+            if (capturedAt != null) {
+                log.info("Captured at for {}: {}", originalFilename(file), capturedAt);
+                return;
+            }
+
+            log.info("No embedded capture timestamp found for {}", originalFilename(file));
+        } catch (ImageProcessingException | IOException e) {
+            log.warn("Could not extract captured-at metadata for {}", originalFilename(file), e);
+        }
+    }
+
+    private Date readCapturedAt(Metadata metadata) {
+        ExifSubIFDDirectory exifSubIfd = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
+        if (exifSubIfd != null) {
+            Date original = exifSubIfd.getDateOriginal();
+            if (original != null) {
+                return original;
+            }
+
+            Date digitized = exifSubIfd.getDateDigitized();
+            if (digitized != null) {
+                return digitized;
+            }
+        }
+
+        ExifIFD0Directory exifIfd0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+        if (exifIfd0 != null) {
+            return exifIfd0.getDate(ExifIFD0Directory.TAG_DATETIME);
+        }
+
+        return null;
     }
 }
