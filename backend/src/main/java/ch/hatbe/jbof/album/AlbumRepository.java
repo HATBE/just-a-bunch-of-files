@@ -36,6 +36,14 @@ public class AlbumRepository {
                 .fetchOptional();
     }
 
+    public Optional<AlbumsRecord> rename(UUID albumId, String name) {
+        return dsl.update(ALBUMS)
+                .set(ALBUMS.NAME, name)
+                .where(ALBUMS.ALBUM_ID.eq(albumId))
+                .returning()
+                .fetchOptional();
+    }
+
     public boolean existsById(UUID albumId) {
         return dsl.fetchExists(
                 dsl.selectOne()

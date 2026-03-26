@@ -40,11 +40,11 @@ public class MediaRepository {
                 .fetchOne();
     }
 
-    public List<MediaFilesRecord> findAll(UUID ownerUserId) {
+    public List<MediaFilesRecord> findAll(UUID userId) {
         var query = dsl.selectFrom(MEDIA_FILES);
 
-        if (ownerUserId != null) {
-            return query.where(MEDIA_FILES.OWNER_USER_ID.eq(ownerUserId))
+        if (userId != null) {
+            return query.where(MEDIA_FILES.OWNER_USER_ID.eq(userId))
                     .orderBy(MEDIA_FILES.UPLOADED_AT.desc(), MEDIA_FILES.FILE_ID.asc())
                     .fetch();
         }

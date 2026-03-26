@@ -30,6 +30,8 @@ public class MediaService {
     private final UserRepository userRepository;
     private final AlbumRepository albumRepository;
     private final StorageService storageService;
+    private final MediaMapper mediaMapper;
+    private final UserMapper userMapper;
 
     public MediaDtos.DetailResponse upload(
             UUID userId,
@@ -76,7 +78,7 @@ public class MediaService {
 
         return repository.findAll(userId)
                 .stream()
-                .map(record -> MediaMapper.toListResponse(record, getUserSummary(record.getOwnerUserId())))
+                .map(record -> mediaMapper.toListResponse(record, getUserSummary(record.getOwnerUserId())))
                 .toList();
     }
 
@@ -94,7 +96,7 @@ public class MediaService {
 
         return repository.findByAlbumId(albumId)
                 .stream()
-                .map(record -> MediaMapper.toListResponse(record, getUserSummary(record.getOwnerUserId())))
+                .map(record -> mediaMapper.toListResponse(record, getUserSummary(record.getOwnerUserId())))
                 .toList();
     }
 
@@ -188,12 +190,12 @@ public class MediaService {
                 .map(album -> new MediaDtos.AlbumReference(album.value1(), album.value2()))
                 .toList();
 
-        return MediaMapper.toDetailResponse(record, getUserSummary(record.getOwnerUserId()), albums);
+        return mediaMapper.toDetailResponse(record, getUserSummary(record.getOwnerUserId()), albums);
     }
 
     private UserDtos.ListResponse getUserSummary(UUID userId) {
         return userRepository.findById(userId)
-                .map(UserMapper::toListResponse)
+                .map(userMapper::toListResponse)
                 .orElseThrow(() -> new NotFoundException("user not found"));
     }
 }

@@ -31,6 +31,14 @@ public class AlbumController {
         return service.findById(albumId);
     }
 
+    @PatchMapping("/{albumId}")
+    public AlbumDtos.ListResponse rename(
+            @PathVariable UUID albumId,
+            @Valid @RequestBody AlbumDtos.RenameAlbumRequest request
+    ) {
+        return service.rename(albumId, request);
+    }
+
     @PostMapping("/{albumId}/files/{fileId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addFile(@PathVariable UUID albumId, @PathVariable UUID fileId) {

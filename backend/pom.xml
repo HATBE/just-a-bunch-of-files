@@ -22,6 +22,7 @@
 		<aws.sdk.version>2.41.34</aws.sdk.version>
 		<postgres.version>42.7.7</postgres.version>
 		<jooq.version>3.19.30</jooq.version>
+		<mapstruct.version>1.6.3</mapstruct.version>
 
 		<db.url>jdbc:postgresql://localhost:35432/jbof</db.url>
 		<db.user>user</db.user>
@@ -88,6 +89,12 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${mapstruct.version}</version>
 		</dependency>
 
 		<dependency>
@@ -207,6 +214,11 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<annotationProcessorPaths>
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>${mapstruct.version}</version>
+						</path>
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>

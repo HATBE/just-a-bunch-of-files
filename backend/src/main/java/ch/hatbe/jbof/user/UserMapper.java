@@ -2,15 +2,11 @@ package ch.hatbe.jbof.user;
 
 import ch.hatbe.jbof.jooq.tables.records.UsersRecord;
 import ch.hatbe.jbof.user.entity.UserDtos;
+import org.mapstruct.Mapper;
 
-public final class UserMapper {
-    private UserMapper() {
-    }
+@Mapper(componentModel = "spring")
+public interface UserMapper {
+    UserDtos.ListResponse toListResponse(UsersRecord record);
 
-    public static UserDtos.ListResponse toListResponse(UsersRecord record) {
-        return new UserDtos.ListResponse(
-                record.getUserId(),
-                record.getUsername()
-        );
-    }
+    UserDtos.DetailResponse toDetailResponse(UsersRecord record);
 }

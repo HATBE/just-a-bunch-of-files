@@ -20,6 +20,8 @@ public class AlbumService {
     private final AlbumRepository repository;
     private final UserRepository userRepository;
     private final MediaService mediaService;
+    private final AlbumMapper albumMapper;
+    private final UserMapper userMapper;
 
     public AlbumDtos.ListResponse create(AlbumDtos.CreateAlbumRequest request) {
         if (!userRepository.existsById(request.userId())) {
@@ -27,13 +29,13 @@ public class AlbumService {
         }
 
         AlbumsRecord record = repository.create(request.userId(), request.name());
-        return AlbumMapper.toListResponse(record, getUserSummary(record.getOwnerUserId()));
+        return albumMapper.toListResponse(record, getUserSummary(record.getOwnerUserId()));
     }
 
     public List<AlbumDtos.ListResponse> findAll() {
         return repository.findAll()
                 .stream()
-                .map(record -> AlbumMapper.toListResponse(record, getUserSummary(record.getOwnerUserId())))
+                .map(record -> albumMapper.toListResponse(record, getUserSummary(record.getOwnerUserId())))
                 .toList();
     }
 
@@ -43,7 +45,14 @@ public class AlbumService {
 
         List<MediaDtos.ListResponse> files = mediaService.findByAlbumId(albumId);
 
-        return AlbumMapper.toDetailResponse(record, getUserSummary(record.getOwnerUserId()), files);
+        return albumMapper.toDetailResponse(record, getUserSummary(record.getOwnerUserId()), files);
+    }
+
+    public AlbumDtos.ListResponse rename(UUID albumId, AlbumDtos.RenameAlbumRequest request) {
+        AlbumsRecord record = repository.rename(albumId, request.name())
+                .orElseThrow(() -> new NotFoundException("album not found"));
+
+        return albumMapper.toListResponse(record, getUserSummary(record.getOwnerUserId()));
     }
 
     public void addFile(UUID albumId, UUID fileId) {
@@ -56,7 +65,7 @@ public class AlbumService {
 
     private UserDtos.ListResponse getUserSummary(UUID userId) {
         return userRepository.findById(userId)
-                .map(UserMapper::toListResponse)
+                .map(userMapper::toListResponse)
                 .orElseThrow(() -> new NotFoundException("user not found"));
     }
 }

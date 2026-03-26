@@ -13,16 +13,18 @@ public class AlbumDtos {
     public record CreateAlbumRequest(
             @NotNull UUID userId,
             @NotBlank String name
-    ) {
-    }
+    ) { }
+
+    public record RenameAlbumRequest(
+            @NotBlank String name
+    ) { }
 
     public record ListResponse(
             UUID albumId,
             UserDtos.ListResponse user,
             String name,
             OffsetDateTime createdAt
-    ) {
-    }
+    ) { }
 
     public record DetailResponse(
             UUID albumId,
@@ -30,6 +32,5 @@ public class AlbumDtos {
             String name,
             OffsetDateTime createdAt,
             List<MediaDtos.ListResponse> files
-    ) {
-    }
+    ) { }
 }

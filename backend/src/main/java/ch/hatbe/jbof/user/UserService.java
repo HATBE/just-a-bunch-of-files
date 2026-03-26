@@ -13,22 +13,23 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository repository;
+    private final UserMapper userMapper;
 
     public UserDtos.ListResponse create(UserDtos.CreateUserRequest request) {
         UsersRecord record = repository.create(request.username());
-        return UserMapper.toListResponse(record);
+        return userMapper.toListResponse(record);
     }
 
     public List<UserDtos.ListResponse> findAll() {
         return repository.findAll()
                 .stream()
-                .map(UserMapper::toListResponse)
+                .map(userMapper::toListResponse)
                 .toList();
     }
 
     public UserDtos.ListResponse findById(UUID userId) {
         return repository.findById(userId)
-                .map(UserMapper::toListResponse)
+                .map(userMapper::toListResponse)
                 .orElseThrow(() -> new NotFoundException("user not found"));
     }
 }
