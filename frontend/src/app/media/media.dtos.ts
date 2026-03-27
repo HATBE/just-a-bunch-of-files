@@ -35,5 +35,5 @@ export interface MediaDetailResponseDto {
 export interface UploadMediaRequestDto {
   userId: string;
   albumIds?: string[];
-  file: File;
+  files: File[];
 }

@@ -17,6 +17,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
 @Service
@@ -25,27 +26,51 @@ public class StorageService {
     private final S3Client client;
 
     public String upload(String bucket, MultipartFile file) throws IOException {
-        validateBucket(bucket);
-
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("file is empty");
         }
 
+        return upload(
+                bucket,
+                file.getOriginalFilename(),
+                file.getContentType(),
+                file.getInputStream(),
+                file.getSize()
+        );
+    }
+
+    public String upload(
+            String bucket,
+            String originalFilename,
+            String contentType,
+            InputStream inputStream,
+            long size
+    ) {
+        validateBucket(bucket);
+
+        if (inputStream == null) {
+            throw new IllegalArgumentException("input stream is empty");
+        }
+
+        if (size < 0) {
+            throw new IllegalArgumentException("size must be positive");
+        }
+
         ensureBucketExists(bucket);
 
-        String key = buildKey(file.getOriginalFilename());
-        String contentType = file.getContentType();
-        if (contentType == null || contentType.isBlank()) {
-            contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        String key = buildKey(originalFilename);
+        String effectiveContentType = contentType;
+        if (effectiveContentType == null || effectiveContentType.isBlank()) {
+            effectiveContentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
         }
 
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
-                .contentType(contentType)
+                .contentType(effectiveContentType)
                 .build();
 
-        client.putObject(request, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+        client.putObject(request, RequestBody.fromInputStream(inputStream, size));
 
         return key;
     }

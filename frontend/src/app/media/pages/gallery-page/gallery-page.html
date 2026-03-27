@@ -14,11 +14,12 @@
     <div class="grid">
       @for (item of items(); track item.fileId) {
         <article class="card">
-          @if (item.kind === 'IMAGE') {
-            <img [src]="getMediaUrl(item.fileId)" [alt]="item.originalFilename" loading="lazy" />
-          } @else {
-            <video class="media-video" [src]="getMediaUrl(item.fileId)" controls preload="metadata"></video>
-          }
+          <div class="preview">
+            <img [src]="getPreviewUrl(item.fileId)" [alt]="item.originalFilename" loading="lazy" />
+            @if (item.kind === 'VIDEO') {
+              <span class="video-badge">Video</span>
+            }
+          </div>
           <div class="meta">
             <div>{{ item.originalFilename }}</div>
             <div>{{ item.kind }}</div>

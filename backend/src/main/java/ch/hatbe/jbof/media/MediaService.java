@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -39,13 +40,14 @@ public class MediaService {
     private final UserRepository userRepository;
     private final AlbumRepository albumRepository;
     private final StorageService storageService;
+    private final ThumbnailService thumbnailService;
     private final MediaMapper mediaMapper;
     private final UserMapper userMapper;
 
-    public MediaDtos.DetailResponse upload(
+    public List<MediaDtos.DetailResponse> upload(
             UUID userId,
             List<UUID> albumIds,
-            MultipartFile file
+            List<MultipartFile> files
     ) throws IOException {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("user not found");
@@ -53,33 +55,16 @@ public class MediaService {
 
         validateAlbums(userId, albumIds);
 
-        MediaKind kind = detectKind(file);
-
-        String bucket = bucketFor(kind);
-        String key = storageService.upload(bucket, file);
-        String contentType = file.getContentType() == null || file.getContentType().isBlank()
-                ? MediaType.APPLICATION_OCTET_STREAM_VALUE
-                : file.getContentType();
-
-        MediaFilesRecord record = repository.create(
-                userId,
-                kind.name(),
-                bucket,
-                key,
-                originalFilename(file),
-                contentType,
-                file.getSize()
-        );
-
-        if (albumIds != null) {
-            for (UUID albumId : albumIds) {
-                repository.addToAlbum(albumId, record.getFileId());
-            }
+        if (files == null || files.isEmpty()) {
+            throw new IllegalArgumentException("files are empty");
         }
 
-        logCapturedAt(file, kind);
+        List<MediaDtos.DetailResponse> uploadedFiles = new java.util.ArrayList<>(files.size());
+        for (MultipartFile file : files) {
+            uploadedFiles.add(uploadSingle(userId, albumIds, file));
+        }
 
-        return toDetailResponse(record);
+        return uploadedFiles;
     }
 
     public List<MediaDtos.ListResponse> findAll(UUID userId) {
@@ -123,6 +108,9 @@ public class MediaService {
                 .orElseThrow(() -> new NotFoundException("file not found"));
 
         storageService.delete(record.getBucket(), record.getObjectKey());
+        if (record.getThumbnailBucket() != null && record.getThumbnailObjectKey() != null) {
+            storageService.delete(record.getThumbnailBucket(), record.getThumbnailObjectKey());
+        }
         repository.deleteById(fileId);
     }
 
@@ -195,6 +183,66 @@ public class MediaService {
                 : file.getOriginalFilename();
     }
 
+    private MediaDtos.DetailResponse uploadSingle(
+            UUID userId,
+            List<UUID> albumIds,
+            MultipartFile file
+    ) throws IOException {
+        MediaKind kind = detectKind(file);
+
+        String bucket = bucketFor(kind);
+        String key = null;
+        String thumbnailKey = null;
+
+        try {
+            key = storageService.upload(bucket, file);
+            ThumbnailService.ThumbnailPayload thumbnail = thumbnailService.createThumbnail(kind, file);
+            thumbnailKey = storageService.upload(
+                    bucket,
+                    thumbnail.filename(),
+                    thumbnail.contentType(),
+                    new ByteArrayInputStream(thumbnail.bytes()),
+                    thumbnail.sizeBytes()
+            );
+            String contentType = file.getContentType() == null || file.getContentType().isBlank()
+                    ? MediaType.APPLICATION_OCTET_STREAM_VALUE
+                    : file.getContentType();
+
+            MediaFilesRecord record = repository.create(
+                    userId,
+                    kind.name(),
+                    bucket,
+                    key,
+                    bucket,
+                    thumbnailKey,
+                    originalFilename(file),
+                    contentType,
+                    file.getSize(),
+                    thumbnail.contentType(),
+                    thumbnail.sizeBytes()
+            );
+
+            if (albumIds != null) {
+                for (UUID albumId : albumIds) {
+                    repository.addToAlbum(albumId, record.getFileId());
+                }
+            }
+
+            logCapturedAt(file, kind);
+
+            return toDetailResponse(record);
+        } catch (Exception e) {
+            cleanupUpload(bucket, key);
+            cleanupUpload(bucket, thumbnailKey);
+
+            if (e instanceof IOException ioException) {
+                throw ioException;
+            }
+
+            throw e;
+        }
+    }
+
     private MediaDtos.DetailResponse toDetailResponse(MediaFilesRecord record) {
         List<MediaDtos.AlbumReference> albums = repository.findAlbumsForFile(record.getFileId())
                 .stream()
@@ -252,5 +300,17 @@ public class MediaService {
         }
 
         return null;
+    }
+
+    private void cleanupUpload(String bucket, String key) {
+        if (bucket == null || key == null) {
+            return;
+        }
+
+        try {
+            storageService.delete(bucket, key);
+        } catch (Exception cleanupError) {
+            log.warn("Could not clean up uploaded object {}/{}", bucket, key, cleanupError);
+        }
     }
 }

@@ -20,7 +20,7 @@ export class GalleryPage {
     void this.load();
   }
 
-  protected getMediaUrl(fileId: string): string {
+  protected getPreviewUrl(fileId: string): string {
     return this.mediaService.getContentUrl(fileId);
   }
 
@@ -36,7 +36,7 @@ export class GalleryPage {
       const items = await this.mediaService.getAll();
       this.items.set(items);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to load images';
+      const message = error instanceof Error ? error.message : 'Failed to load media';
       this.errorMessage.set(message);
     } finally {
       this.isLoading.set(false);

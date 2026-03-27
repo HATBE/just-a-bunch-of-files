@@ -25,18 +25,26 @@ public class MediaRepository {
             String kind,
             String bucket,
             String objectKey,
+            String thumbnailBucket,
+            String thumbnailObjectKey,
             String originalFilename,
             String contentType,
-            long sizeBytes
+            long sizeBytes,
+            String thumbnailContentType,
+            Long thumbnailSizeBytes
     ) {
         return dsl.insertInto(MEDIA_FILES)
             .set(MEDIA_FILES.OWNER_USER_ID, ownerUserId)
             .set(MEDIA_FILES.KIND, kind)
             .set(MEDIA_FILES.BUCKET, bucket)
             .set(MEDIA_FILES.OBJECT_KEY, objectKey)
+            .set(MEDIA_FILES.THUMBNAIL_BUCKET, thumbnailBucket)
+            .set(MEDIA_FILES.THUMBNAIL_OBJECT_KEY, thumbnailObjectKey)
             .set(MEDIA_FILES.ORIGINAL_FILENAME, originalFilename)
             .set(MEDIA_FILES.CONTENT_TYPE, contentType)
             .set(MEDIA_FILES.SIZE_BYTES, sizeBytes)
+            .set(MEDIA_FILES.THUMBNAIL_CONTENT_TYPE, thumbnailContentType)
+            .set(MEDIA_FILES.THUMBNAIL_SIZE_BYTES, thumbnailSizeBytes)
             .set(MEDIA_FILES.PROCESSING_STATUS, MediaProcessingStatus.UPLOADED.name())
             .returning()
             .fetchOne();

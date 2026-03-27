@@ -33,6 +33,16 @@ create table if not exists album_media_files (
     primary key (album_id, file_id)
 );
 
+alter table media_files
+    add column if not exists thumbnail_bucket varchar(255),
+    add column if not exists thumbnail_object_key varchar(512),
+    add column if not exists thumbnail_content_type varchar(255),
+    add column if not exists thumbnail_size_bytes bigint;
+
+create unique index if not exists uq_media_files_thumbnail_object_key
+    on media_files (thumbnail_object_key)
+    where thumbnail_object_key is not null;
+
 create index if not exists idx_albums_owner_user_id on albums(owner_user_id);
 create index if not exists idx_media_files_owner_user_id on media_files(owner_user_id);
 create index if not exists idx_album_media_files_file_id on album_media_files(file_id);

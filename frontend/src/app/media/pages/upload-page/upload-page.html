@@ -1,5 +1,5 @@
 <section class="page">
-  <h1>Upload image</h1>
+  <h1>Upload files</h1>
 
   <label class="field">
     <span>User ID</span>
@@ -12,9 +12,19 @@
   </label>
 
   <label class="field">
-    <span>File</span>
-    <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+    <span>Files</span>
+    <input
+      type="file"
+      accept=".jpg,.jpeg,.png,.gif,.webp,.bmp,.svg,.mp4,.mov,.webm,.avi,.mkv,image/*,video/*"
+      multiple
+      (change)="onFileSelected($event)"
+    />
   </label>
+
+  @if (selectedFiles.length > 0) {
+    <p>{{ selectedFiles.length }} file(s) selected</p>
+    <p>{{ getBatchCount() }} upload batch(es)</p>
+  }
 
   <button type="button" (click)="upload()" [disabled]="isUploading()">
     {{ isUploading() ? 'Uploading...' : 'Upload' }}

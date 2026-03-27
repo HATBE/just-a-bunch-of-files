@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ApiError } from '../../../core/http.service';
 import { MediaService } from '../../media.service';
 
 @Component({
@@ -10,6 +11,9 @@ import { MediaService } from '../../media.service';
   styleUrl: './upload-page.css',
 })
 export class UploadPage {
+  private static readonly MAX_FILES_PER_BATCH = 20;
+  private static readonly MAX_BATCH_SIZE_BYTES = 512 * 1024 * 1024;
+
   private readonly mediaService = inject(MediaService);
   private readonly router = inject(Router);
 
@@ -18,11 +22,11 @@ export class UploadPage {
   protected readonly isUploading = signal(false);
   protected readonly successMessage = signal('');
   protected readonly errorMessage = signal('');
-  protected selectedFile: File | null = null;
+  protected selectedFiles: File[] = [];
 
   protected onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.selectedFile = input.files?.[0] ?? null;
+    this.selectedFiles = Array.from(input.files ?? []);
     this.successMessage.set('');
     this.errorMessage.set('');
   }
@@ -33,8 +37,8 @@ export class UploadPage {
       return;
     }
 
-    if (!this.selectedFile) {
-      this.errorMessage.set('Select a file first.');
+    if (this.selectedFiles.length === 0) {
+      this.errorMessage.set('Select at least one file first.');
       return;
     }
 
@@ -48,21 +52,78 @@ export class UploadPage {
         .map((value) => value.trim())
         .filter(Boolean);
 
-      await this.mediaService.upload({
-        userId: this.userId().trim(),
-        albumIds,
-        file: this.selectedFile,
-      });
+      const batches = this.createBatches(this.selectedFiles);
+      let uploadedCount = 0;
 
-      this.successMessage.set('Upload completed.');
-      this.selectedFile = null;
+      for (let index = 0; index < batches.length; index++) {
+        this.successMessage.set(`Uploading batch ${index + 1} of ${batches.length}...`);
+
+        const uploaded = await this.mediaService.upload({
+          userId: this.userId().trim(),
+          albumIds,
+          files: batches[index],
+        });
+
+        uploadedCount += uploaded.length;
+      }
+
+      this.successMessage.set(`Uploaded ${uploadedCount} file(s) in ${batches.length} batch(es).`);
+      this.selectedFiles = [];
       this.albumIds.set('');
       await this.router.navigateByUrl('/images');
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Upload failed';
+      const message = this.readErrorMessage(error);
       this.errorMessage.set(message);
     } finally {
       this.isUploading.set(false);
     }
+  }
+
+  protected getBatchCount(): number {
+    return this.createBatches(this.selectedFiles).length;
+  }
+
+  private createBatches(files: File[]): File[][] {
+    const batches: File[][] = [];
+    let currentBatch: File[] = [];
+    let currentBatchSize = 0;
+
+    for (const file of files) {
+      const exceedsFileCountLimit = currentBatch.length >= UploadPage.MAX_FILES_PER_BATCH;
+      const exceedsSizeLimit =
+        currentBatch.length > 0 &&
+        currentBatchSize + file.size > UploadPage.MAX_BATCH_SIZE_BYTES;
+
+      if (exceedsFileCountLimit || exceedsSizeLimit) {
+        batches.push(currentBatch);
+        currentBatch = [];
+        currentBatchSize = 0;
+      }
+
+      currentBatch.push(file);
+      currentBatchSize += file.size;
+    }
+
+    if (currentBatch.length > 0) {
+      batches.push(currentBatch);
+    }
+
+    return batches;
+  }
+
+  private readErrorMessage(error: unknown): string {
+    if (this.isApiError(error)) {
+      return error.message || `Upload failed (${error.status})`;
+    }
+
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    return 'Upload failed';
+  }
+
+  private isApiError(error: unknown): error is ApiError {
+    return typeof error === 'object' && error !== null && 'status' in error && 'message' in error;
   }
 }

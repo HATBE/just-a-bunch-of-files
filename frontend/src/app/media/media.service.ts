@@ -29,17 +29,20 @@ export class MediaService extends HttpService {
     return this.get<MediaDetailResponseDto>([fileId]);
   }
 
-  public upload(request: UploadMediaRequestDto): Promise<MediaDetailResponseDto> {
+  public upload(request: UploadMediaRequestDto): Promise<MediaDetailResponseDto[]> {
     const payload = new FormData();
     payload.set('userId', request.userId);
-    payload.set('file', request.file);
+
+    for (const file of request.files) {
+      payload.append('files', file);
+    }
 
     for (const albumId of request.albumIds ?? []) {
       payload.append('albumIds', albumId);
     }
 
     return firstValueFrom(
-      this.http.post<MediaDetailResponseDto>(this.createUrl(), payload)
+      this.http.post<MediaDetailResponseDto[]>(this.createUrl(), payload)
     );
   }
 

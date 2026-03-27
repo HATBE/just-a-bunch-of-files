@@ -22,12 +22,12 @@ public class MediaController {
     private final MediaService service;
 
     @PostMapping
-    public MediaDtos.DetailResponse upload(
+    public List<MediaDtos.DetailResponse> upload(
             @RequestParam UUID userId,
             @RequestParam(required = false) List<UUID> albumIds,
-            @RequestParam("file") MultipartFile file
+            @RequestParam("files") List<MultipartFile> files
     ) throws IOException {
-        return service.upload(userId, albumIds, file);
+        return service.upload(userId, albumIds, files);
     }
 
     @GetMapping
