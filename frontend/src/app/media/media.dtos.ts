@@ -16,7 +16,15 @@ export interface MediaListResponseDto {
   objectKey: string;
   contentType: string;
   sizeBytes: number;
+  capturedAt: string | null;
   uploadedAt: string;
+}
+
+export interface MediaPagedResponseDto {
+  items: MediaListResponseDto[];
+  limit: number;
+  offset: number;
+  hasMore: boolean;
 }
 
 export interface MediaDetailResponseDto {
@@ -28,6 +36,7 @@ export interface MediaDetailResponseDto {
   objectKey: string;
   contentType: string;
   sizeBytes: number;
+  capturedAt: string | null;
   uploadedAt: string;
   albums: MediaAlbumReferenceDto[];
 }

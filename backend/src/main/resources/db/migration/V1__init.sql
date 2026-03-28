@@ -18,9 +18,14 @@ create table if not exists media_files (
     kind varchar(32) not null,
     bucket varchar(255) not null,
     object_key varchar(512) not null unique,
+    thumbnail_bucket varchar(255),
+    thumbnail_object_key varchar(512),
     original_filename varchar(512) not null,
     content_type varchar(255) not null,
+    thumbnail_content_type varchar(255),
     size_bytes bigint not null,
+    thumbnail_size_bytes bigint,
+    captured_at timestamptz,
     uploaded_at timestamptz not null default now(),
     processing_status varchar(32) not null default 'UPLOADED',
     constraint media_files_kind_check check (kind in ('IMAGE', 'VIDEO')),
@@ -33,16 +38,11 @@ create table if not exists album_media_files (
     primary key (album_id, file_id)
 );
 
-alter table media_files
-    add column if not exists thumbnail_bucket varchar(255),
-    add column if not exists thumbnail_object_key varchar(512),
-    add column if not exists thumbnail_content_type varchar(255),
-    add column if not exists thumbnail_size_bytes bigint;
-
 create unique index if not exists uq_media_files_thumbnail_object_key
     on media_files (thumbnail_object_key)
     where thumbnail_object_key is not null;
 
 create index if not exists idx_albums_owner_user_id on albums(owner_user_id);
 create index if not exists idx_media_files_owner_user_id on media_files(owner_user_id);
+create index if not exists idx_media_files_captured_at on media_files (captured_at desc, uploaded_at desc, file_id asc);
 create index if not exists idx_album_media_files_file_id on album_media_files(file_id);

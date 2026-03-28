@@ -1,45 +1,384 @@
-import { DatePipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, ViewChild, inject, signal } from '@angular/core';
+import { ApiError } from '../../../core/http.service';
 import { MediaService } from '../../media.service';
 import { MediaListResponseDto } from '../../media.dtos';
 
 @Component({
   selector: 'app-gallery-page',
-  imports: [DatePipe],
   templateUrl: './gallery-page.html',
   styleUrl: './gallery-page.css',
 })
-export class GalleryPage {
+export class GalleryPage implements OnDestroy {
+  private static readonly PAGE_SIZE = 24;
+  private static readonly MIN_ROW_HEIGHT = 110;
+  private static readonly ROW_GAP = 12;
+  private static readonly SECTION_GAP = 20;
+  private static readonly SECTION_MIN_WIDTH = 260;
+  private static readonly SECTION_MAX_WIDTH_RATIO = 0.78;
+  private static readonly MIN_ASPECT_RATIO = 0.65;
+  private static readonly MAX_ASPECT_RATIO = 1.8;
+  private static readonly LOAD_MORE_THRESHOLD_PX = 1000;
+  private static readonly MIN_PAGE_OVERFLOW_PX = 280;
+  private static readonly SECTION_DATE_FORMAT = new Intl.DateTimeFormat('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
   private readonly mediaService = inject(MediaService);
+  private resizeObserver?: ResizeObserver;
+  private readonly aspectRatios = new Map<string, number>();
+  private autofillScheduled = false;
+  private autofillInFlight = false;
+
+  @ViewChild('gallerySurface')
+  private set gallerySurfaceRef(value: ElementRef<HTMLElement> | undefined) {
+    this.gallerySurface = value;
+    this.resizeObserver?.disconnect();
+
+    const surface = value?.nativeElement;
+    if (!surface) {
+      return;
+    }
+
+    this.resizeObserver = new ResizeObserver(() => {
+      this.rebuildSections();
+    });
+    this.resizeObserver.observe(surface);
+    this.rebuildSections();
+    this.scheduleAutofillCheck();
+  }
+
+  private gallerySurface?: ElementRef<HTMLElement>;
 
   protected readonly items = signal<MediaListResponseDto[]>([]);
+  protected readonly sections = signal<GallerySectionSlice[]>([]);
   protected readonly isLoading = signal(true);
+  protected readonly isLoadingMore = signal(false);
+  protected readonly hasMore = signal(false);
   protected readonly errorMessage = signal('');
 
   constructor() {
     void this.load();
   }
 
+  public ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+  }
+
+  @HostListener('window:scroll')
+  protected onWindowScroll(): void {
+    this.scheduleAutofillCheck();
+  }
+
   protected getPreviewUrl(fileId: string): string {
-    return this.mediaService.getContentUrl(fileId);
+    return this.mediaService.getPreviewUrl(fileId);
+  }
+
+  protected onPreviewLoad(fileId: string, event: Event): void {
+    const image = event.target as HTMLImageElement | null;
+    if (!image || image.naturalWidth <= 0 || image.naturalHeight <= 0) {
+      return;
+    }
+
+    const aspectRatio = image.naturalWidth / image.naturalHeight;
+    this.aspectRatios.set(fileId, this.normalizeAspectRatio(aspectRatio));
+    this.rebuildSections();
+    this.scheduleAutofillCheck();
   }
 
   protected async refresh(): Promise<void> {
-    await this.load();
+    await this.load(true);
   }
 
-  private async load(): Promise<void> {
-    this.isLoading.set(true);
-    this.errorMessage.set('');
+  protected async loadMore(): Promise<void> {
+    if (this.isLoading() || this.isLoadingMore() || !this.hasMore()) {
+      return;
+    }
+
+    await this.load(false);
+  }
+
+  private async load(reset = true): Promise<void> {
+    if (reset) {
+      this.isLoading.set(true);
+      this.errorMessage.set('');
+    } else {
+      this.isLoadingMore.set(true);
+    }
 
     try {
-      const items = await this.mediaService.getAll();
-      this.items.set(items);
+      const offset = reset ? 0 : this.items().length;
+      const response = await this.mediaService.getAll(undefined, GalleryPage.PAGE_SIZE, offset);
+      const nextItems = reset
+        ? response.items
+        : [...this.items(), ...response.items];
+
+      this.items.set(nextItems);
+      this.hasMore.set(response.hasMore);
+      this.rebuildSections();
+      this.scheduleAutofillCheck();
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to load media';
+      const message = this.readErrorMessage(error);
       this.errorMessage.set(message);
     } finally {
-      this.isLoading.set(false);
+      if (reset) {
+        this.isLoading.set(false);
+      } else {
+        this.isLoadingMore.set(false);
+      }
     }
   }
+
+  private readErrorMessage(error: unknown): string {
+    if (this.isApiError(error)) {
+      return error.message || `Failed to load media (${error.status})`;
+    }
+
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    return 'Failed to load media';
+  }
+
+  private isApiError(error: unknown): error is ApiError {
+    return typeof error === 'object' && error !== null && 'status' in error && 'message' in error;
+  }
+
+  private rebuildSections(): void {
+    const surfaceWidth = this.gallerySurface?.nativeElement.clientWidth ?? 0;
+    const items = this.items();
+
+    if (surfaceWidth <= 0 || items.length === 0) {
+      this.sections.set([]);
+      return;
+    }
+
+    const groupedItems = new Map<string, MediaListResponseDto[]>();
+    for (const item of items) {
+      const sectionKey = this.sectionKeyFor(item);
+      const sectionItems = groupedItems.get(sectionKey) ?? [];
+      sectionItems.push(item);
+      groupedItems.set(sectionKey, sectionItems);
+    }
+
+    this.sections.set(
+      Array.from(groupedItems.entries()).flatMap(([sectionKey, sectionItems]) =>
+        this.buildSectionSlices(sectionKey, sectionItems, surfaceWidth),
+      ),
+    );
+  }
+
+  private buildSectionSlices(
+    sectionKey: string,
+    items: MediaListResponseDto[],
+    surfaceWidth: number,
+  ): GallerySectionSlice[] {
+    const rows: GallerySectionSlice[] = [];
+    const sectionWidth = this.estimateSectionWidth(items, surfaceWidth);
+    let currentItems: MediaListResponseDto[] = [];
+    let currentAspectSum = 0;
+    let rowIndex = 0;
+
+    for (const item of items) {
+      const aspectRatio = this.resolveAspectRatio(item);
+      currentItems.push(item);
+      currentAspectSum += aspectRatio;
+
+      const gapWidth = GalleryPage.ROW_GAP * Math.max(0, currentItems.length - 1);
+      const estimatedHeight = (sectionWidth - gapWidth) / currentAspectSum;
+      if (estimatedHeight <= this.targetRowHeight(sectionWidth) && currentItems.length > 0) {
+        rows.push({
+          key: `${sectionKey}-${rowIndex}`,
+          label: this.sectionLabelFor(items[0]),
+          width: this.rowWidth(currentItems, sectionWidth),
+          row: this.buildRow(currentItems, sectionWidth),
+        });
+        currentItems = [];
+        currentAspectSum = 0;
+        rowIndex += 1;
+      }
+    }
+
+    if (currentItems.length > 0) {
+      rows.push({
+        key: `${sectionKey}-${rowIndex}`,
+        label: this.sectionLabelFor(items[0]),
+        width: this.rowWidth(currentItems, sectionWidth),
+        row: this.buildRow(currentItems, sectionWidth),
+      });
+    }
+
+    return rows;
+  }
+
+  private estimateSectionWidth(items: MediaListResponseDto[], surfaceWidth: number): number {
+    const maxWidth = Math.floor(surfaceWidth * GalleryPage.SECTION_MAX_WIDTH_RATIO);
+    const targetHeight = this.targetRowHeight(maxWidth);
+    const visibleItems = items.slice(0, Math.min(items.length, 6));
+    const preferredWidth = Math.round(
+      visibleItems.reduce((sum, item) => sum + this.resolveAspectRatio(item) * targetHeight, 0)
+      + Math.max(0, visibleItems.length - 1) * GalleryPage.ROW_GAP,
+    );
+
+    return Math.min(maxWidth, Math.max(GalleryPage.SECTION_MIN_WIDTH, preferredWidth));
+  }
+
+  private buildRow(items: MediaListResponseDto[], surfaceWidth: number): GalleryRow {
+    const aspectSum = items.reduce((sum, item) => sum + this.resolveAspectRatio(item), 0);
+    const gapWidth = GalleryPage.ROW_GAP * Math.max(0, items.length - 1);
+    const justifiedHeight = (surfaceWidth - gapWidth) / aspectSum;
+    const targetRowHeight = this.targetRowHeight(surfaceWidth);
+    const rowHeight = Math.min(targetRowHeight, justifiedHeight);
+    const height = Math.max(GalleryPage.MIN_ROW_HEIGHT, Math.round(rowHeight));
+
+    return {
+      items: items.map((item) => ({
+        item,
+        width: Math.max(90, Math.round(height * this.resolveAspectRatio(item))),
+      })),
+      height,
+    };
+  }
+
+  private rowWidth(items: MediaListResponseDto[], surfaceWidth: number): number {
+    const row = this.buildRow(items, surfaceWidth);
+    return row.items.reduce((sum, entry) => sum + entry.width, 0)
+      + GalleryPage.ROW_GAP * Math.max(0, row.items.length - 1);
+  }
+
+  private scheduleAutofillCheck(): void {
+    if (this.autofillScheduled) {
+      return;
+    }
+
+    this.autofillScheduled = true;
+    queueMicrotask(() => {
+      this.autofillScheduled = false;
+      void this.ensureViewportFilled();
+    });
+  }
+
+  private async ensureViewportFilled(): Promise<void> {
+    if (
+      this.autofillInFlight ||
+      this.isLoading() ||
+      this.isLoadingMore() ||
+      !this.hasMore()
+    ) {
+      return;
+    }
+
+    const pageHeight = document.documentElement.scrollHeight;
+    const viewportBottom = window.scrollY + window.innerHeight;
+    const remainingScroll = pageHeight - viewportBottom;
+    const needsMore =
+      pageHeight <= window.innerHeight + GalleryPage.MIN_PAGE_OVERFLOW_PX ||
+      remainingScroll <= GalleryPage.LOAD_MORE_THRESHOLD_PX;
+
+    if (!needsMore) {
+      return;
+    }
+
+    this.autofillInFlight = true;
+    try {
+      await this.load(false);
+    } finally {
+      this.autofillInFlight = false;
+      if (this.hasMore()) {
+        this.scheduleAutofillCheck();
+      }
+    }
+  }
+
+  private resolveAspectRatio(item: MediaListResponseDto): number {
+    const known = this.aspectRatios.get(item.fileId);
+    if (known != null) {
+      return known;
+    }
+
+    if (item.kind === 'VIDEO') {
+      return 16 / 9;
+    }
+
+    return 4 / 3;
+  }
+
+  private normalizeAspectRatio(aspectRatio: number): number {
+    return Math.min(
+      GalleryPage.MAX_ASPECT_RATIO,
+      Math.max(GalleryPage.MIN_ASPECT_RATIO, aspectRatio),
+    );
+  }
+
+  private targetRowHeight(containerWidth: number): number {
+    if (containerWidth >= 520) {
+      return 264;
+    }
+
+    if (containerWidth >= 420) {
+      return 276;
+    }
+
+    if (containerWidth >= 340) {
+      return 250;
+    }
+
+    return 166;
+  }
+
+  private sectionKeyFor(item: MediaListResponseDto): string {
+    const date = this.displayDateFor(item);
+    return [
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+    ].join('-');
+  }
+
+  private sectionLabelFor(item: MediaListResponseDto): string {
+    const date = this.displayDateFor(item);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    if (this.isSameDay(date, today)) {
+      return 'Today';
+    }
+
+    if (this.isSameDay(date, yesterday)) {
+      return 'Yesterday';
+    }
+
+    return GalleryPage.SECTION_DATE_FORMAT.format(date);
+  }
+
+  private displayDateFor(item: MediaListResponseDto): Date {
+    return new Date(item.capturedAt ?? item.uploadedAt);
+  }
+
+  private isSameDay(left: Date, right: Date): boolean {
+    return left.getFullYear() === right.getFullYear()
+      && left.getMonth() === right.getMonth()
+      && left.getDate() === right.getDate();
+  }
 }
+
+type GallerySectionSlice = {
+  key: string;
+  label: string;
+  width: number;
+  row: GalleryRow;
+};
+
+type GalleryRow = {
+  items: GalleryRowItem[];
+  height: number;
+};
+
+type GalleryRowItem = {
+  item: MediaListResponseDto;
+  width: number;
+};

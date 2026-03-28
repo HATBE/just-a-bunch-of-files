@@ -21,6 +21,7 @@ public class MediaDtos {
             String objectKey,
             String contentType,
             Long sizeBytes,
+            OffsetDateTime capturedAt,
             OffsetDateTime uploadedAt
     ) { }
 
@@ -33,6 +34,7 @@ public class MediaDtos {
             String objectKey,
             String contentType,
             Long sizeBytes,
+            OffsetDateTime capturedAt,
             OffsetDateTime uploadedAt,
             List<AlbumReference> albums
     ) { }

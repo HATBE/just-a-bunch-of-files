@@ -11,22 +11,29 @@
   } @else if (items().length === 0) {
     <p>No media found.</p>
   } @else {
-    <div class="grid">
-      @for (item of items(); track item.fileId) {
-        <article class="card">
-          <div class="preview">
-            <img [src]="getPreviewUrl(item.fileId)" [alt]="item.originalFilename" loading="lazy" />
-            @if (item.kind === 'VIDEO') {
-              <span class="video-badge">Video</span>
+    <div #gallerySurface class="gallery">
+      @for (section of sections(); track section.key) {
+        <section class="gallery-section" [style.width.px]="section.width">
+          <div class="section-break">
+            <h2>{{ section.label }}</h2>
+          </div>
+
+          <div class="gallery-row" [style.height.px]="section.row.height">
+            @for (entry of section.row.items; track entry.item.fileId) {
+              <article class="gallery-item" [style.width.px]="entry.width">
+                <img
+                  [src]="getPreviewUrl(entry.item.fileId)"
+                  [alt]="entry.item.originalFilename"
+                  loading="lazy"
+                  (load)="onPreviewLoad(entry.item.fileId, $event)"
+                />
+                @if (entry.item.kind === 'VIDEO') {
+                  <span class="video-badge">Video</span>
+                }
+              </article>
             }
           </div>
-          <div class="meta">
-            <div>{{ item.originalFilename }}</div>
-            <div>{{ item.kind }}</div>
-            <div>{{ item.user.username }}</div>
-            <div>{{ item.uploadedAt | date: 'medium' }}</div>
-          </div>
-        </article>
+        </section>
       }
     </div>
   }

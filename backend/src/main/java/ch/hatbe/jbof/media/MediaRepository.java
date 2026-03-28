@@ -1,6 +1,8 @@
 package ch.hatbe.jbof.media;
 
 import ch.hatbe.jbof.jooq.tables.records.MediaFilesRecord;
+import ch.hatbe.jbof.core.pagination.JooqPagination;
+import ch.hatbe.jbof.core.pagination.PageRequest;
 import ch.hatbe.jbof.media.entity.MediaProcessingStatus;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
@@ -30,6 +32,7 @@ public class MediaRepository {
             String originalFilename,
             String contentType,
             long sizeBytes,
+            java.time.OffsetDateTime capturedAt,
             String thumbnailContentType,
             Long thumbnailSizeBytes
     ) {
@@ -43,6 +46,7 @@ public class MediaRepository {
             .set(MEDIA_FILES.ORIGINAL_FILENAME, originalFilename)
             .set(MEDIA_FILES.CONTENT_TYPE, contentType)
             .set(MEDIA_FILES.SIZE_BYTES, sizeBytes)
+            .set(MEDIA_FILES.CAPTURED_AT, capturedAt)
             .set(MEDIA_FILES.THUMBNAIL_CONTENT_TYPE, thumbnailContentType)
             .set(MEDIA_FILES.THUMBNAIL_SIZE_BYTES, thumbnailSizeBytes)
             .set(MEDIA_FILES.PROCESSING_STATUS, MediaProcessingStatus.UPLOADED.name())
@@ -50,16 +54,21 @@ public class MediaRepository {
             .fetchOne();
     }
 
-    public List<MediaFilesRecord> findAll(UUID userId) {
+    public List<MediaFilesRecord> findAll(UUID userId, PageRequest pageRequest) {
         var query = dsl.selectFrom(MEDIA_FILES).where(MEDIA_FILES.PROCESSING_STATUS.eq(MediaProcessingStatus.UPLOADED.name())); // TODO: remove uplaoded and change to PROCESSED
 
         if (userId != null) {
-            return query.and(MEDIA_FILES.OWNER_USER_ID.eq(userId))
-                .orderBy(MEDIA_FILES.UPLOADED_AT.desc(), MEDIA_FILES.FILE_ID.asc())
-                .fetch();
+            return JooqPagination.apply(
+                    query.and(MEDIA_FILES.OWNER_USER_ID.eq(userId))
+                            .orderBy(MEDIA_FILES.CAPTURED_AT.desc().nullsLast(), MEDIA_FILES.UPLOADED_AT.desc(), MEDIA_FILES.FILE_ID.asc()),
+                    pageRequest
+            ).fetch();
         }
 
-        return query.orderBy(MEDIA_FILES.UPLOADED_AT.desc(), MEDIA_FILES.FILE_ID.asc())
+        return JooqPagination.apply(
+                query.orderBy(MEDIA_FILES.CAPTURED_AT.desc().nullsLast(), MEDIA_FILES.UPLOADED_AT.desc(), MEDIA_FILES.FILE_ID.asc()),
+                pageRequest
+        )
                 .fetch();
     }
 
@@ -76,7 +85,7 @@ public class MediaRepository {
             .join(ALBUM_MEDIA_FILES).on(ALBUM_MEDIA_FILES.FILE_ID.eq(MEDIA_FILES.FILE_ID))
             .where(ALBUM_MEDIA_FILES.ALBUM_ID.eq(albumId))
             .and(MEDIA_FILES.PROCESSING_STATUS.eq(MediaProcessingStatus.UPLOADED.name())) // TODO: remove uplaoded and change to PROCESSED
-            .orderBy(MEDIA_FILES.UPLOADED_AT.desc(), MEDIA_FILES.FILE_ID.asc())
+            .orderBy(MEDIA_FILES.CAPTURED_AT.desc().nullsLast(), MEDIA_FILES.UPLOADED_AT.desc(), MEDIA_FILES.FILE_ID.asc())
             .fetchInto(MEDIA_FILES);
     }
 

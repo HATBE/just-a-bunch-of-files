@@ -2,6 +2,9 @@ package ch.hatbe.jbof.media;
 
 import ch.hatbe.jbof.album.AlbumRepository;
 import ch.hatbe.jbof.core.exception.NotFoundException;
+import ch.hatbe.jbof.core.pagination.PageQuery;
+import ch.hatbe.jbof.core.pagination.PageRequest;
+import ch.hatbe.jbof.core.pagination.PageResult;
 import ch.hatbe.jbof.jooq.tables.records.MediaFilesRecord;
 import ch.hatbe.jbof.media.entity.MediaDtos;
 import ch.hatbe.jbof.media.entity.MediaKind;
@@ -14,6 +17,9 @@ import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
+import com.drew.metadata.mov.QuickTimeDirectory;
+import com.drew.metadata.mov.metadata.QuickTimeMetadataDirectory;
+import com.drew.metadata.mp4.Mp4Directory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -25,14 +31,19 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class MediaService {
+    private static final int DEFAULT_PAGE_SIZE = 24;
+    private static final int MAX_PAGE_SIZE = 100;
     private static final String IMAGE_BUCKET = "images";
     private static final String VIDEO_BUCKET = "videos";
 
@@ -67,22 +78,19 @@ public class MediaService {
         return uploadedFiles;
     }
 
-    public List<MediaDtos.ListResponse> findAll(UUID userId) {
+    public PageResult<MediaDtos.ListResponse> findAll(UUID userId, PageQuery pageQuery) {
         if (userId != null && !userRepository.existsById(userId)) {
             throw new NotFoundException("user not found");
         }
 
-        return repository.findAll(userId)
+        PageRequest pageRequest = pageQuery.toPageRequest(DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
+
+        List<MediaDtos.ListResponse> slice = repository.findAll(userId, pageRequest)
                 .stream()
                 .map(record -> mediaMapper.toListResponse(record, getUserSummary(record.getOwnerUserId())))
                 .toList();
-    }
 
-    public MediaDtos.DetailResponse findById(UUID fileId) {
-        MediaFilesRecord record = repository.findById(fileId)
-                .orElseThrow(() -> new NotFoundException("file not found"));
-
-        return toDetailResponse(record);
+        return PageResult.fromSlice(slice, pageRequest);
     }
 
     public List<MediaDtos.ListResponse> findByAlbumId(UUID albumId) {
@@ -96,11 +104,43 @@ public class MediaService {
                 .toList();
     }
 
+    public MediaDtos.DetailResponse findById(UUID fileId) {
+        MediaFilesRecord record = repository.findById(fileId)
+                .orElseThrow(() -> new NotFoundException("file not found"));
+
+        return toDetailResponse(record);
+    }
+
     public ResponseInputStream<GetObjectResponse> download(UUID fileId) {
         MediaFilesRecord record = repository.findById(fileId)
                 .orElseThrow(() -> new NotFoundException("file not found"));
 
         return storageService.download(record.getBucket(), record.getObjectKey());
+    }
+
+    public MediaDownload preview(UUID fileId) {
+        MediaFilesRecord record = repository.findById(fileId)
+                .orElseThrow(() -> new NotFoundException("file not found"));
+
+        String bucket = record.getThumbnailBucket() == null || record.getThumbnailBucket().isBlank()
+                ? record.getBucket()
+                : record.getThumbnailBucket();
+        String objectKey = record.getThumbnailObjectKey() == null || record.getThumbnailObjectKey().isBlank()
+                ? record.getObjectKey()
+                : record.getThumbnailObjectKey();
+        String contentType = record.getThumbnailContentType() == null || record.getThumbnailContentType().isBlank()
+                ? record.getContentType()
+                : record.getThumbnailContentType();
+        long sizeBytes = record.getThumbnailSizeBytes() == null
+                ? record.getSizeBytes()
+                : record.getThumbnailSizeBytes();
+
+        return new MediaDownload(
+                originalFilename(record.getOriginalFilename()),
+                contentType,
+                sizeBytes,
+                storageService.download(bucket, objectKey)
+        );
     }
 
     public void delete(UUID fileId) {
@@ -183,6 +223,12 @@ public class MediaService {
                 : file.getOriginalFilename();
     }
 
+    private String originalFilename(String originalFilename) {
+        return originalFilename == null || originalFilename.isBlank()
+                ? "file"
+                : originalFilename;
+    }
+
     private MediaDtos.DetailResponse uploadSingle(
             UUID userId,
             List<UUID> albumIds,
@@ -204,6 +250,7 @@ public class MediaService {
                     new ByteArrayInputStream(thumbnail.bytes()),
                     thumbnail.sizeBytes()
             );
+            OffsetDateTime capturedAt = extractCapturedAt(file, kind).orElse(null);
             String contentType = file.getContentType() == null || file.getContentType().isBlank()
                     ? MediaType.APPLICATION_OCTET_STREAM_VALUE
                     : file.getContentType();
@@ -218,6 +265,7 @@ public class MediaService {
                     originalFilename(file),
                     contentType,
                     file.getSize(),
+                    capturedAt,
                     thumbnail.contentType(),
                     thumbnail.sizeBytes()
             );
@@ -227,8 +275,6 @@ public class MediaService {
                     repository.addToAlbum(albumId, record.getFileId());
                 }
             }
-
-            logCapturedAt(file, kind);
 
             return toDetailResponse(record);
         } catch (Exception e) {
@@ -259,28 +305,33 @@ public class MediaService {
     }
 
 
-    private void logCapturedAt(MultipartFile file, MediaKind kind) {
-        if (kind != MediaKind.IMAGE) {
-            log.info("Capture timestamp extraction is not implemented yet for {} {}", kind, originalFilename(file));
-            return;
-        }
-
+    private Optional<OffsetDateTime> extractCapturedAt(MultipartFile file, MediaKind kind) {
         try (InputStream inputStream = file.getInputStream()) {
             Metadata metadata = ImageMetadataReader.readMetadata(inputStream);
-            Date capturedAt = readCapturedAt(metadata);
+            Date capturedAt = readCapturedAt(metadata, kind);
 
             if (capturedAt != null) {
-                log.info("Captured at for {}: {}", originalFilename(file), capturedAt);
-                return;
+                OffsetDateTime capturedAtValue = OffsetDateTime.ofInstant(capturedAt.toInstant(), ZoneOffset.UTC);
+                log.info("Captured at for {} {}: {}", kind, originalFilename(file), capturedAtValue);
+                return Optional.of(capturedAtValue);
             }
 
-            log.info("No embedded capture timestamp found for {}", originalFilename(file));
+            log.info("No embedded capture timestamp found for {} {}", kind, originalFilename(file));
         } catch (ImageProcessingException | IOException e) {
             log.warn("Could not extract captured-at metadata for {}", originalFilename(file), e);
         }
+
+        return Optional.empty();
     }
 
-    private Date readCapturedAt(Metadata metadata) {
+    private Date readCapturedAt(Metadata metadata, MediaKind kind) {
+        return switch (kind) {
+            case IMAGE -> readImageCapturedAt(metadata);
+            case VIDEO -> readVideoCapturedAt(metadata);
+        };
+    }
+
+    private Date readImageCapturedAt(Metadata metadata) {
         ExifSubIFDDirectory exifSubIfd = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
         if (exifSubIfd != null) {
             Date original = exifSubIfd.getDateOriginal();
@@ -296,7 +347,38 @@ public class MediaService {
 
         ExifIFD0Directory exifIfd0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
         if (exifIfd0 != null) {
-            return exifIfd0.getDate(ExifIFD0Directory.TAG_DATETIME);
+            Date date = exifIfd0.getDate(ExifIFD0Directory.TAG_DATETIME);
+            if (date != null) {
+                return date;
+            }
+        }
+
+        return null;
+    }
+
+    private Date readVideoCapturedAt(Metadata metadata) {
+        QuickTimeMetadataDirectory quickTimeMetadata = metadata.getFirstDirectoryOfType(QuickTimeMetadataDirectory.class);
+        if (quickTimeMetadata != null) {
+            Date date = quickTimeMetadata.getDate(QuickTimeMetadataDirectory.TAG_CREATION_DATE);
+            if (date != null) {
+                return date;
+            }
+        }
+
+        QuickTimeDirectory quickTimeDirectory = metadata.getFirstDirectoryOfType(QuickTimeDirectory.class);
+        if (quickTimeDirectory != null) {
+            Date date = quickTimeDirectory.getDate(QuickTimeDirectory.TAG_CREATION_TIME);
+            if (date != null) {
+                return date;
+            }
+        }
+
+        Mp4Directory mp4Directory = metadata.getFirstDirectoryOfType(Mp4Directory.class);
+        if (mp4Directory != null) {
+            Date date = mp4Directory.getDate(Mp4Directory.TAG_CREATION_TIME);
+            if (date != null) {
+                return date;
+            }
         }
 
         return null;
@@ -313,4 +395,11 @@ public class MediaService {
             log.warn("Could not clean up uploaded object {}/{}", bucket, key, cleanupError);
         }
     }
+
+    public record MediaDownload(
+            String originalFilename,
+            String contentType,
+            long sizeBytes,
+            ResponseInputStream<GetObjectResponse> stream
+    ) { }
 }

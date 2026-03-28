@@ -1,5 +1,7 @@
 package ch.hatbe.jbof.media;
 
+import ch.hatbe.jbof.core.pagination.PageQuery;
+import ch.hatbe.jbof.core.pagination.PageResult;
 import ch.hatbe.jbof.media.entity.MediaDtos;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
@@ -31,8 +33,11 @@ public class MediaController {
     }
 
     @GetMapping
-    public List<MediaDtos.ListResponse> findAll(@RequestParam(required = false) UUID userId) {
-        return service.findAll(userId);
+    public PageResult<MediaDtos.ListResponse> findAll(
+            @RequestParam(required = false) UUID userId,
+            PageQuery pageQuery
+    ) {
+        return service.findAll(userId, pageQuery);
     }
 
     @GetMapping("/{fileId}")
@@ -54,6 +59,21 @@ public class MediaController {
                 .contentType(MediaType.parseMediaType(contentType))
                 .contentLength(file.sizeBytes())
                 .body(new InputStreamResource(objectStream));
+    }
+
+    @GetMapping("/{fileId}/preview")
+    public ResponseEntity<InputStreamResource> preview(@PathVariable UUID fileId) {
+        MediaService.MediaDownload preview = service.preview(fileId);
+
+        String contentType = preview.contentType() == null || preview.contentType().isBlank()
+                ? MediaType.APPLICATION_OCTET_STREAM_VALUE
+                : preview.contentType();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + preview.originalFilename() + "\"")
+                .contentType(MediaType.parseMediaType(contentType))
+                .contentLength(preview.sizeBytes())
+                .body(new InputStreamResource(preview.stream()));
     }
 
     @DeleteMapping("/{fileId}")

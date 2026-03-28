@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { HttpService } from '../core/http.service';
 import {
   MediaDetailResponseDto,
+  MediaPagedResponseDto,
   MediaListResponseDto,
   UploadMediaRequestDto
 } from './media.dtos';
@@ -17,11 +18,17 @@ export class MediaService extends HttpService {
     this.setEntity('media');
   }
 
-  public getAll(userId?: string): Promise<MediaListResponseDto[]> {
-    const params = userId ? new HttpParams().set('userId', userId) : undefined;
+  public getAll(userId?: string, limit = 24, offset = 0): Promise<MediaPagedResponseDto> {
+    let params = new HttpParams()
+      .set('limit', limit)
+      .set('offset', offset);
+
+    if (userId) {
+      params = params.set('userId', userId);
+    }
 
     return firstValueFrom(
-      this.http.get<MediaListResponseDto[]>(this.createUrl(), { params })
+      this.http.get<MediaPagedResponseDto>(this.createUrl(), { params })
     );
   }
 
@@ -52,5 +59,9 @@ export class MediaService extends HttpService {
 
   public getContentUrl(fileId: string): string {
     return this.createUrl([fileId, 'content']);
+  }
+
+  public getPreviewUrl(fileId: string): string {
+    return this.createUrl([fileId, 'preview']);
   }
 }

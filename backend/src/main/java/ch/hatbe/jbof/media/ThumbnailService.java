@@ -1,6 +1,11 @@
 package ch.hatbe.jbof.media;
 
 import ch.hatbe.jbof.media.entity.MediaKind;
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.exif.ExifDirectoryBase;
+import com.drew.metadata.exif.ExifIFD0Directory;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.jcodec.api.JCodecException;
@@ -12,10 +17,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -34,13 +41,19 @@ public class ThumbnailService {
     }
 
     private ThumbnailPayload createImageThumbnail(MultipartFile file) throws IOException {
-        try (InputStream inputStream = file.getInputStream()) {
-            BufferedImage source = ImageIO.read(inputStream);
+        byte[] bytes = file.getBytes();
+
+        try (InputStream metadataStream = new java.io.ByteArrayInputStream(bytes);
+             InputStream imageStream = new java.io.ByteArrayInputStream(bytes)) {
+            Metadata metadata = ImageMetadataReader.readMetadata(metadataStream);
+            BufferedImage source = ImageIO.read(imageStream);
             if (source == null) {
                 throw new IOException("unsupported image format");
             }
 
-            return encodeThumbnail(source);
+            return encodeThumbnail(applyImageOrientation(source, readImageOrientation(metadata)));
+        } catch (ImageProcessingException e) {
+            throw new IOException("image metadata extraction failed", e);
         }
     }
 
@@ -49,7 +62,7 @@ public class ThumbnailService {
 
         try {
             try (InputStream inputStream = file.getInputStream()) {
-                Files.copy(inputStream, tempFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
             }
 
             BufferedImage frame = extractFrame(tempFile);
@@ -61,14 +74,71 @@ public class ThumbnailService {
 
     private BufferedImage extractFrame(Path videoFile) throws IOException {
         try (SeekableByteChannel channel = NIOUtils.readableChannel(videoFile.toFile())) {
+            AWTFrameGrab frameGrab = AWTFrameGrab.createAWTFrameGrab(channel);
             try {
-                return AWTFrameGrab.getFrame(channel, 1.0);
+                frameGrab.seekToSecondPrecise(1);
+                return frameGrab.getFrameWithOrientation();
             } catch (JCodecException ignored) {
-                return AWTFrameGrab.getFrame(videoFile.toFile(), 0);
+                try (SeekableByteChannel fallbackChannel = NIOUtils.readableChannel(videoFile.toFile())) {
+                    AWTFrameGrab fallbackGrab = AWTFrameGrab.createAWTFrameGrab(fallbackChannel);
+                    fallbackGrab.seekToFramePrecise(0);
+                    return fallbackGrab.getFrameWithOrientation();
+                }
             }
         } catch (JCodecException e) {
             throw new IOException("video frame extraction failed", e);
         }
+    }
+
+    private int readImageOrientation(Metadata metadata) {
+        ExifIFD0Directory exifIfd0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+        if (exifIfd0 == null) {
+            return 1;
+        }
+
+        Integer orientation = exifIfd0.getInteger(ExifDirectoryBase.TAG_ORIENTATION);
+        return orientation == null ? 1 : orientation;
+    }
+
+    private BufferedImage applyImageOrientation(BufferedImage source, int orientation) {
+        int width = source.getWidth();
+        int height = source.getHeight();
+        int targetWidth = switch (orientation) {
+            case 5, 6, 7, 8 -> height;
+            default -> width;
+        };
+        int targetHeight = switch (orientation) {
+            case 5, 6, 7, 8 -> width;
+            default -> height;
+        };
+
+        if (orientation == 1) {
+            return source;
+        }
+
+        BufferedImage rotated = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = rotated.createGraphics();
+        try {
+            graphics.setTransform(orientationTransform(orientation, width, height));
+            graphics.drawImage(source, 0, 0, null);
+        } finally {
+            graphics.dispose();
+        }
+
+        return rotated;
+    }
+
+    private AffineTransform orientationTransform(int orientation, int width, int height) {
+        return switch (orientation) {
+            case 2 -> new AffineTransform(-1, 0, 0, 1, width, 0);
+            case 3 -> new AffineTransform(-1, 0, 0, -1, width, height);
+            case 4 -> new AffineTransform(1, 0, 0, -1, 0, height);
+            case 5 -> new AffineTransform(0, 1, 1, 0, 0, 0);
+            case 6 -> new AffineTransform(0, 1, -1, 0, height, 0);
+            case 7 -> new AffineTransform(0, -1, -1, 0, height, width);
+            case 8 -> new AffineTransform(0, -1, 1, 0, 0, width);
+            default -> new AffineTransform();
+        };
     }
 
     private ThumbnailPayload encodeThumbnail(BufferedImage source) throws IOException {

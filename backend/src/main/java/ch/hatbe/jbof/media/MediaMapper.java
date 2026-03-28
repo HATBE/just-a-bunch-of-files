@@ -39,6 +39,7 @@ public interface MediaMapper {
                 objectKey,
                 contentType,
                 sizeBytes,
+                record.getCapturedAt(),
                 record.getUploadedAt()
         );
     }
