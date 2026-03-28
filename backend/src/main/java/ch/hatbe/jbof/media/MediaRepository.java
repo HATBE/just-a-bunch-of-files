@@ -79,6 +79,23 @@ public class MediaRepository {
             .fetchOptional();
     }
 
+    public MediaFilesRecord updateThumbnail(
+            UUID fileId,
+            String thumbnailBucket,
+            String thumbnailObjectKey,
+            String thumbnailContentType,
+            Long thumbnailSizeBytes
+    ) {
+        return dsl.update(MEDIA_FILES)
+                .set(MEDIA_FILES.THUMBNAIL_BUCKET, thumbnailBucket)
+                .set(MEDIA_FILES.THUMBNAIL_OBJECT_KEY, thumbnailObjectKey)
+                .set(MEDIA_FILES.THUMBNAIL_CONTENT_TYPE, thumbnailContentType)
+                .set(MEDIA_FILES.THUMBNAIL_SIZE_BYTES, thumbnailSizeBytes)
+                .where(MEDIA_FILES.FILE_ID.eq(fileId))
+                .returning()
+                .fetchOne();
+    }
+
     public List<MediaFilesRecord> findByAlbumId(UUID albumId) {
         return dsl.select(MEDIA_FILES.fields())
             .from(MEDIA_FILES)

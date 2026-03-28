@@ -143,6 +143,45 @@ public class MediaService {
         );
     }
 
+    public MediaDtos.DetailResponse regeneratePreview(UUID fileId) throws IOException {
+        MediaFilesRecord record = repository.findById(fileId)
+                .orElseThrow(() -> new NotFoundException("file not found"));
+
+        MediaKind kind = MediaKind.valueOf(record.getKind());
+        byte[] originalBytes;
+        try (ResponseInputStream<GetObjectResponse> objectStream =
+                     storageService.download(record.getBucket(), record.getObjectKey())) {
+            originalBytes = objectStream.readAllBytes();
+        }
+
+        ThumbnailService.ThumbnailPayload thumbnail = thumbnailService.createThumbnail(kind, originalBytes);
+        String thumbnailBucket = record.getThumbnailBucket() == null || record.getThumbnailBucket().isBlank()
+                ? record.getBucket()
+                : record.getThumbnailBucket();
+        String previousThumbnailKey = record.getThumbnailObjectKey();
+        String thumbnailKey = storageService.upload(
+                thumbnailBucket,
+                thumbnail.filename(),
+                thumbnail.contentType(),
+                new ByteArrayInputStream(thumbnail.bytes()),
+                thumbnail.sizeBytes()
+        );
+
+        MediaFilesRecord updatedRecord = repository.updateThumbnail(
+                fileId,
+                thumbnailBucket,
+                thumbnailKey,
+                thumbnail.contentType(),
+                thumbnail.sizeBytes()
+        );
+
+        if (previousThumbnailKey != null && !previousThumbnailKey.isBlank() && !previousThumbnailKey.equals(thumbnailKey)) {
+            storageService.delete(thumbnailBucket, previousThumbnailKey);
+        }
+
+        return toDetailResponse(updatedRecord);
+    }
+
     public void delete(UUID fileId) {
         MediaFilesRecord record = repository.findById(fileId)
                 .orElseThrow(() -> new NotFoundException("file not found"));

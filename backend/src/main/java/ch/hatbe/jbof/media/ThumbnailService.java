@@ -34,15 +34,17 @@ public class ThumbnailService {
     private static final String THUMBNAIL_FILENAME = "thumbnail.jpg";
 
     public ThumbnailPayload createThumbnail(MediaKind kind, MultipartFile file) throws IOException {
+        return createThumbnail(kind, file.getBytes());
+    }
+
+    public ThumbnailPayload createThumbnail(MediaKind kind, byte[] bytes) throws IOException {
         return switch (kind) {
-            case IMAGE -> createImageThumbnail(file);
-            case VIDEO -> createVideoThumbnail(file);
+            case IMAGE -> createImageThumbnail(bytes);
+            case VIDEO -> createVideoThumbnail(bytes);
         };
     }
 
-    private ThumbnailPayload createImageThumbnail(MultipartFile file) throws IOException {
-        byte[] bytes = file.getBytes();
-
+    private ThumbnailPayload createImageThumbnail(byte[] bytes) throws IOException {
         try (InputStream metadataStream = new java.io.ByteArrayInputStream(bytes);
              InputStream imageStream = new java.io.ByteArrayInputStream(bytes)) {
             Metadata metadata = ImageMetadataReader.readMetadata(metadataStream);
@@ -57,11 +59,11 @@ public class ThumbnailService {
         }
     }
 
-    private ThumbnailPayload createVideoThumbnail(MultipartFile file) throws IOException {
+    private ThumbnailPayload createVideoThumbnail(byte[] bytes) throws IOException {
         Path tempFile = Files.createTempFile("jbof-video-thumbnail-", ".bin");
 
         try {
-            try (InputStream inputStream = file.getInputStream()) {
+            try (InputStream inputStream = new java.io.ByteArrayInputStream(bytes)) {
                 Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
             }
 

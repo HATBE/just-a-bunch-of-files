@@ -76,6 +76,11 @@ public class MediaController {
                 .body(new InputStreamResource(preview.stream()));
     }
 
+    @PostMapping("/{fileId}/preview/regenerate")
+    public MediaDtos.DetailResponse regeneratePreview(@PathVariable UUID fileId) throws IOException {
+        return service.regeneratePreview(fileId);
+    }
+
     @DeleteMapping("/{fileId}")
     public ResponseEntity<Void> delete(@PathVariable UUID fileId) {
         service.delete(fileId);

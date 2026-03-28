@@ -14,9 +14,11 @@
     <div #gallerySurface class="gallery">
       @for (section of sections(); track section.key) {
         <section class="gallery-section" [style.width.px]="section.width">
-          <div class="section-break">
-            <h2>{{ section.label }}</h2>
-          </div>
+          @if (section.showLabel) {
+            <div class="section-break">
+              <h2>{{ section.label }}</h2>
+            </div>
+          }
 
           <div class="gallery-row" [style.height.px]="section.row.height">
             @for (entry of section.row.items; track entry.item.fileId) {
