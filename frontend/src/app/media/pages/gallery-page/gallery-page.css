@@ -30,6 +30,10 @@
   justify-items: start;
 }
 
+.section-break-empty {
+  visibility: hidden;
+}
+
 .section-break h2 {
   margin: 0;
   font-size: clamp(1rem, 1vw + 0.85rem, 1.35rem);

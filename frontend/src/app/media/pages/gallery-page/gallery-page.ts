@@ -19,10 +19,9 @@ export class GalleryPage implements OnDestroy {
   private static readonly MAX_ASPECT_RATIO = 1.8;
   private static readonly LOAD_MORE_THRESHOLD_PX = 1000;
   private static readonly MIN_PAGE_OVERFLOW_PX = 280;
-  private static readonly SECTION_DATE_FORMAT = new Intl.DateTimeFormat('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
+  private static readonly SECTION_DATE_FORMAT = new Intl.DateTimeFormat(undefined, {
+    day: '2-digit',
+    month: '2-digit',
     year: 'numeric',
   });
 
@@ -173,6 +172,7 @@ export class GalleryPage implements OnDestroy {
   ): GallerySectionSlice[] {
     const slices: GallerySectionSlice[] = [];
     let remainingShelfWidth = surfaceWidth;
+    const shelfHeight = this.targetRowHeight(surfaceWidth);
 
     for (const [sectionKey, sectionItems] of groupedItems.entries()) {
       const queue = [...sectionItems];
@@ -186,13 +186,14 @@ export class GalleryPage implements OnDestroy {
 
         const desiredWidth = Math.min(
           remainingShelfWidth,
-          this.estimateSectionWidth(queue, surfaceWidth),
+          this.estimateSectionWidth(queue, surfaceWidth, shelfHeight),
         );
         const slice = this.buildSectionSlice(
           `${sectionKey}-${sliceIndex}`,
           label,
           queue,
           desiredWidth,
+          shelfHeight,
           sliceIndex === 0,
         );
 
@@ -216,24 +217,31 @@ export class GalleryPage implements OnDestroy {
     label: string,
     items: MediaListResponseDto[],
     desiredWidth: number,
+    rowHeight: number,
     showLabel: boolean,
   ): GallerySectionSlice {
     const rowItems: MediaListResponseDto[] = [];
-    let aspectSum = 0;
+    let projectedWidth = 0;
 
     for (const item of items) {
-      const aspectRatio = this.resolveAspectRatio(item);
-      rowItems.push(item);
-      aspectSum += aspectRatio;
+      const itemWidth = this.itemWidth(item, rowHeight);
+      const nextWidth = rowItems.length === 0
+        ? itemWidth
+        : projectedWidth + GalleryPage.ROW_GAP + itemWidth;
 
-      const gapWidth = GalleryPage.ROW_GAP * Math.max(0, rowItems.length - 1);
-      const estimatedHeight = (desiredWidth - gapWidth) / aspectSum;
-      if (estimatedHeight <= this.targetRowHeight(desiredWidth)) {
+      if (rowItems.length > 0 && nextWidth > desiredWidth) {
         break;
       }
+
+      rowItems.push(item);
+      projectedWidth = nextWidth;
     }
 
-    const row = this.buildRow(rowItems, desiredWidth);
+    if (rowItems.length === 0 && items.length > 0) {
+      rowItems.push(items[0]);
+    }
+
+    const row = this.buildRow(rowItems, rowHeight);
     return {
       key,
       label,
@@ -243,33 +251,30 @@ export class GalleryPage implements OnDestroy {
     };
   }
 
-  private estimateSectionWidth(items: MediaListResponseDto[], surfaceWidth: number): number {
+  private estimateSectionWidth(items: MediaListResponseDto[], surfaceWidth: number, rowHeight: number): number {
     const maxWidth = Math.floor(surfaceWidth * GalleryPage.SECTION_MAX_WIDTH_RATIO);
-    const targetHeight = this.targetRowHeight(maxWidth);
     const visibleItems = items.slice(0, Math.min(items.length, 6));
     const preferredWidth = Math.round(
-      visibleItems.reduce((sum, item) => sum + this.resolveAspectRatio(item) * targetHeight, 0)
+      visibleItems.reduce((sum, item) => sum + this.itemWidth(item, rowHeight), 0)
       + Math.max(0, visibleItems.length - 1) * GalleryPage.ROW_GAP,
     );
 
     return Math.min(maxWidth, Math.max(GalleryPage.SECTION_MIN_WIDTH, preferredWidth));
   }
 
-  private buildRow(items: MediaListResponseDto[], surfaceWidth: number): GalleryRow {
-    const aspectSum = items.reduce((sum, item) => sum + this.resolveAspectRatio(item), 0);
-    const gapWidth = GalleryPage.ROW_GAP * Math.max(0, items.length - 1);
-    const justifiedHeight = (surfaceWidth - gapWidth) / aspectSum;
-    const targetRowHeight = this.targetRowHeight(surfaceWidth);
-    const rowHeight = Math.min(targetRowHeight, justifiedHeight);
+  private buildRow(items: MediaListResponseDto[], rowHeight: number): GalleryRow {
     const height = Math.max(GalleryPage.MIN_ROW_HEIGHT, Math.round(rowHeight));
-
     return {
       items: items.map((item) => ({
         item,
-        width: Math.max(90, Math.round(height * this.resolveAspectRatio(item))),
+        width: this.itemWidth(item, height),
       })),
       height,
     };
+  }
+
+  private itemWidth(item: MediaListResponseDto, rowHeight: number): number {
+    return Math.max(90, Math.round(rowHeight * this.resolveAspectRatio(item)));
   }
 
   private rowWidth(row: GalleryRow): number {

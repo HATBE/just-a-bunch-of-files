@@ -55,7 +55,7 @@ public class MediaRepository {
     }
 
     public List<MediaFilesRecord> findAll(UUID userId, PageRequest pageRequest) {
-        var query = dsl.selectFrom(MEDIA_FILES).where(MEDIA_FILES.PROCESSING_STATUS.eq(MediaProcessingStatus.UPLOADED.name())); // TODO: remove uplaoded and change to PROCESSED
+        var query = dsl.selectFrom(MEDIA_FILES).where(MEDIA_FILES.PROCESSING_STATUS.eq(MediaProcessingStatus.PROCESSED.name()));
 
         if (userId != null) {
             return JooqPagination.apply(
@@ -72,10 +72,16 @@ public class MediaRepository {
                 .fetch();
     }
 
-    public Optional<MediaFilesRecord> findById(UUID fileId) {
+    public Optional<MediaFilesRecord> findProcessedById(UUID fileId) {
         return dsl.selectFrom(MEDIA_FILES)
             .where(MEDIA_FILES.FILE_ID.eq(fileId))
-            .and(MEDIA_FILES.PROCESSING_STATUS.eq(MediaProcessingStatus.UPLOADED.name())) // TODO: remove uplaoded and change to PROCESSED
+            .and(MEDIA_FILES.PROCESSING_STATUS.eq(MediaProcessingStatus.PROCESSED.name()))
+            .fetchOptional();
+    }
+
+    public Optional<MediaFilesRecord> findExistingById(UUID fileId) {
+        return dsl.selectFrom(MEDIA_FILES)
+            .where(MEDIA_FILES.FILE_ID.eq(fileId))
             .fetchOptional();
     }
 
@@ -101,7 +107,7 @@ public class MediaRepository {
             .from(MEDIA_FILES)
             .join(ALBUM_MEDIA_FILES).on(ALBUM_MEDIA_FILES.FILE_ID.eq(MEDIA_FILES.FILE_ID))
             .where(ALBUM_MEDIA_FILES.ALBUM_ID.eq(albumId))
-            .and(MEDIA_FILES.PROCESSING_STATUS.eq(MediaProcessingStatus.UPLOADED.name())) // TODO: remove uplaoded and change to PROCESSED
+            .and(MEDIA_FILES.PROCESSING_STATUS.eq(MediaProcessingStatus.PROCESSED.name()))
             .orderBy(MEDIA_FILES.CAPTURED_AT.desc().nullsLast(), MEDIA_FILES.UPLOADED_AT.desc(), MEDIA_FILES.FILE_ID.asc())
             .fetchInto(MEDIA_FILES);
     }

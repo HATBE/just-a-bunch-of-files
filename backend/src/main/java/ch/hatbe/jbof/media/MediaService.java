@@ -6,20 +6,14 @@ import ch.hatbe.jbof.core.pagination.PageQuery;
 import ch.hatbe.jbof.core.pagination.PageRequest;
 import ch.hatbe.jbof.core.pagination.PageResult;
 import ch.hatbe.jbof.jooq.tables.records.MediaFilesRecord;
+import ch.hatbe.jbof.messaging.RabbitMqProperties;
+import ch.hatbe.jbof.messaging.RabbitMqService;
 import ch.hatbe.jbof.media.entity.MediaDtos;
 import ch.hatbe.jbof.media.entity.MediaKind;
 import ch.hatbe.jbof.storage.StorageService;
 import ch.hatbe.jbof.user.UserRepository;
 import ch.hatbe.jbof.user.entity.UserDtos;
 import ch.hatbe.jbof.user.UserMapper;
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.exif.ExifIFD0Directory;
-import com.drew.metadata.exif.ExifSubIFDDirectory;
-import com.drew.metadata.mov.QuickTimeDirectory;
-import com.drew.metadata.mov.metadata.QuickTimeMetadataDirectory;
-import com.drew.metadata.mp4.Mp4Directory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -30,12 +24,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -44,14 +33,15 @@ import java.util.UUID;
 public class MediaService {
     private static final int DEFAULT_PAGE_SIZE = 24;
     private static final int MAX_PAGE_SIZE = 100;
-    private static final String IMAGE_BUCKET = "images";
-    private static final String VIDEO_BUCKET = "videos";
+    private static final String STAGING_BUCKET = "media-staging";
 
     private final MediaRepository repository;
     private final UserRepository userRepository;
     private final AlbumRepository albumRepository;
     private final StorageService storageService;
     private final ThumbnailService thumbnailService;
+    private final RabbitMqService rabbitMqService;
+    private final RabbitMqProperties rabbitMqProperties;
     private final MediaMapper mediaMapper;
     private final UserMapper userMapper;
 
@@ -105,21 +95,21 @@ public class MediaService {
     }
 
     public MediaDtos.DetailResponse findById(UUID fileId) {
-        MediaFilesRecord record = repository.findById(fileId)
+        MediaFilesRecord record = repository.findProcessedById(fileId)
                 .orElseThrow(() -> new NotFoundException("file not found"));
 
         return toDetailResponse(record);
     }
 
     public ResponseInputStream<GetObjectResponse> download(UUID fileId) {
-        MediaFilesRecord record = repository.findById(fileId)
+        MediaFilesRecord record = repository.findProcessedById(fileId)
                 .orElseThrow(() -> new NotFoundException("file not found"));
 
         return storageService.download(record.getBucket(), record.getObjectKey());
     }
 
     public MediaDownload preview(UUID fileId) {
-        MediaFilesRecord record = repository.findById(fileId)
+        MediaFilesRecord record = repository.findProcessedById(fileId)
                 .orElseThrow(() -> new NotFoundException("file not found"));
 
         String bucket = record.getThumbnailBucket() == null || record.getThumbnailBucket().isBlank()
@@ -144,7 +134,7 @@ public class MediaService {
     }
 
     public MediaDtos.DetailResponse regeneratePreview(UUID fileId) throws IOException {
-        MediaFilesRecord record = repository.findById(fileId)
+        MediaFilesRecord record = repository.findProcessedById(fileId)
                 .orElseThrow(() -> new NotFoundException("file not found"));
 
         MediaKind kind = MediaKind.valueOf(record.getKind());
@@ -183,7 +173,7 @@ public class MediaService {
     }
 
     public void delete(UUID fileId) {
-        MediaFilesRecord record = repository.findById(fileId)
+        MediaFilesRecord record = repository.findExistingById(fileId)
                 .orElseThrow(() -> new NotFoundException("file not found"));
 
         storageService.delete(record.getBucket(), record.getObjectKey());
@@ -194,7 +184,7 @@ public class MediaService {
     }
 
     public void addToAlbum(UUID albumId, UUID fileId) {
-        MediaFilesRecord record = repository.findById(fileId)
+        MediaFilesRecord record = repository.findExistingById(fileId)
                 .orElseThrow(() -> new NotFoundException("file not found"));
 
         if (!albumRepository.existsByIdAndOwnerUserId(albumId, record.getOwnerUserId())) {
@@ -205,7 +195,7 @@ public class MediaService {
     }
 
     public void removeFromAlbum(UUID albumId, UUID fileId) {
-        if (!repository.findById(fileId).isPresent()) {
+        if (repository.findExistingById(fileId).isEmpty()) {
             throw new NotFoundException("file not found");
         }
 
@@ -226,13 +216,6 @@ public class MediaService {
                 throw new NotFoundException("album not found");
             }
         }
-    }
-
-    private String bucketFor(MediaKind kind) {
-        return switch (kind) {
-            case IMAGE -> IMAGE_BUCKET;
-            case VIDEO -> VIDEO_BUCKET;
-        };
     }
 
     private MediaKind detectKind(MultipartFile file) {
@@ -275,21 +258,12 @@ public class MediaService {
     ) throws IOException {
         MediaKind kind = detectKind(file);
 
-        String bucket = bucketFor(kind);
+        String bucket = STAGING_BUCKET;
         String key = null;
-        String thumbnailKey = null;
+        UUID fileId = null;
 
         try {
             key = storageService.upload(bucket, file);
-            ThumbnailService.ThumbnailPayload thumbnail = thumbnailService.createThumbnail(kind, file);
-            thumbnailKey = storageService.upload(
-                    bucket,
-                    thumbnail.filename(),
-                    thumbnail.contentType(),
-                    new ByteArrayInputStream(thumbnail.bytes()),
-                    thumbnail.sizeBytes()
-            );
-            OffsetDateTime capturedAt = extractCapturedAt(file, kind).orElse(null);
             String contentType = file.getContentType() == null || file.getContentType().isBlank()
                     ? MediaType.APPLICATION_OCTET_STREAM_VALUE
                     : file.getContentType();
@@ -299,15 +273,16 @@ public class MediaService {
                     kind.name(),
                     bucket,
                     key,
-                    bucket,
-                    thumbnailKey,
+                    null,
+                    null,
                     originalFilename(file),
                     contentType,
                     file.getSize(),
-                    capturedAt,
-                    thumbnail.contentType(),
-                    thumbnail.sizeBytes()
+                    null,
+                    null,
+                    null
             );
+            fileId = record.getFileId();
 
             if (albumIds != null) {
                 for (UUID albumId : albumIds) {
@@ -315,10 +290,17 @@ public class MediaService {
                 }
             }
 
+            rabbitMqService.sendToQueue(
+                    rabbitMqProperties.mediaProcessingQueue(),
+                    new MediaProcessingTask(record.getFileId())
+            );
+
             return toDetailResponse(record);
         } catch (Exception e) {
+            if (fileId != null) {
+                repository.deleteById(fileId);
+            }
             cleanupUpload(bucket, key);
-            cleanupUpload(bucket, thumbnailKey);
 
             if (e instanceof IOException ioException) {
                 throw ioException;
@@ -341,86 +323,6 @@ public class MediaService {
         return userRepository.findById(userId)
                 .map(userMapper::toListResponse)
                 .orElseThrow(() -> new NotFoundException("user not found"));
-    }
-
-
-    private Optional<OffsetDateTime> extractCapturedAt(MultipartFile file, MediaKind kind) {
-        try (InputStream inputStream = file.getInputStream()) {
-            Metadata metadata = ImageMetadataReader.readMetadata(inputStream);
-            Date capturedAt = readCapturedAt(metadata, kind);
-
-            if (capturedAt != null) {
-                OffsetDateTime capturedAtValue = OffsetDateTime.ofInstant(capturedAt.toInstant(), ZoneOffset.UTC);
-                log.info("Captured at for {} {}: {}", kind, originalFilename(file), capturedAtValue);
-                return Optional.of(capturedAtValue);
-            }
-
-            log.info("No embedded capture timestamp found for {} {}", kind, originalFilename(file));
-        } catch (ImageProcessingException | IOException e) {
-            log.warn("Could not extract captured-at metadata for {}", originalFilename(file), e);
-        }
-
-        return Optional.empty();
-    }
-
-    private Date readCapturedAt(Metadata metadata, MediaKind kind) {
-        return switch (kind) {
-            case IMAGE -> readImageCapturedAt(metadata);
-            case VIDEO -> readVideoCapturedAt(metadata);
-        };
-    }
-
-    private Date readImageCapturedAt(Metadata metadata) {
-        ExifSubIFDDirectory exifSubIfd = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
-        if (exifSubIfd != null) {
-            Date original = exifSubIfd.getDateOriginal();
-            if (original != null) {
-                return original;
-            }
-
-            Date digitized = exifSubIfd.getDateDigitized();
-            if (digitized != null) {
-                return digitized;
-            }
-        }
-
-        ExifIFD0Directory exifIfd0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
-        if (exifIfd0 != null) {
-            Date date = exifIfd0.getDate(ExifIFD0Directory.TAG_DATETIME);
-            if (date != null) {
-                return date;
-            }
-        }
-
-        return null;
-    }
-
-    private Date readVideoCapturedAt(Metadata metadata) {
-        QuickTimeMetadataDirectory quickTimeMetadata = metadata.getFirstDirectoryOfType(QuickTimeMetadataDirectory.class);
-        if (quickTimeMetadata != null) {
-            Date date = quickTimeMetadata.getDate(QuickTimeMetadataDirectory.TAG_CREATION_DATE);
-            if (date != null) {
-                return date;
-            }
-        }
-
-        QuickTimeDirectory quickTimeDirectory = metadata.getFirstDirectoryOfType(QuickTimeDirectory.class);
-        if (quickTimeDirectory != null) {
-            Date date = quickTimeDirectory.getDate(QuickTimeDirectory.TAG_CREATION_TIME);
-            if (date != null) {
-                return date;
-            }
-        }
-
-        Mp4Directory mp4Directory = metadata.getFirstDirectoryOfType(Mp4Directory.class);
-        if (mp4Directory != null) {
-            Date date = mp4Directory.getDate(Mp4Directory.TAG_CREATION_TIME);
-            if (date != null) {
-                return date;
-            }
-        }
-
-        return null;
     }
 
     private void cleanupUpload(String bucket, String key) {
