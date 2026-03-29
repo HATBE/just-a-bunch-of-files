@@ -8,5 +8,4 @@ public record RabbitMqProperties(
         String defaultRoutingKey,
         long receiveTimeout,
         String mediaProcessingQueue
-) {
-}
+) {}

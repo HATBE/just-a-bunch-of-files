@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -31,15 +30,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class MediaService {
-    private static final int DEFAULT_PAGE_SIZE = 24;
-    private static final int MAX_PAGE_SIZE = 100;
     private static final String STAGING_BUCKET = "media-staging";
 
     private final MediaRepository repository;
     private final UserRepository userRepository;
     private final AlbumRepository albumRepository;
     private final StorageService storageService;
-    private final ThumbnailService thumbnailService;
     private final RabbitMqService rabbitMqService;
     private final RabbitMqProperties rabbitMqProperties;
     private final MediaMapper mediaMapper;
@@ -57,7 +53,7 @@ public class MediaService {
         validateAlbums(userId, albumIds);
 
         if (files == null || files.isEmpty()) {
-            throw new IllegalArgumentException("files are empty");
+            throw new IllegalArgumentException("There are no files");
         }
 
         List<MediaDtos.DetailResponse> uploadedFiles = new java.util.ArrayList<>(files.size());
@@ -73,7 +69,7 @@ public class MediaService {
             throw new NotFoundException("user not found");
         }
 
-        PageRequest pageRequest = pageQuery.toPageRequest(DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
+        PageRequest pageRequest = pageQuery.toPageRequest();
 
         List<MediaDtos.ListResponse> slice = repository.findAll(userId, pageRequest)
                 .stream()
@@ -95,21 +91,21 @@ public class MediaService {
     }
 
     public MediaDtos.DetailResponse findById(UUID fileId) {
-        MediaFilesRecord record = repository.findProcessedById(fileId)
+        MediaFilesRecord record = repository.findById(fileId)
                 .orElseThrow(() -> new NotFoundException("file not found"));
 
         return toDetailResponse(record);
     }
 
     public ResponseInputStream<GetObjectResponse> download(UUID fileId) {
-        MediaFilesRecord record = repository.findProcessedById(fileId)
+        MediaFilesRecord record = repository.findById(fileId)
                 .orElseThrow(() -> new NotFoundException("file not found"));
 
         return storageService.download(record.getBucket(), record.getObjectKey());
     }
 
     public MediaDownload preview(UUID fileId) {
-        MediaFilesRecord record = repository.findProcessedById(fileId)
+        MediaFilesRecord record = repository.findById(fileId)
                 .orElseThrow(() -> new NotFoundException("file not found"));
 
         String bucket = record.getThumbnailBucket() == null || record.getThumbnailBucket().isBlank()
@@ -131,45 +127,6 @@ public class MediaService {
                 sizeBytes,
                 storageService.download(bucket, objectKey)
         );
-    }
-
-    public MediaDtos.DetailResponse regeneratePreview(UUID fileId) throws IOException {
-        MediaFilesRecord record = repository.findProcessedById(fileId)
-                .orElseThrow(() -> new NotFoundException("file not found"));
-
-        MediaKind kind = MediaKind.valueOf(record.getKind());
-        byte[] originalBytes;
-        try (ResponseInputStream<GetObjectResponse> objectStream =
-                     storageService.download(record.getBucket(), record.getObjectKey())) {
-            originalBytes = objectStream.readAllBytes();
-        }
-
-        ThumbnailService.ThumbnailPayload thumbnail = thumbnailService.createThumbnail(kind, originalBytes);
-        String thumbnailBucket = record.getThumbnailBucket() == null || record.getThumbnailBucket().isBlank()
-                ? record.getBucket()
-                : record.getThumbnailBucket();
-        String previousThumbnailKey = record.getThumbnailObjectKey();
-        String thumbnailKey = storageService.upload(
-                thumbnailBucket,
-                thumbnail.filename(),
-                thumbnail.contentType(),
-                new ByteArrayInputStream(thumbnail.bytes()),
-                thumbnail.sizeBytes()
-        );
-
-        MediaFilesRecord updatedRecord = repository.updateThumbnail(
-                fileId,
-                thumbnailBucket,
-                thumbnailKey,
-                thumbnail.contentType(),
-                thumbnail.sizeBytes()
-        );
-
-        if (previousThumbnailKey != null && !previousThumbnailKey.isBlank() && !previousThumbnailKey.equals(thumbnailKey)) {
-            storageService.delete(thumbnailBucket, previousThumbnailKey);
-        }
-
-        return toDetailResponse(updatedRecord);
     }
 
     public void delete(UUID fileId) {

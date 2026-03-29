@@ -10,7 +10,7 @@ public class MediaDtos {
     public record AlbumReference(
             UUID albumId,
             String name
-    ) { }
+    ) {}
 
     public record ListResponse(
             UUID fileId,
@@ -23,7 +23,7 @@ public class MediaDtos {
             Long sizeBytes,
             OffsetDateTime capturedAt,
             OffsetDateTime uploadedAt
-    ) { }
+    ) {}
 
     public record DetailResponse(
             UUID fileId,
@@ -37,5 +37,5 @@ public class MediaDtos {
             OffsetDateTime capturedAt,
             OffsetDateTime uploadedAt,
             List<AlbumReference> albums
-    ) { }
+    ) {}
 }

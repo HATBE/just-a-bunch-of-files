@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static ch.hatbe.jbof.core.jooq.JooqConditions.when;
 import static ch.hatbe.jbof.jooq.Tables.ALBUMS;
 import static ch.hatbe.jbof.jooq.Tables.ALBUM_MEDIA_FILES;
 import static ch.hatbe.jbof.jooq.Tables.MEDIA_FILES;
@@ -55,24 +56,17 @@ public class MediaRepository {
     }
 
     public List<MediaFilesRecord> findAll(UUID userId, PageRequest pageRequest) {
-        var query = dsl.selectFrom(MEDIA_FILES).where(MEDIA_FILES.PROCESSING_STATUS.eq(MediaProcessingStatus.PROCESSED.name()));
-
-        if (userId != null) {
-            return JooqPagination.apply(
-                    query.and(MEDIA_FILES.OWNER_USER_ID.eq(userId))
-                            .orderBy(MEDIA_FILES.CAPTURED_AT.desc().nullsLast(), MEDIA_FILES.UPLOADED_AT.desc(), MEDIA_FILES.FILE_ID.asc()),
-                    pageRequest
-            ).fetch();
-        }
-
         return JooqPagination.apply(
-                query.orderBy(MEDIA_FILES.CAPTURED_AT.desc().nullsLast(), MEDIA_FILES.UPLOADED_AT.desc(), MEDIA_FILES.FILE_ID.asc()),
+                dsl.selectFrom(MEDIA_FILES)
+                        .where(MEDIA_FILES.PROCESSING_STATUS.eq(MediaProcessingStatus.PROCESSED.name()))
+                        .and(when(userId != null, MEDIA_FILES.OWNER_USER_ID.eq(userId)))
+                        .orderBy(MEDIA_FILES.CAPTURED_AT.desc().nullsLast(), MEDIA_FILES.UPLOADED_AT.desc(), MEDIA_FILES.FILE_ID.asc()),
                 pageRequest
         )
                 .fetch();
     }
 
-    public Optional<MediaFilesRecord> findProcessedById(UUID fileId) {
+    public Optional<MediaFilesRecord> findById(UUID fileId) {
         return dsl.selectFrom(MEDIA_FILES)
             .where(MEDIA_FILES.FILE_ID.eq(fileId))
             .and(MEDIA_FILES.PROCESSING_STATUS.eq(MediaProcessingStatus.PROCESSED.name()))
@@ -85,23 +79,7 @@ public class MediaRepository {
             .fetchOptional();
     }
 
-    public MediaFilesRecord updateThumbnail(
-            UUID fileId,
-            String thumbnailBucket,
-            String thumbnailObjectKey,
-            String thumbnailContentType,
-            Long thumbnailSizeBytes
-    ) {
-        return dsl.update(MEDIA_FILES)
-                .set(MEDIA_FILES.THUMBNAIL_BUCKET, thumbnailBucket)
-                .set(MEDIA_FILES.THUMBNAIL_OBJECT_KEY, thumbnailObjectKey)
-                .set(MEDIA_FILES.THUMBNAIL_CONTENT_TYPE, thumbnailContentType)
-                .set(MEDIA_FILES.THUMBNAIL_SIZE_BYTES, thumbnailSizeBytes)
-                .where(MEDIA_FILES.FILE_ID.eq(fileId))
-                .returning()
-                .fetchOne();
-    }
-
+    // TODO: filter on main
     public List<MediaFilesRecord> findByAlbumId(UUID albumId) {
         return dsl.select(MEDIA_FILES.fields())
             .from(MEDIA_FILES)

@@ -1,31 +1,27 @@
 package ch.hatbe.jbof.core.pagination;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class PageQuery {
+    private static final int DEFAULT_PAGE_SIZE = 30;
+    private static final int MAX_PAGE_SIZE = 100;
+
     private Integer limit;
     private Integer offset;
 
-    public Integer getLimit() {
-        return limit;
+    public PageRequest toPageRequest() {
+        return toPageRequest(DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
     }
 
-    public void setLimit(Integer limit) {
-        this.limit = limit;
-    }
-
-    public Integer getOffset() {
-        return offset;
-    }
-
-    public void setOffset(Integer offset) {
-        this.offset = offset;
-    }
-
-    public PageRequest toPageRequest(int defaultLimit, int maxLimit) {
-        int resolvedLimit = limit == null ? defaultLimit : limit;
+    public PageRequest toPageRequest(int size, int maxPageSize) {
+        int resolvedLimit = limit == null ? size : limit;
         int resolvedOffset = offset == null ? 0 : offset;
 
-        if (resolvedLimit < 1 || resolvedLimit > maxLimit) {
-            throw new IllegalArgumentException("limit must be between 1 and " + maxLimit);
+        if (resolvedLimit < 1 || resolvedLimit > maxPageSize) {
+            throw new IllegalArgumentException("limit must be between 1 and " + maxPageSize);
         }
 
         if (resolvedOffset < 0) {

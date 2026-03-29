@@ -50,13 +50,8 @@ public class MediaController {
         MediaDtos.DetailResponse file = service.findById(fileId);
         ResponseInputStream<GetObjectResponse> objectStream = service.download(fileId);
 
-        String contentType = file.contentType() == null || file.contentType().isBlank()
-                ? MediaType.APPLICATION_OCTET_STREAM_VALUE
-                : file.contentType();
-
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.originalFilename() + "\"")
-                .contentType(MediaType.parseMediaType(contentType))
+                .contentType(MediaType.parseMediaType(file.contentType()))
                 .contentLength(file.sizeBytes())
                 .body(new InputStreamResource(objectStream));
     }
@@ -65,20 +60,10 @@ public class MediaController {
     public ResponseEntity<InputStreamResource> preview(@PathVariable UUID fileId) {
         MediaService.MediaDownload preview = service.preview(fileId);
 
-        String contentType = preview.contentType() == null || preview.contentType().isBlank()
-                ? MediaType.APPLICATION_OCTET_STREAM_VALUE
-                : preview.contentType();
-
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + preview.originalFilename() + "\"")
-                .contentType(MediaType.parseMediaType(contentType))
+                .contentType(MediaType.parseMediaType(preview.contentType()))
                 .contentLength(preview.sizeBytes())
                 .body(new InputStreamResource(preview.stream()));
-    }
-
-    @PostMapping("/{fileId}/preview/regenerate")
-    public MediaDtos.DetailResponse regeneratePreview(@PathVariable UUID fileId) throws IOException {
-        return service.regeneratePreview(fileId);
     }
 
     @DeleteMapping("/{fileId}")
