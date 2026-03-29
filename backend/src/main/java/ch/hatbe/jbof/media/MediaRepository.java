@@ -1,7 +1,7 @@
 package ch.hatbe.jbof.media;
 
 import ch.hatbe.jbof.jooq.tables.records.MediaFilesRecord;
-import ch.hatbe.jbof.core.pagination.JooqPagination;
+import ch.hatbe.jbof.core.pagination.Pagination;
 import ch.hatbe.jbof.core.pagination.PageRequest;
 import ch.hatbe.jbof.media.entity.MediaProcessingStatus;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +56,7 @@ public class MediaRepository {
     }
 
     public List<MediaFilesRecord> findAll(UUID userId, PageRequest pageRequest) {
-        return JooqPagination.apply(
+        return Pagination.apply(
                 dsl.selectFrom(MEDIA_FILES)
                         .where(MEDIA_FILES.PROCESSING_STATUS.eq(MediaProcessingStatus.PROCESSED.name()))
                         .and(when(userId != null, MEDIA_FILES.OWNER_USER_ID.eq(userId)))

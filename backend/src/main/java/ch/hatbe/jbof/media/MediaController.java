@@ -5,7 +5,6 @@ import ch.hatbe.jbof.core.pagination.PageResult;
 import ch.hatbe.jbof.media.entity.MediaDtos;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +57,7 @@ public class MediaController {
 
     @GetMapping("/{fileId}/preview")
     public ResponseEntity<InputStreamResource> preview(@PathVariable UUID fileId) {
-        MediaService.MediaDownload preview = service.preview(fileId);
+        MediaDtos.MediaDownload preview = service.preview(fileId);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(preview.contentType()))

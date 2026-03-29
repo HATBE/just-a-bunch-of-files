@@ -1,6 +1,8 @@
 package ch.hatbe.jbof.media.entity;
 
 import ch.hatbe.jbof.user.entity.UserDtos;
+import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -38,4 +40,11 @@ public class MediaDtos {
             OffsetDateTime uploadedAt,
             List<AlbumReference> albums
     ) {}
+
+    public record MediaDownload(
+            String originalFilename,
+            String contentType,
+            long sizeBytes,
+            ResponseInputStream<GetObjectResponse> stream
+    ) { }
 }

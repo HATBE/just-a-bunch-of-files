@@ -4,8 +4,8 @@ import org.jooq.Record;
 import org.jooq.SelectForUpdateStep;
 import org.jooq.SelectLimitStep;
 
-public final class JooqPagination {
-    private JooqPagination() {
+public final class Pagination {
+    private Pagination() {
     }
 
     public static <R extends Record> SelectForUpdateStep<R> apply(

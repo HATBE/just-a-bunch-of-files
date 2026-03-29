@@ -104,7 +104,7 @@ public class MediaService {
         return storageService.download(record.getBucket(), record.getObjectKey());
     }
 
-    public MediaDownload preview(UUID fileId) {
+    public MediaDtos.MediaDownload preview(UUID fileId) {
         MediaFilesRecord record = repository.findById(fileId)
                 .orElseThrow(() -> new NotFoundException("file not found"));
 
@@ -121,7 +121,7 @@ public class MediaService {
                 ? record.getSizeBytes()
                 : record.getThumbnailSizeBytes();
 
-        return new MediaDownload(
+        return new MediaDtos.MediaDownload(
                 originalFilename(record.getOriginalFilename()),
                 contentType,
                 sizeBytes,
@@ -293,11 +293,4 @@ public class MediaService {
             log.warn("Could not clean up uploaded object {}/{}", bucket, key, cleanupError);
         }
     }
-
-    public record MediaDownload(
-            String originalFilename,
-            String contentType,
-            long sizeBytes,
-            ResponseInputStream<GetObjectResponse> stream
-    ) { }
 }
