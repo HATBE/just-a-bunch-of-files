@@ -1,7 +1,6 @@
 package ch.hatbe.jbof.user;
 
 import ch.hatbe.jbof.core.exception.NotFoundException;
-import ch.hatbe.jbof.jooq.tables.records.UsersRecord;
 import ch.hatbe.jbof.user.entity.UserDtos;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,8 +15,7 @@ public class UserService {
     private final UserMapper userMapper;
 
     public UserDtos.ListResponse create(UserDtos.CreateUserRequest request) {
-        UsersRecord record = repository.create(request.username());
-        return userMapper.toListResponse(record);
+        return userMapper.toListResponse(repository.create(request.username()));
     }
 
     public List<UserDtos.ListResponse> findAll() {
@@ -27,9 +25,9 @@ public class UserService {
                 .toList();
     }
 
-    public UserDtos.ListResponse findById(UUID userId) {
+    public UserDtos.DetailResponse findById(UUID userId) {
         return repository.findById(userId)
-                .map(userMapper::toListResponse)
+                .map(userMapper::toDetailResponse)
                 .orElseThrow(() -> new NotFoundException("user not found"));
     }
 }

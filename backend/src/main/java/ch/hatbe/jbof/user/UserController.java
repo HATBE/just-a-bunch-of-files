@@ -27,7 +27,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserDtos.ListResponse findById(@PathVariable UUID userId) {
+    public UserDtos.DetailResponse findById(@PathVariable UUID userId) {
         return service.findById(userId);
     }
 }

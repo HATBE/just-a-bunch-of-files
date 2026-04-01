@@ -1,50 +1,78 @@
 package ch.hatbe.jbof.media.entity;
 
+import ch.hatbe.jbof.album.entity.AlbumDtos;
 import ch.hatbe.jbof.user.entity.UserDtos;
-import software.amazon.awssdk.core.ResponseInputStream;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
 public class MediaDtos {
-    public record AlbumReference(
-            UUID albumId,
-            String name
-    ) {}
-
-    public record ListResponse(
-            UUID fileId,
-            UserDtos.ListResponse user,
-            MediaKind kind,
+    public record MediaFileView(
+            UUID mediaFileId,
+            UserDtos.UserView user,
+            List<AlbumDtos.AlbumView> albums,
+            String kind,
+            String processingStatus,
             String originalFilename,
-            String bucket,
-            String objectKey,
-            String contentType,
-            Long sizeBytes,
-            OffsetDateTime capturedAt,
-            OffsetDateTime uploadedAt
-    ) {}
-
-    public record DetailResponse(
-            UUID fileId,
-            UserDtos.ListResponse user,
-            MediaKind kind,
-            String originalFilename,
-            String bucket,
-            String objectKey,
             String contentType,
             Long sizeBytes,
             OffsetDateTime capturedAt,
             OffsetDateTime uploadedAt,
-            List<AlbumReference> albums
-    ) {}
+            Integer width,
+            Integer height,
+            Long durationMs,
+            OffsetDateTime createdAt,
+            String bucket,
+            String objectKey,
+            String checksumSha256
+    ) {
+    }
 
-    public record MediaDownload(
+    public record MediaFileListResponse(
+            UUID mediaFileId,
             String originalFilename,
             String contentType,
-            long sizeBytes,
-            ResponseInputStream<GetObjectResponse> stream
-    ) { }
+            String kind,
+            String processingStatus,
+            OffsetDateTime uploadedAt,
+            String username,
+            List<AlbumItem> albums
+    ) {
+        public record AlbumItem(
+                UUID albumId,
+                String name
+        ) {
+        }
+    }
+
+    public record MediaFileDetailedResponse(
+            UUID mediaFileId,
+            UserItem user,
+            List<AlbumItem> albums,
+            String kind,
+            String processingStatus,
+            String originalFilename,
+            String contentType,
+            Long sizeBytes,
+            OffsetDateTime capturedAt,
+            OffsetDateTime uploadedAt,
+            Integer width,
+            Integer height,
+            Long durationMs,
+            OffsetDateTime createdAt
+    ) {
+        public record UserItem(
+                UUID userId,
+                String username
+        ) {
+        }
+
+        public record AlbumItem(
+                UUID albumId,
+                String name,
+                OffsetDateTime createdAt
+        ) {
+        }
+    }
 }

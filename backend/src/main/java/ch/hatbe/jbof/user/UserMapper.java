@@ -1,12 +1,22 @@
 package ch.hatbe.jbof.user;
 
-import ch.hatbe.jbof.jooq.tables.records.UsersRecord;
 import ch.hatbe.jbof.user.entity.UserDtos;
-import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring")
-public interface UserMapper {
-    UserDtos.ListResponse toListResponse(UsersRecord record);
+@Component
+public class UserMapper {
+    public UserDtos.ListResponse toListResponse(UserDtos.UserView view) {
+        return new UserDtos.ListResponse(
+                view.userId(),
+                view.username()
+        );
+    }
 
-    UserDtos.DetailResponse toDetailResponse(UsersRecord record);
+    public UserDtos.DetailResponse toDetailResponse(UserDtos.UserView view) {
+        return new UserDtos.DetailResponse(
+                view.userId(),
+                view.username(),
+                view.createdAt()
+        );
+    }
 }

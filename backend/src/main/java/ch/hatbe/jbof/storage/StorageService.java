@@ -1,5 +1,6 @@
 package ch.hatbe.jbof.storage;
 
+import ch.hatbe.jbof.media.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -24,64 +25,28 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class StorageService {
     private final S3Client client;
-
-    public String upload(String bucket, MultipartFile file) throws IOException {
-        if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("file is empty");
-        }
-
-        return upload(
-                bucket,
-                file.getOriginalFilename(),
-                file.getContentType(),
-                file.getInputStream(),
-                file.getSize()
-        );
-    }
+    private final FileService fileService;
 
     public String upload(
             String bucket,
-            String originalFilename,
-            String contentType,
-            InputStream inputStream,
-            long size
-    ) {
-        validateBucket(bucket);
+            MultipartFile file
+    ) throws IOException {
+        this.ensureBucketExists(bucket);
 
-        if (inputStream == null) {
-            throw new IllegalArgumentException("input stream is empty");
-        }
-
-        if (size < 0) {
-            throw new IllegalArgumentException("size must be positive");
-        }
-
-        ensureBucketExists(bucket);
-
-        String key = buildKey(originalFilename);
-        String effectiveContentType = contentType;
-        if (effectiveContentType == null || effectiveContentType.isBlank()) {
-            effectiveContentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
-        }
+        String key = this.buildKey(file);
 
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
-                .contentType(effectiveContentType)
+                .contentType(this.fileService.getEffectiveContentType(file))
                 .build();
 
-        client.putObject(request, RequestBody.fromInputStream(inputStream, size));
+        client.putObject(request, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
         return key;
     }
 
     public ResponseInputStream<GetObjectResponse> download(String bucket, String key) {
-        validateBucket(bucket);
-
-        if (key == null || key.isBlank()) {
-            throw new IllegalArgumentException("key is empty");
-        }
-
         GetObjectRequest request = GetObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
@@ -91,12 +56,6 @@ public class StorageService {
     }
 
     public void delete(String bucket, String key) {
-        validateBucket(bucket);
-
-        if (key == null || key.isBlank()) {
-            throw new IllegalArgumentException("key is empty");
-        }
-
         DeleteObjectRequest request = DeleteObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
@@ -119,35 +78,10 @@ public class StorageService {
         }
     }
 
-    private void validateBucket(String bucket) {
-        if (bucket == null || bucket.isBlank()) {
-            throw new IllegalArgumentException("bucket is empty");
-        }
-    }
-
-    private String buildKey(String originalFilename) {
-        String extension = extractExtension(originalFilename);
+    private String buildKey(MultipartFile file) {
+        String extension = this.fileService.extractExtension(file);
         return extension.isEmpty()
                 ? UUID.randomUUID().toString()
                 : UUID.randomUUID() + "." + extension;
-    }
-
-    private String extractExtension(String originalFilename) {
-        if (originalFilename == null || originalFilename.isBlank()) {
-            return "";
-        }
-
-        String name = originalFilename.replace("\\", "/");
-        int slashIndex = name.lastIndexOf('/');
-        if (slashIndex >= 0) {
-            name = name.substring(slashIndex + 1);
-        }
-
-        int dotIndex = name.indexOf('.');
-        if (dotIndex <= 0 || dotIndex == name.length() - 1) {
-            return "";
-        }
-
-        return name.substring(dotIndex + 1);
     }
 }

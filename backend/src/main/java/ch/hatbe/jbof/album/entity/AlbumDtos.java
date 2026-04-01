@@ -13,24 +13,54 @@ public class AlbumDtos {
     public record CreateAlbumRequest(
             @NotNull UUID userId,
             @NotBlank String name
-    ) { }
+    ) {
+    }
 
     public record RenameAlbumRequest(
             @NotBlank String name
-    ) { }
+    ) {
+    }
+
+    // Flat album shape used when albums are embedded into other views.
+    public record AlbumView(
+            UUID albumId,
+            UUID ownerUserId,
+            String name,
+            OffsetDateTime createdAt
+    ) {
+    }
+
+    public record ListView(
+            UUID albumId,
+            UserDtos.ListResponse user,
+            String name,
+            OffsetDateTime createdAt
+    ) {
+    }
+
+    public record DetailView(
+            UUID albumId,
+            UserDtos.ListResponse user,
+            String name,
+            OffsetDateTime createdAt,
+            List<MediaDtos.MediaFileListResponse> files
+    ) {
+    }
 
     public record ListResponse(
             UUID albumId,
             UserDtos.ListResponse user,
             String name,
             OffsetDateTime createdAt
-    ) { }
+    ) {
+    }
 
     public record DetailResponse(
             UUID albumId,
             UserDtos.ListResponse user,
             String name,
             OffsetDateTime createdAt,
-            List<MediaDtos.ListResponse> files
-    ) { }
+            List<MediaDtos.MediaFileListResponse> files
+    ) {
+    }
 }

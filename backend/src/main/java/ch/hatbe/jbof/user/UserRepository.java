@@ -1,6 +1,7 @@
 package ch.hatbe.jbof.user;
 
 import ch.hatbe.jbof.jooq.tables.records.UsersRecord;
+import ch.hatbe.jbof.user.entity.UserDtos;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
@@ -15,24 +16,27 @@ import static ch.hatbe.jbof.jooq.Tables.USERS;
 @RequiredArgsConstructor
 public class UserRepository {
     private final DSLContext dsl;
+    private final UserViewFactory userViewFactory;
 
-    public UsersRecord create(String username) {
-        return dsl.insertInto(USERS)
+    public UserDtos.UserView create(String username) {
+        UsersRecord record = dsl.insertInto(USERS)
                 .set(USERS.USERNAME, username)
                 .returning()
                 .fetchOne();
+        assert record != null;
+        return this.userViewFactory.fromRecord(record);
     }
 
-    public List<UsersRecord> findAll() {
+    public List<UserDtos.UserView> findAll() {
         return dsl.selectFrom(USERS)
                 .orderBy(USERS.USER_ID.asc())
-                .fetch();
+                .fetch(this.userViewFactory::fromRecord);
     }
 
-    public Optional<UsersRecord> findById(UUID userId) {
+    public Optional<UserDtos.UserView> findById(UUID userId) {
         return dsl.selectFrom(USERS)
                 .where(USERS.USER_ID.eq(userId))
-                .fetchOptional();
+                .fetchOptional(this.userViewFactory::fromRecord);
     }
 
     public boolean existsById(UUID userId) {

@@ -1,73 +1,35 @@
 package ch.hatbe.jbof.media;
 
-import ch.hatbe.jbof.core.pagination.PageQuery;
-import ch.hatbe.jbof.core.pagination.PageResult;
 import ch.hatbe.jbof.media.entity.MediaDtos;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.ResponseInputStream;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/media")
+@RequestMapping("/api/v1/media-files")
 @RequiredArgsConstructor
 public class MediaController {
     private final MediaService service;
 
-    @PostMapping
-    public List<MediaDtos.DetailResponse> upload(
-            @RequestParam UUID userId,
-            @RequestParam(required = false) List<UUID> albumIds,
-            @RequestParam("files") List<MultipartFile> files
-    ) throws IOException {
-        return service.upload(userId, albumIds, files);
-    }
-
     @GetMapping
-    public PageResult<MediaDtos.ListResponse> findAll(
-            @RequestParam(required = false) UUID userId,
-            PageQuery pageQuery
+    public List<MediaDtos.MediaFileListResponse> getAll(
+            @RequestParam(required = false) UUID albumId
     ) {
-        return service.findAll(userId, pageQuery);
+        if (albumId != null) {
+            return service.getAllForAlbum(albumId);
+        }
+
+        return service.getAllForList();
     }
 
-    @GetMapping("/{fileId}")
-    public MediaDtos.DetailResponse findById(@PathVariable UUID fileId) {
-        return service.findById(fileId);
-    }
-
-    @GetMapping("/{fileId}/content")
-    public ResponseEntity<InputStreamResource> download(@PathVariable UUID fileId) {
-        MediaDtos.DetailResponse file = service.findById(fileId);
-        ResponseInputStream<GetObjectResponse> objectStream = service.download(fileId);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(file.contentType()))
-                .contentLength(file.sizeBytes())
-                .body(new InputStreamResource(objectStream));
-    }
-
-    @GetMapping("/{fileId}/preview")
-    public ResponseEntity<InputStreamResource> preview(@PathVariable UUID fileId) {
-        MediaDtos.MediaDownload preview = service.preview(fileId);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(preview.contentType()))
-                .contentLength(preview.sizeBytes())
-                .body(new InputStreamResource(preview.stream()));
-    }
-
-    @DeleteMapping("/{fileId}")
-    public ResponseEntity<Void> delete(@PathVariable UUID fileId) {
-        service.delete(fileId);
-        return ResponseEntity.noContent().build();
+    @GetMapping("/{mediaFileId}")
+    public MediaDtos.MediaFileDetailedResponse getById(@PathVariable UUID mediaFileId) {
+        return service.getDetailedById(mediaFileId);
     }
 }
