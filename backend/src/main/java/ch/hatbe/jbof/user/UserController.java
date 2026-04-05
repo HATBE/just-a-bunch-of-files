@@ -1,10 +1,13 @@
 package ch.hatbe.jbof.user;
 
-import ch.hatbe.jbof.user.entity.UserDtos;
-import jakarta.validation.Valid;
+import ch.hatbe.jbof.user.entity.UserDetailDto;
+import ch.hatbe.jbof.user.entity.UserListDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,21 +16,17 @@ import java.util.UUID;
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService service;
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserDtos.ListResponse create(@Valid @RequestBody UserDtos.CreateUserRequest request) {
-        return service.create(request);
-    }
+    private final UserService userService;
 
     @GetMapping
-    public List<UserDtos.ListResponse> findAll() {
-        return service.findAll();
+    public List<UserListDto> findAll() {
+        return userService.findAll();
     }
 
-    @GetMapping("/{userId}")
-    public UserDtos.DetailResponse findById(@PathVariable UUID userId) {
-        return service.findById(userId);
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDetailDto> findById(@PathVariable UUID id) {
+        return userService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

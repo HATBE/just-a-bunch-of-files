@@ -1,6 +1,6 @@
 create extension if not exists pgcrypto;
 
-       create type media_kind as enum ('IMAGE', 'VIDEO');
+create type media_kind as enum ('IMAGE', 'VIDEO');
 
 create type media_processing_status as enum (
   'UPLOADED',

@@ -1,8 +1,6 @@
 package ch.hatbe.jbof.storage;
 
-import ch.hatbe.jbof.media.FileService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.ResponseInputStream;
@@ -18,7 +16,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.UUID;
 
 @Service
@@ -62,6 +59,13 @@ public class StorageService {
                 .build();
 
         client.deleteObject(request);
+    }
+
+    public void deleteQuietly(String bucket, String key) {
+        try {
+            delete(bucket, key);
+        } catch (RuntimeException ignored) {
+        }
     }
 
     private void ensureBucketExists(String bucket) {

@@ -1,53 +1,32 @@
 package ch.hatbe.jbof.album;
 
-import ch.hatbe.jbof.album.entity.AlbumDtos;
-import jakarta.validation.Valid;
+import ch.hatbe.jbof.album.entity.AlbumDetailDto;
+import ch.hatbe.jbof.album.entity.AlbumListDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/albums")
+@RequestMapping("/albums")
 @RequiredArgsConstructor
 public class AlbumController {
-    private final AlbumService service;
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public AlbumDtos.ListResponse create(@Valid @RequestBody AlbumDtos.CreateAlbumRequest request) {
-        return service.create(request);
-    }
+    private final AlbumService albumService;
 
     @GetMapping
-    public List<AlbumDtos.ListResponse> findAll() {
-        return service.findAll();
+    public List<AlbumListDto> findAll() {
+        return albumService.findAll();
     }
 
-    @GetMapping("/{albumId}")
-    public AlbumDtos.DetailResponse findById(@PathVariable UUID albumId) {
-        return service.findById(albumId);
-    }
-
-    @PatchMapping("/{albumId}")
-    public AlbumDtos.ListResponse rename(
-            @PathVariable UUID albumId,
-            @Valid @RequestBody AlbumDtos.RenameAlbumRequest request
-    ) {
-        return service.rename(albumId, request);
-    }
-
-    @PostMapping("/{albumId}/files/{fileId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void addFile(@PathVariable UUID albumId, @PathVariable UUID fileId) {
-        service.addFile(albumId, fileId);
-    }
-
-    @DeleteMapping("/{albumId}/files/{fileId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeFile(@PathVariable UUID albumId, @PathVariable UUID fileId) {
-        service.removeFile(albumId, fileId);
+    @GetMapping("/{id}")
+    public ResponseEntity<AlbumDetailDto> findById(@PathVariable UUID id) {
+        return albumService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

@@ -1,22 +1,22 @@
 package ch.hatbe.jbof.user;
 
-import ch.hatbe.jbof.user.entity.UserDtos;
-import org.springframework.stereotype.Component;
+import ch.hatbe.jbof.user.entity.User;
+import ch.hatbe.jbof.user.entity.UserDetailDto;
+import ch.hatbe.jbof.user.entity.UserListDto;
 
-@Component
-public class UserMapper {
-    public UserDtos.ListResponse toListResponse(UserDtos.UserView view) {
-        return new UserDtos.ListResponse(
-                view.userId(),
-                view.username()
+public final class UserMapper {
+    public static UserListDto toListDto(User entity) {
+        return new UserListDto(
+                entity.getUserId(),
+                entity.getUsername()
         );
     }
 
-    public UserDtos.DetailResponse toDetailResponse(UserDtos.UserView view) {
-        return new UserDtos.DetailResponse(
-                view.userId(),
-                view.username(),
-                view.createdAt()
+    public static UserDetailDto toDetailDto(User entity) {
+        return new UserDetailDto(
+                entity.getUserId(),
+                entity.getUsername(),
+                entity.getCreatedAt()
         );
     }
 }

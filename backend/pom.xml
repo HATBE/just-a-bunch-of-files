@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -21,12 +21,7 @@
 		<java.version>17</java.version>
 		<aws.sdk.version>2.41.34</aws.sdk.version>
 		<postgres.version>42.7.7</postgres.version>
-		<jooq.version>3.19.30</jooq.version>
 		<mapstruct.version>1.6.3</mapstruct.version>
-
-		<db.url>jdbc:postgresql://localhost:35432/jbof</db.url>
-		<db.user>user</db.user>
-		<db.password>password</db.password>
 	</properties>
 
 	<dependencies>
@@ -42,12 +37,7 @@
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jdbc</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jooq</artifactId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
 		<dependency>
@@ -141,101 +131,18 @@
 
 	<build>
 		<plugins>
-			<!-- 1) migrate DB first -->
 			<plugin>
 				<groupId>org.flywaydb</groupId>
 				<artifactId>flyway-maven-plugin</artifactId>
 				<configuration>
-					<url>${db.url}</url>
-					<user>${db.user}</user>
-					<password>${db.password}</password>
+					<url>jdbc:postgresql://localhost:35432/jbof</url>
+					<user>user</user>
+					<password>password</password>
 					<locations>
 						<location>filesystem:src/main/resources/db/migration</location>
 					</locations>
 					<cleanDisabled>false</cleanDisabled>
 				</configuration>
-				<executions>
-					<execution>
-						<id>flyway-migrate-before-jooq</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>migrate</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- 2) then jOOQ reads the migrated DB -->
-			<plugin>
-				<groupId>org.jooq</groupId>
-				<artifactId>jooq-codegen-maven</artifactId>
-				<version>${jooq.version}</version>
-
-				<dependencies>
-					<dependency>
-						<groupId>org.postgresql</groupId>
-						<artifactId>postgresql</artifactId>
-						<version>${postgres.version}</version>
-					</dependency>
-				</dependencies>
-
-				<executions>
-					<execution>
-						<id>generate-jooq</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<jdbc>
-								<driver>org.postgresql.Driver</driver>
-								<url>${db.url}</url>
-								<user>${db.user}</user>
-								<password>${db.password}</password>
-							</jdbc>
-
-							<generator>
-								<database>
-									<name>org.jooq.meta.postgres.PostgresDatabase</name>
-									<inputSchema>public</inputSchema>
-								</database>
-
-								<generate>
-									<records>true</records>
-									<pojos>true</pojos>
-									<daos>false</daos>
-									<fluentSetters>true</fluentSetters>
-								</generate>
-
-								<target>
-									<packageName>ch.hatbe.jbof.jooq</packageName>
-									<directory>target/generated-sources/jooq</directory>
-								</target>
-							</generator>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- 3) add generated folder to compile path -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>3.6.0</version>
-				<executions>
-					<execution>
-						<id>add-jooq-generated-sources</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>target/generated-sources/jooq</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 
 			<plugin>

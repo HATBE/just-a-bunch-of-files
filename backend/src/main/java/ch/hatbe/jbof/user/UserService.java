@@ -1,33 +1,30 @@
 package ch.hatbe.jbof.user;
 
-import ch.hatbe.jbof.core.exception.NotFoundException;
-import ch.hatbe.jbof.user.entity.UserDtos;
+import ch.hatbe.jbof.user.entity.UserDetailDto;
+import ch.hatbe.jbof.user.entity.UserListDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository repository;
-    private final UserMapper userMapper;
+    private final UserRepository userRepository;
 
-    public UserDtos.ListResponse create(UserDtos.CreateUserRequest request) {
-        return userMapper.toListResponse(repository.create(request.username()));
-    }
-
-    public List<UserDtos.ListResponse> findAll() {
-        return repository.findAll()
+    public List<UserListDto> findAll() {
+        return userRepository.findAllByOrderByCreatedAtDesc()
                 .stream()
-                .map(userMapper::toListResponse)
+                .map(UserMapper::toListDto)
                 .toList();
     }
 
-    public UserDtos.DetailResponse findById(UUID userId) {
-        return repository.findById(userId)
-                .map(userMapper::toDetailResponse)
-                .orElseThrow(() -> new NotFoundException("user not found"));
+    public Optional<UserDetailDto> findById(UUID id) {
+        return userRepository.findByUserId(id)
+                .map(UserMapper::toDetailDto);
     }
 }

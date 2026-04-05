@@ -1,4 +1,4 @@
-package ch.hatbe.jbof.media.entity;
+package ch.hatbe.jbof.mediaFile.entity;
 
 public enum MediaProcessingStatus {
     UPLOADED,
