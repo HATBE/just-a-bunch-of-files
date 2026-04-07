@@ -2,7 +2,6 @@ package ch.hatbe.jbof.mediaFile.entity;
 
 import ch.hatbe.jbof.user.entity.UserListDto;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public record MediaFileListDto(
@@ -11,6 +10,5 @@ public record MediaFileListDto(
         MediaProcessingStatus processingStatus,
         String originalFilename,
         String contentType,
-        OffsetDateTime uploadedAt,
         UserListDto owner
 ) {}

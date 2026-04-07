@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface MediaFileRepository extends JpaRepository<MediaFile, UUID> {
     @EntityGraph(attributePaths = { "owner" })
-    List<MediaFile> findAllByOrderByUploadedAtDesc();
+    List<MediaFile> findAllByOrderByMetadataUploadedAtDesc();
 
     @EntityGraph(attributePaths = { "owner", "metadata", "derivatives", "albums" })
     Optional<MediaFile> findByMediaFileId(UUID mediaFileId);

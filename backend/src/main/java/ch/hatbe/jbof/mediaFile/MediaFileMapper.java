@@ -13,7 +13,6 @@ public final class MediaFileMapper {
                 entity.getProcessingStatus(),
                 entity.getOriginalFilename(),
                 entity.getContentType(),
-                entity.getUploadedAt(),
                 UserMapper.toListDto(entity.getOwner())
         );
     }
@@ -25,7 +24,6 @@ public final class MediaFileMapper {
                 entity.getProcessingStatus(),
                 entity.getOriginalFilename(),
                 entity.getContentType(),
-                entity.getUploadedAt(),
                 null
         );
     }
@@ -39,14 +37,6 @@ public final class MediaFileMapper {
                 entity.getObjectKey(),
                 entity.getOriginalFilename(),
                 entity.getContentType(),
-                entity.getSizeBytes(),
-                entity.getChecksumSha256(),
-                entity.getCapturedAt(),
-                entity.getUploadedAt(),
-                entity.getWidth(),
-                entity.getHeight(),
-                entity.getDurationMs(),
-                entity.getCreatedAt(),
                 UserMapper.toListDto(entity.getOwner()),
                 toMetadataDto(entity.getMetadata()),
                 entity.getDerivatives().stream().map(DerivativeMapper::toDto).toList(),
@@ -64,6 +54,13 @@ public final class MediaFileMapper {
                 entity.getGpsLon(),
                 entity.getCameraMake(),
                 entity.getCameraModel(),
+                entity.getSizeBytes(),
+                entity.getChecksumSha256(),
+                entity.getCapturedAt(),
+                entity.getUploadedAt(),
+                entity.getWidth(),
+                entity.getHeight(),
+                entity.getDurationMs(),
                 entity.getMetadataJson(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()

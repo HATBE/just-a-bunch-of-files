@@ -52,34 +52,13 @@ public class MediaFile {
     @Column(name = "content_type", nullable = false, length = 255)
     private String contentType;
 
-    @Column(name = "size_bytes")
-    private Long sizeBytes;
-
-    @Column(name = "checksum_sha256", length = 64)
-    private String checksumSha256;
-
-    @Column(name = "captured_at")
-    private OffsetDateTime capturedAt;
-
-    @Column(name = "uploaded_at", nullable = false)
-    private OffsetDateTime uploadedAt;
-
-    @Column(name = "width")
-    private Integer width;
-
-    @Column(name = "height")
-    private Integer height;
-
-    @Column(name = "duration_ms")
-    private Long durationMs;
-
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
     @OneToMany(mappedBy = "mediaFile", fetch = FetchType.LAZY)
     private Set<MediaDerivative> derivatives = new LinkedHashSet<>();
 
-    @OneToOne(mappedBy = "mediaFile", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "mediaFile", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private MediaMetadata metadata;
 
     @ManyToMany(mappedBy = "mediaFiles", fetch = FetchType.LAZY)

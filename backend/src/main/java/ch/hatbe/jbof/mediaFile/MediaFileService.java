@@ -32,7 +32,7 @@ public class MediaFileService {
 
     @Transactional(readOnly = true)
     public List<MediaFileListDto> findAll() {
-        return mediaFileRepository.findAllByOrderByUploadedAtDesc()
+        return mediaFileRepository.findAllByOrderByMetadataUploadedAtDesc()
                 .stream()
                 .map(MediaFileMapper::toListDto)
                 .toList();
@@ -80,20 +80,27 @@ public class MediaFileService {
 
         try {
             MediaFile mediaFile = new MediaFile();
+            OffsetDateTime now = OffsetDateTime.now();
+            MediaMetadata metadata = new MediaMetadata();
 
             mediaFile.setOwner(owner);
             mediaFile.setProcessingStatus(MediaProcessingStatus.UPLOADED);
             mediaFile.setContentType(contentType);
             mediaFile.setKind(kind);
-            mediaFile.setUploadedAt(OffsetDateTime.now());
-            mediaFile.setCreatedAt(OffsetDateTime.now());
+            mediaFile.setCreatedAt(now);
             mediaFile.setOriginalFilename(file.getOriginalFilename());
-            mediaFile.setCapturedAt(this.fileService.getCapturedAt(file, kind));
             mediaFile.setBucket(bucket);
             mediaFile.setObjectKey(key);
+            mediaFile.setMetadata(metadata);
 
-            mediaFile.setSizeBytes(file.getSize());
-            mediaFile.setChecksumSha256(this.fileService.sha256(file));
+            metadata.setMediaFile(mediaFile);
+            metadata.setSizeBytes(file.getSize());
+            metadata.setChecksumSha256(this.fileService.sha256(file));
+            metadata.setCapturedAt(this.fileService.getCapturedAt(file, kind));
+            metadata.setUploadedAt(now);
+            metadata.setCreatedAt(now);
+            metadata.setUpdatedAt(now);
+            metadata.setMetadataJson("{}");
 
             MediaFile createdFile = mediaFileRepository.save(mediaFile);
             this.attachToAlbums(createdFile, albums);
