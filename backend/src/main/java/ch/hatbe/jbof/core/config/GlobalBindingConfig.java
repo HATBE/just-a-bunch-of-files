@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalBindingConfig {
     @InitBinder
     public void initBinder(WebDataBinder binder) {
-        binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
+        binder.registerCustomEditor(String.class, new StringTrimmerEditor(true)); // auto trim input strings
     }
 }

@@ -20,17 +20,6 @@ public final class MediaFileMapper {
         );
     }
 
-    public static MediaFileListDto toListDtoWithoutOwnerLoop(MediaFile entity) {
-        return new MediaFileListDto(
-                entity.getMediaFileId(),
-                entity.getKind(),
-                entity.getProcessingStatus(),
-                entity.getOriginalFilename(),
-                entity.getContentType(),
-                null
-        );
-    }
-
     public static MediaFileDetailDto toDetailDto(MediaFile entity) {
         return new MediaFileDetailDto(
                 entity.getMediaFileId(),
@@ -48,10 +37,6 @@ public final class MediaFileMapper {
     }
 
     private static MediaMetadataDto toMetadataDto(MediaMetadata entity) {
-        if (entity == null) {
-            return null;
-        }
-
         return new MediaMetadataDto(
                 entity.getGpsLat(),
                 entity.getGpsLon(),

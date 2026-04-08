@@ -6,15 +6,12 @@ import ch.hatbe.jbof.album.entity.dto.AlbumListDto;
 import ch.hatbe.jbof.mediaFile.MediaFileMapper;
 import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileListDto;
 import ch.hatbe.jbof.user.UserMapper;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-
 public final class AlbumMapper {
-
-    private AlbumMapper() {
-    }
-
     public static AlbumListDto toListDto(Album entity) {
         return new AlbumListDto(
                 entity.getAlbumId(),

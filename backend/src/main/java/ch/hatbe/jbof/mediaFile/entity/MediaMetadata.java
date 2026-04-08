@@ -17,8 +17,8 @@ import java.util.UUID;
 @Table(name = "media_metadata")
 public class MediaMetadata {
     @Id
-    @Column(name = "media_file_id", nullable = false, updatable = false)
-    private UUID mediaFileId;
+    @Column(name = "media_file_id", nullable = false, updatable = false, length = 36)
+    private UUID mediaFileId;  // shares ID with Media File
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId

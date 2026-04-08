@@ -9,6 +9,7 @@ import ch.hatbe.jbof.user.UserRepository;
 import ch.hatbe.jbof.user.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -23,20 +24,20 @@ public class AlbumService {
     private final AlbumRepository albumRepository;
     private final UserRepository userRepository;
 
-    public List<AlbumListDto> findAll() {
-        return albumRepository.findAllByOrderByCreatedAtDesc()
+    public List<AlbumListDto> findAll(Pageable pageable) {
+        return this.albumRepository.findAllByOrderByCreatedAtDesc(pageable)
                 .stream()
                 .map(AlbumMapper::toListDto)
                 .toList();
     }
 
     public Optional<AlbumDetailDto> findById(UUID id) {
-        return albumRepository.findByAlbumId(id)
+        return this.albumRepository.findByAlbumId(id)
                 .map(AlbumMapper::toDetailDto);
     }
 
     public UUID create(CreateAlbumRequest request) {
-        User owner = userRepository.findByUserId(request.ownerUserId())
+        User owner = this.userRepository.findByUserId(request.ownerUserId())
                 .orElseThrow(() -> new NotFoundException("user not found: " + request.ownerUserId()));
 
         Album album = new Album();
@@ -44,15 +45,15 @@ public class AlbumService {
         album.setName(request.name());
         album.setCreatedAt(OffsetDateTime.now());
 
-        Album createdAlbum = albumRepository.save(album);
+        Album createdAlbum = this.albumRepository.save(album);
 
         return createdAlbum.getAlbumId();
     }
 
     public void delete(UUID id) {
-        Album album = albumRepository.findByAlbumId(id)
+        Album album = this.albumRepository.findByAlbumId(id)
                 .orElseThrow(() -> new NotFoundException("album not found: " + id));
 
-        albumRepository.delete(album);
+        this.albumRepository.delete(album);
     }
 }

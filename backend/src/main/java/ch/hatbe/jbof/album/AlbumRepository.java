@@ -1,6 +1,7 @@
 package ch.hatbe.jbof.album;
 
 import ch.hatbe.jbof.album.entity.Album;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,7 +11,7 @@ import java.util.UUID;
 
 public interface AlbumRepository extends JpaRepository<Album, UUID> {
     @EntityGraph(attributePaths = { "owner" })
-    List<Album> findAllByOrderByCreatedAtDesc();
+    List<Album> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     @EntityGraph(attributePaths = { "owner", "mediaFiles" })
     Optional<Album> findByAlbumId(UUID albumId);

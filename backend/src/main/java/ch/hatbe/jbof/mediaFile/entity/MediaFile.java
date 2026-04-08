@@ -23,7 +23,7 @@ import java.util.UUID;
 public class MediaFile {
     @Id
     @UuidGenerator
-    @Column(name = "media_file_id", nullable = false, updatable = false)
+    @Column(name = "media_file_id", nullable = false, updatable = false, length = 36)
     private UUID mediaFileId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

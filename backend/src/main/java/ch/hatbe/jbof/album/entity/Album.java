@@ -22,7 +22,7 @@ import java.util.UUID;
 public class Album {
     @Id
     @UuidGenerator
-    @Column(name = "album_id", nullable = false, updatable = false)
+    @Column(name = "album_id", nullable = false, updatable = false, length = 36)
     private UUID albumId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -33,9 +33,10 @@ public class Album {
     private String name;
 
     @Column(name = "created_at", nullable = false)
-    private OffsetDateTime createdAt;
+    private OffsetDateTime createdAt = OffsetDateTime.now();
 
-    @Formula("(select count(*) from album_media_files amf where amf.album_id = album_id)")
+    @Basic(fetch = FetchType.LAZY) // Fetch only when needed
+    @Formula("SELECT COUNT(*) FROM album_media_files amf WHERE amf.album_id = album_id")
     private long mediaFileCount;
 
     @ManyToMany(fetch = FetchType.LAZY)

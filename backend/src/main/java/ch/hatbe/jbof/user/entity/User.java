@@ -13,18 +13,12 @@ import java.util.UUID;
 public class User {
     @Id
     @UuidGenerator
-    @Column(name = "user_id", nullable = false, updatable = false)
+    @Column(name = "user_id", nullable = false, updatable = false, length = 36)
     private UUID userId;
 
     @Column(name = "username", nullable = false, unique = true, length = 255)
     private String username;
 
     @Column(name = "created_at", nullable = false)
-    private OffsetDateTime createdAt;
-
-   /*@OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
-    private List<Album> albums = new ArrayList<>();
-
-    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
-    private List<MediaFile> mediaFiles = new ArrayList<>();*/
+    private OffsetDateTime createdAt = OffsetDateTime.now();;
 }

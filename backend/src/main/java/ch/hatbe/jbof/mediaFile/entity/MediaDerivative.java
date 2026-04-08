@@ -10,18 +10,11 @@ import java.util.UUID;
 
 @Entity
 @Getter
-@Table(
-        name = "media_derivatives",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uq_media_derivatives_variant", columnNames = {
-                        "media_file_id", "kind", "width", "height"
-                })
-        }
-)
+@Table(name = "media_derivatives")
 public class MediaDerivative {
     @Id
-    @Column(name = "derivative_id", nullable = false, updatable = false)
-    private UUID derivativeId;
+    @Column(name = "derivative_id", nullable = false, updatable = false, length = 36)
+    private UUID derivativeId; // shares ID with Media File
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "media_file_id", nullable = false)

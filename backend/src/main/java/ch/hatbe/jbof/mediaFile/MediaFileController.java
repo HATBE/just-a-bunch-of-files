@@ -25,21 +25,21 @@ import java.util.UUID;
 public class MediaFileController {
     private final MediaFileService mediaFileService;
 
-    @PostMapping
-    public ResponseEntity<List<UUID>> create(@Valid @ModelAttribute CreateMediaFileRequest request) throws Exception {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(mediaFileService.create(request));
-    }
-
     @GetMapping
     public Page<MediaFileListDto> findAll(Pageable pageable) {
-        return mediaFileService.findAll(pageable);
+        return this.mediaFileService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<MediaFileDetailDto> findById(@PathVariable UUID id) {
-        return mediaFileService.findById(id)
+        return this.mediaFileService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<List<UUID>> create(@Valid @ModelAttribute CreateMediaFileRequest request) throws Exception {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(this.mediaFileService.create(request));
     }
 }

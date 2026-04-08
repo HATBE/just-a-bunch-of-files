@@ -51,6 +51,7 @@ public class MediaFileService {
     public List<UUID> create(CreateMediaFileRequest request) throws Exception {
         User owner = userRepository.findByUserId(request.ownerUserId())
                 .orElseThrow(() -> new NotFoundException("user not found: " + request.ownerUserId()));
+
         List<Album> albums = this.resolveAlbums(request.ownerUserId(), request.albumIds());
 
         return this.uploadFiles(request.files(), owner, albums);
