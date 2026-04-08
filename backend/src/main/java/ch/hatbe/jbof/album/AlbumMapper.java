@@ -20,7 +20,8 @@ public final class AlbumMapper {
                 entity.getAlbumId(),
                 entity.getName(),
                 entity.getCreatedAt(),
-                UserMapper.toListDto(entity.getOwner())
+                UserMapper.toListDto(entity.getOwner()),
+                entity.getMediaFileCount()
         );
     }
 

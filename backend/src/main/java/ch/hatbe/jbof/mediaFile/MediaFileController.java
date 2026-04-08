@@ -5,6 +5,8 @@ import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileDetailDto;
 import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileListDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,9 +25,15 @@ import java.util.UUID;
 public class MediaFileController {
     private final MediaFileService mediaFileService;
 
+    @PostMapping
+    public ResponseEntity<List<UUID>> create(@Valid @ModelAttribute CreateMediaFileRequest request) throws Exception {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(mediaFileService.create(request));
+    }
+
     @GetMapping
-    public List<MediaFileListDto> findAll() {
-        return mediaFileService.findAll();
+    public Page<MediaFileListDto> findAll(Pageable pageable) {
+        return mediaFileService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
@@ -33,11 +41,5 @@ public class MediaFileController {
         return mediaFileService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @PostMapping
-    public ResponseEntity<List<UUID>> create(@Valid @ModelAttribute CreateMediaFileRequest request) throws Exception {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(mediaFileService.create(request));
     }
 }

@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.OffsetDateTime;
@@ -33,6 +34,9 @@ public class Album {
 
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
+
+    @Formula("(select count(*) from album_media_files amf where amf.album_id = album_id)")
+    private long mediaFileCount;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

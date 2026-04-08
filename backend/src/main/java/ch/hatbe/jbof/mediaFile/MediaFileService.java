@@ -13,6 +13,8 @@ import ch.hatbe.jbof.user.UserRepository;
 import ch.hatbe.jbof.user.entity.User;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,11 +36,9 @@ public class MediaFileService {
     private final StorageService storageService;
 
     @Transactional(readOnly = true)
-    public List<MediaFileListDto> findAll() {
-        return mediaFileRepository.findAllByOrderByMetadataUploadedAtDesc()
-                .stream()
-                .map(MediaFileMapper::toListDto)
-                .toList();
+    public Page<MediaFileListDto> findAll(Pageable pageable) {
+        return mediaFileRepository.findAllByOrderByMetadataUploadedAtDesc(pageable)
+                .map(MediaFileMapper::toListDto);
     }
 
     @Transactional(readOnly = true)

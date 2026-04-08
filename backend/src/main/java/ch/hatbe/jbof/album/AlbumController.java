@@ -19,10 +19,16 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/albums")
+@RequestMapping("/api/v1/albums")
 @RequiredArgsConstructor
 public class AlbumController {
     private final AlbumService albumService;
+
+    @PostMapping
+    public ResponseEntity<UUID> create(@Valid @RequestBody CreateAlbumRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(albumService.create(request));
+    }
 
     @GetMapping
     public List<AlbumListDto> findAll() {
@@ -34,12 +40,6 @@ public class AlbumController {
         return albumService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @PostMapping
-    public ResponseEntity<AlbumDetailDto> create(@Valid @RequestBody CreateAlbumRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(albumService.create(request));
     }
 
     @DeleteMapping("/{id}")

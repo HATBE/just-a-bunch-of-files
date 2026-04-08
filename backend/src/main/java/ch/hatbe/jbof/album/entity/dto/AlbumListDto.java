@@ -9,5 +9,6 @@ public record AlbumListDto(
         UUID albumId,
         String name,
         OffsetDateTime createdAt,
-        UserListDto owner
+        UserListDto owner,
+        long mediaFileCount
 ) {}

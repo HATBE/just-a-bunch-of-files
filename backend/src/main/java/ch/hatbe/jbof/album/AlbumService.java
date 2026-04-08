@@ -35,7 +35,7 @@ public class AlbumService {
                 .map(AlbumMapper::toDetailDto);
     }
 
-    public AlbumDetailDto create(CreateAlbumRequest request) {
+    public UUID create(CreateAlbumRequest request) {
         User owner = userRepository.findByUserId(request.ownerUserId())
                 .orElseThrow(() -> new NotFoundException("user not found: " + request.ownerUserId()));
 
@@ -44,7 +44,9 @@ public class AlbumService {
         album.setName(request.name());
         album.setCreatedAt(OffsetDateTime.now());
 
-        return AlbumMapper.toDetailDto(albumRepository.save(album));
+        Album createdAlbum = albumRepository.save(album);
+
+        return createdAlbum.getAlbumId();
     }
 
     public void delete(UUID id) {
