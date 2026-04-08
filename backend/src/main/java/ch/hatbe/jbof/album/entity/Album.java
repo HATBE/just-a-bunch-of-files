@@ -4,6 +4,8 @@ import ch.hatbe.jbof.mediaFile.entity.MediaFile;
 import ch.hatbe.jbof.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.OffsetDateTime;
@@ -13,6 +15,8 @@ import java.util.UUID;
 
 @Entity
 @Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "albums")
 public class Album {
     @Id

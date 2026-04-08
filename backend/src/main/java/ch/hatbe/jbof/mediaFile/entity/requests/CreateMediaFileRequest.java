@@ -1,4 +1,4 @@
-package ch.hatbe.jbof.mediaFile.entity;
+package ch.hatbe.jbof.mediaFile.entity.requests;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;

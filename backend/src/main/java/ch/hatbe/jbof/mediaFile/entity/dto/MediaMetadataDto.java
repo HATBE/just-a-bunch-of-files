@@ -1,4 +1,4 @@
-package ch.hatbe.jbof.mediaFile.entity;
+package ch.hatbe.jbof.mediaFile.entity.dto;
 
 import java.time.OffsetDateTime;
 

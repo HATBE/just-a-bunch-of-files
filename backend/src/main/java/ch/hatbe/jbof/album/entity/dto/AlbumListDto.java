@@ -1,6 +1,6 @@
-package ch.hatbe.jbof.album.entity;
+package ch.hatbe.jbof.album.entity.dto;
 
-import ch.hatbe.jbof.user.entity.UserListDto;
+import ch.hatbe.jbof.user.entity.dto.UserListDto;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;

@@ -1,7 +1,7 @@
 package ch.hatbe.jbof.user;
 
-import ch.hatbe.jbof.user.entity.UserDetailDto;
-import ch.hatbe.jbof.user.entity.UserListDto;
+import ch.hatbe.jbof.user.entity.dto.UserDetailDto;
+import ch.hatbe.jbof.user.entity.dto.UserListDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

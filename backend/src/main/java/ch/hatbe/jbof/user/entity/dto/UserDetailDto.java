@@ -1,4 +1,4 @@
-package ch.hatbe.jbof.user.entity;
+package ch.hatbe.jbof.user.entity.dto;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;

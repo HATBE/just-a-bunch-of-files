@@ -1,8 +1,8 @@
 package ch.hatbe.jbof.mediaFile;
 
-import ch.hatbe.jbof.mediaFile.entity.CreateMediaFileRequest;
-import ch.hatbe.jbof.mediaFile.entity.MediaFileDetailDto;
-import ch.hatbe.jbof.mediaFile.entity.MediaFileListDto;
+import ch.hatbe.jbof.mediaFile.entity.requests.CreateMediaFileRequest;
+import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileDetailDto;
+import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileListDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

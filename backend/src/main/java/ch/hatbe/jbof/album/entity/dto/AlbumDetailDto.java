@@ -1,7 +1,7 @@
-package ch.hatbe.jbof.album.entity;
+package ch.hatbe.jbof.album.entity.dto;
 
-import ch.hatbe.jbof.mediaFile.entity.MediaFileListDto;
-import ch.hatbe.jbof.user.entity.UserListDto;
+import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileListDto;
+import ch.hatbe.jbof.user.entity.dto.UserListDto;
 
 import java.time.OffsetDateTime;
 import java.util.List;

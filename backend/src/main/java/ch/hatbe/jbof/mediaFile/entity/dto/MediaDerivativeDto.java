@@ -1,4 +1,6 @@
-package ch.hatbe.jbof.mediaFile.entity;
+package ch.hatbe.jbof.mediaFile.entity.dto;
+
+import ch.hatbe.jbof.mediaFile.entity.MediaDerivativeKind;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;

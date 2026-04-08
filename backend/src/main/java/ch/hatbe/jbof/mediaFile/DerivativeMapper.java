@@ -1,7 +1,7 @@
 package ch.hatbe.jbof.mediaFile;
 
 import ch.hatbe.jbof.mediaFile.entity.MediaDerivative;
-import ch.hatbe.jbof.mediaFile.entity.MediaDerivativeDto;
+import ch.hatbe.jbof.mediaFile.entity.dto.MediaDerivativeDto;
 
 public final class DerivativeMapper {
     public static MediaDerivativeDto toDto(MediaDerivative entity) {

@@ -1,7 +1,9 @@
-package ch.hatbe.jbof.mediaFile.entity;
+package ch.hatbe.jbof.mediaFile.entity.dto;
 
-import ch.hatbe.jbof.album.entity.AlbumListDto;
-import ch.hatbe.jbof.user.entity.UserListDto;
+import ch.hatbe.jbof.album.entity.dto.AlbumListDto;
+import ch.hatbe.jbof.mediaFile.entity.MediaKind;
+import ch.hatbe.jbof.mediaFile.entity.MediaProcessingStatus;
+import ch.hatbe.jbof.user.entity.dto.UserListDto;
 
 import java.util.List;
 import java.util.UUID;

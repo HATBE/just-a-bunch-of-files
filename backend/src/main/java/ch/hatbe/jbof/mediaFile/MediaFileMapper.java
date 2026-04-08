@@ -3,6 +3,9 @@ package ch.hatbe.jbof.mediaFile;
 
 import ch.hatbe.jbof.album.AlbumMapper;
 import ch.hatbe.jbof.mediaFile.entity.*;
+import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileDetailDto;
+import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileListDto;
+import ch.hatbe.jbof.mediaFile.entity.dto.MediaMetadataDto;
 import ch.hatbe.jbof.user.UserMapper;
 
 public final class MediaFileMapper {
