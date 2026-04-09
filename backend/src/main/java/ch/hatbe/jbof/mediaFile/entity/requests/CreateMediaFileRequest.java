@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 public record CreateMediaFileRequest(
-        @NotNull(message = "ownerUserId must not be empty")
-        UUID ownerUserId,
-
         @NotNull(message = "files must not be empty")
         @Size(max = 100, min = 1, message = "there must be between 1 and 100 files")
         List<MultipartFile> files,

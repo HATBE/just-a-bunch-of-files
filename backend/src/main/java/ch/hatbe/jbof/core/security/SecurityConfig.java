@@ -37,6 +37,7 @@ public class SecurityConfig {
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/albums").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/v1/media-files").authenticated()
                 .anyRequest().permitAll()
         );

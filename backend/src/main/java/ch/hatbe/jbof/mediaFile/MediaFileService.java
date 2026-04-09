@@ -2,6 +2,7 @@ package ch.hatbe.jbof.mediaFile;
 
 import ch.hatbe.jbof.album.AlbumRepository;
 import ch.hatbe.jbof.album.entity.Album;
+import ch.hatbe.jbof.core.security.AuthenticatedUserService;
 import ch.hatbe.jbof.core.exception.NotFoundException;
 import ch.hatbe.jbof.mediaFile.entity.*;
 import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileDetailDto;
@@ -9,7 +10,6 @@ import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileListDto;
 import ch.hatbe.jbof.mediaFile.entity.requests.CreateMediaFileRequest;
 import ch.hatbe.jbof.storage.FileService;
 import ch.hatbe.jbof.storage.StorageService;
-import ch.hatbe.jbof.user.UserRepository;
 import ch.hatbe.jbof.user.entity.User;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +30,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MediaFileService {
     private final MediaFileRepository mediaFileRepository;
-    private final UserRepository userRepository;
     private final AlbumRepository albumRepository;
     private final FileService fileService;
     private final StorageService storageService;
+    private final AuthenticatedUserService authenticatedUserService;
 
     @Transactional(readOnly = true)
     public Page<MediaFileListDto> findAll(Pageable pageable) {
@@ -49,10 +49,9 @@ public class MediaFileService {
 
     @Transactional
     public List<UUID> create(CreateMediaFileRequest request) throws Exception {
-        User owner = userRepository.findByUserId(request.ownerUserId())
-                .orElseThrow(() -> new NotFoundException("user not found: " + request.ownerUserId()));
+        User owner = this.authenticatedUserService.getOrCreateCurrentUser();
 
-        List<Album> albums = this.resolveAlbums(request.ownerUserId(), request.albumIds());
+        List<Album> albums = this.resolveAlbums(owner, request.albumIds());
 
         return this.uploadFiles(request.files(), owner, albums);
     }
@@ -116,7 +115,7 @@ public class MediaFileService {
         }
     }
 
-    private List<Album> resolveAlbums(@NotNull UUID ownerUserId, List<UUID> albumIds) {
+    private List<Album> resolveAlbums(@NotNull User owner, List<UUID> albumIds) {
         if (albumIds == null || albumIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -126,7 +125,7 @@ public class MediaFileService {
             Album album = this.albumRepository.findByAlbumId(albumId)
                     .orElseThrow(() -> new NotFoundException(String.format("Album with id %s not found", albumId)));
 
-            if (!ownerUserId.equals(album.getOwner().getUserId())) {
+            if (!owner.getUserId().equals(album.getOwner().getUserId())) {
                 throw new NotFoundException(String.format("Album with id %s not found", albumId));
             }
 

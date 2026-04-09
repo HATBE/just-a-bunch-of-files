@@ -4,8 +4,8 @@ import ch.hatbe.jbof.album.entity.Album;
 import ch.hatbe.jbof.album.entity.dto.AlbumDetailDto;
 import ch.hatbe.jbof.album.entity.dto.AlbumListDto;
 import ch.hatbe.jbof.album.entity.requests.CreateAlbumRequest;
+import ch.hatbe.jbof.core.security.AuthenticatedUserService;
 import ch.hatbe.jbof.core.exception.NotFoundException;
-import ch.hatbe.jbof.user.UserRepository;
 import ch.hatbe.jbof.user.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AlbumService {
     private final AlbumRepository albumRepository;
-    private final UserRepository userRepository;
+    private final AuthenticatedUserService authenticatedUserService;
 
     public List<AlbumListDto> findAll(Pageable pageable) {
         return this.albumRepository.findAllByOrderByCreatedAtDesc(pageable)
@@ -37,8 +37,7 @@ public class AlbumService {
     }
 
     public UUID create(CreateAlbumRequest request) {
-        User owner = this.userRepository.findByUserId(request.ownerUserId())
-                .orElseThrow(() -> new NotFoundException("user not found: " + request.ownerUserId()));
+        User owner = this.authenticatedUserService.getOrCreateCurrentUser();
 
         Album album = new Album();
         album.setOwner(owner);

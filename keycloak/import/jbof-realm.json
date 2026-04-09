@@ -12,6 +12,10 @@
       {
         "name": "create_mediafile",
         "description": "Allows uploading media files"
+      },
+      {
+        "name": "create_album",
+        "description": "Allows creating albums"
       }
     ]
   },
@@ -60,7 +64,8 @@
       "email": "media-admin@example.local",
       "emailVerified": true,
       "realmRoles": [
-        "create_mediafile"
+        "create_mediafile",
+        "create_album"
       ],
       "credentials": [
         {

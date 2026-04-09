@@ -17,6 +17,7 @@ create type media_derivative_kind as enum (
 create table if not exists users (
     user_id uuid primary key default gen_random_uuid(),
     username varchar(255) not null unique,
+    keycloak_user_id varchar(255) not null unique,
     created_at timestamptz not null default now()
 );
 

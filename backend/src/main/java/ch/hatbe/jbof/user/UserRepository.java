@@ -11,4 +11,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findAllByOrderByCreatedAtDesc();
 
     Optional<User> findByUserId(UUID userId);
+
+    Optional<User> findByKeycloakUserId(String keycloakUserId);
 }
