@@ -3,4 +3,13 @@
     <a routerLink="/images" routerLinkActive="active" ariaCurrentWhenActive="page">All images</a>
     <a routerLink="/upload" routerLinkActive="active" ariaCurrentWhenActive="page">Upload image</a>
   </nav>
+
+  <div class="auth-actions">
+    @if (isAuthenticated()) {
+      <span>{{ username() }}</span>
+      <button type="button" (click)="logout()">Logout</button>
+    } @else {
+      <button type="button" (click)="login()">Login</button>
+    }
+  </div>
 </header>

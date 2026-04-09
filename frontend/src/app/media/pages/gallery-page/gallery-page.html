@@ -19,17 +19,13 @@
           </div>
 
           <div class="gallery-row" [style.height.px]="section.row.height">
-            @for (entry of section.row.items; track entry.item.fileId) {
+            @for (entry of section.row.items; track entry.item.mediaFileId) {
               <article class="gallery-item" [style.width.px]="entry.width">
-                <img
-                  [src]="getPreviewUrl(entry.item.fileId)"
-                  [alt]="entry.item.originalFilename"
-                  loading="lazy"
-                  (load)="onPreviewLoad(entry.item.fileId, $event)"
-                />
-                @if (entry.item.kind === 'VIDEO') {
-                  <span class="video-badge">Video</span>
-                }
+                <div class="media-placeholder">
+                  <strong>{{ entry.item.kind }}</strong>
+                  <span>{{ entry.item.originalFilename }}</span>
+                  <small>{{ entry.item.contentType }}</small>
+                </div>
               </article>
             }
           </div>

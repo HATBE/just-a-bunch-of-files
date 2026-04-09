@@ -27,11 +27,13 @@ public class AlbumController {
     private final AlbumService albumService;
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public List<AlbumListDto> findAll(Pageable pageable) {
         return this.albumService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<AlbumDetailDto> findById(@PathVariable UUID id) {
         return this.albumService.findById(id)
                 .map(ResponseEntity::ok)
@@ -46,6 +48,7 @@ public class AlbumController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         this.albumService.delete(id);
         return ResponseEntity.noContent().build();

@@ -71,22 +71,6 @@ export class GalleryPage implements OnDestroy {
     this.scheduleAutofillCheck();
   }
 
-  protected getPreviewUrl(fileId: string): string {
-    return this.mediaService.getPreviewUrl(fileId);
-  }
-
-  protected onPreviewLoad(fileId: string, event: Event): void {
-    const image = event.target as HTMLImageElement | null;
-    if (!image || image.naturalWidth <= 0 || image.naturalHeight <= 0) {
-      return;
-    }
-
-    const aspectRatio = image.naturalWidth / image.naturalHeight;
-    this.aspectRatios.set(fileId, this.normalizeAspectRatio(aspectRatio));
-    this.rebuildSections();
-    this.scheduleAutofillCheck();
-  }
-
   protected async refresh(): Promise<void> {
     await this.load(true);
   }
@@ -108,14 +92,14 @@ export class GalleryPage implements OnDestroy {
     }
 
     try {
-      const offset = reset ? 0 : this.items().length;
-      const response = await this.mediaService.getAll(undefined, GalleryPage.PAGE_SIZE, offset);
+      const page = reset ? 0 : Math.floor(this.items().length / GalleryPage.PAGE_SIZE);
+      const response = await this.mediaService.getAll(GalleryPage.PAGE_SIZE, page);
       const nextItems = reset
-        ? response.items
-        : [...this.items(), ...response.items];
+        ? response.content
+        : [...this.items(), ...response.content];
 
       this.items.set(nextItems);
-      this.hasMore.set(response.hasMore);
+      this.hasMore.set(!response.last);
       this.rebuildSections();
       this.scheduleAutofillCheck();
     } catch (error) {
@@ -327,7 +311,7 @@ export class GalleryPage implements OnDestroy {
   }
 
   private resolveAspectRatio(item: MediaListResponseDto): number {
-    const known = this.aspectRatios.get(item.fileId);
+    const known = this.aspectRatios.get(item.mediaFileId);
     if (known != null) {
       return known;
     }
@@ -363,39 +347,11 @@ export class GalleryPage implements OnDestroy {
   }
 
   private sectionKeyFor(item: MediaListResponseDto): string {
-    const date = this.displayDateFor(item);
-    return [
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-    ].join('-');
+    return 'media';
   }
 
   private sectionLabelFor(item: MediaListResponseDto): string {
-    const date = this.displayDateFor(item);
-    const today = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(today.getDate() - 1);
-
-    if (this.isSameDay(date, today)) {
-      return 'Today';
-    }
-
-    if (this.isSameDay(date, yesterday)) {
-      return 'Yesterday';
-    }
-
-    return GalleryPage.SECTION_DATE_FORMAT.format(date);
-  }
-
-  private displayDateFor(item: MediaListResponseDto): Date {
-    return new Date(item.capturedAt ?? item.uploadedAt);
-  }
-
-  private isSameDay(left: Date, right: Date): boolean {
-    return left.getFullYear() === right.getFullYear()
-      && left.getMonth() === right.getMonth()
-      && left.getDate() === right.getDate();
+    return 'Your media';
   }
 }
 

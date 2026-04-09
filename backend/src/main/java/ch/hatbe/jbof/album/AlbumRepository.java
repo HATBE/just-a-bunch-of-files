@@ -11,10 +11,10 @@ import java.util.UUID;
 
 public interface AlbumRepository extends JpaRepository<Album, UUID> {
     @EntityGraph(attributePaths = { "owner" })
-    List<Album> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    List<Album> findAllByOwnerUserIdOrderByCreatedAtDesc(UUID ownerUserId, Pageable pageable);
 
     @EntityGraph(attributePaths = { "owner", "mediaFiles" })
-    Optional<Album> findByAlbumId(UUID albumId);
+    Optional<Album> findByAlbumIdAndOwnerUserId(UUID albumId, UUID ownerUserId);
 
     boolean existsByAlbumIdAndOwnerUserId(UUID albumId, UUID ownerUserId);
 }

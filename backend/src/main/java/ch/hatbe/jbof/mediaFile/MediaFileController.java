@@ -27,12 +27,13 @@ public class MediaFileController {
     private final MediaFileService mediaFileService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('get_mediafile')")
+    @PreAuthorize("isAuthenticated()")
     public Page<MediaFileListDto> findAll(Pageable pageable) {
         return this.mediaFileService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<MediaFileDetailDto> findById(@PathVariable UUID id) {
         return this.mediaFileService.findById(id)
                 .map(ResponseEntity::ok)

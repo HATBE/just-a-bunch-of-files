@@ -2,11 +2,6 @@
   <h1>Upload files</h1>
 
   <label class="field">
-    <span>User ID</span>
-    <input [ngModel]="userId()" (ngModelChange)="userId.set($event)" type="text" />
-  </label>
-
-  <label class="field">
     <span>Album IDs (comma separated, optional)</span>
     <input [ngModel]="albumIds()" (ngModelChange)="albumIds.set($event)" type="text" />
   </label>

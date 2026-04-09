@@ -37,13 +37,17 @@ public class MediaFileService {
 
     @Transactional(readOnly = true)
     public Page<MediaFileListDto> findAll(Pageable pageable) {
-        return mediaFileRepository.findAllByProcessingStatusOrderByMetadataUploadedAtDesc(MediaProcessingStatus.READY, pageable)
+        User currentUser = this.authenticatedUserService.getOrCreateCurrentUser();
+
+        return mediaFileRepository.findAllByOwnerUserIdAndProcessingStatusOrderByMetadataUploadedAtDesc(currentUser.getUserId(), MediaProcessingStatus.READY, pageable)
                 .map(MediaFileMapper::toListDto);
     }
 
     @Transactional(readOnly = true)
     public Optional<MediaFileDetailDto> findById(UUID id) {
-        return mediaFileRepository.findByMediaFileIdAndProcessingStatus(id, MediaProcessingStatus.READY)
+        User currentUser = this.authenticatedUserService.getOrCreateCurrentUser();
+
+        return mediaFileRepository.findByMediaFileIdAndOwnerUserIdAndProcessingStatus(id, currentUser.getUserId(), MediaProcessingStatus.READY)
                 .map(MediaFileMapper::toDetailDto);
     }
 
@@ -122,12 +126,8 @@ public class MediaFileService {
 
         List<Album> albums = new ArrayList<>(albumIds.size());
         for (UUID albumId : albumIds) {
-            Album album = this.albumRepository.findByAlbumId(albumId)
+            Album album = this.albumRepository.findByAlbumIdAndOwnerUserId(albumId, owner.getUserId())
                     .orElseThrow(() -> new NotFoundException(String.format("Album with id %s not found", albumId)));
-
-            if (!owner.getUserId().equals(album.getOwner().getUserId())) {
-                throw new NotFoundException(String.format("Album with id %s not found", albumId));
-            }
 
             albums.add(album);
         }

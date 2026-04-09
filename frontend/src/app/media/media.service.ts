@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { HttpService } from '../core/http.service';
 import {
   MediaDetailResponseDto,
-  MediaPagedResponseDto,
+  PageResponseDto,
   MediaListResponseDto,
   UploadMediaRequestDto
 } from './media.dtos';
@@ -15,20 +15,16 @@ import {
 export class MediaService extends HttpService {
   constructor() {
     super();
-    this.setEntity('media');
+    this.setEntity('media-files');
   }
 
-  public getAll(userId?: string, limit = 24, offset = 0): Promise<MediaPagedResponseDto> {
-    let params = new HttpParams()
-      .set('limit', limit)
-      .set('offset', offset);
-
-    if (userId) {
-      params = params.set('userId', userId);
-    }
+  public getAll(size = 24, page = 0): Promise<PageResponseDto<MediaListResponseDto>> {
+    const params = new HttpParams()
+      .set('size', size)
+      .set('page', page);
 
     return firstValueFrom(
-      this.http.get<MediaPagedResponseDto>(this.createUrl(), { params })
+      this.http.get<PageResponseDto<MediaListResponseDto>>(this.createUrl(), { params })
     );
   }
 
@@ -36,9 +32,8 @@ export class MediaService extends HttpService {
     return this.get<MediaDetailResponseDto>([fileId]);
   }
 
-  public upload(request: UploadMediaRequestDto): Promise<MediaDetailResponseDto[]> {
+  public upload(request: UploadMediaRequestDto): Promise<string[]> {
     const payload = new FormData();
-    payload.set('userId', request.userId);
 
     for (const file of request.files) {
       payload.append('files', file);
@@ -49,7 +44,7 @@ export class MediaService extends HttpService {
     }
 
     return firstValueFrom(
-      this.http.post<MediaDetailResponseDto[]>(this.createUrl(), payload)
+      this.http.post<string[]>(this.createUrl(), payload)
     );
   }
 
@@ -57,11 +52,4 @@ export class MediaService extends HttpService {
     return this.delete<void>([fileId]);
   }
 
-  public getContentUrl(fileId: string): string {
-    return this.createUrl([fileId, 'content']);
-  }
-
-  public getPreviewUrl(fileId: string): string {
-    return this.createUrl([fileId, 'preview']);
-  }
 }

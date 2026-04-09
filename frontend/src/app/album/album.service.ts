@@ -25,7 +25,15 @@ export class AlbumService extends HttpService {
   }
 
   public create(request: CreateAlbumRequestDto): Promise<AlbumListResponseDto> {
-    return this.post<AlbumListResponseDto, CreateAlbumRequestDto>([], request);
+    return this.post<string, CreateAlbumRequestDto>([], request)
+      .then((albumId) => this.getById(albumId))
+      .then((album) => ({
+        albumId: album.albumId,
+        owner: album.owner,
+        name: album.name,
+        createdAt: album.createdAt,
+        mediaFileCount: album.mediaFiles.length
+      }));
   }
 
   public rename(albumId: string, request: RenameAlbumRequestDto): Promise<AlbumListResponseDto> {

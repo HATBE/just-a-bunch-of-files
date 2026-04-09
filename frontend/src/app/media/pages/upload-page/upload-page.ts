@@ -17,7 +17,6 @@ export class UploadPage {
   private readonly mediaService = inject(MediaService);
   private readonly router = inject(Router);
 
-  protected readonly userId = signal('');
   protected readonly albumIds = signal('');
   protected readonly isUploading = signal(false);
   protected readonly successMessage = signal('');
@@ -32,11 +31,6 @@ export class UploadPage {
   }
 
   protected async upload(): Promise<void> {
-    if (!this.userId().trim()) {
-      this.errorMessage.set('User ID is required.');
-      return;
-    }
-
     if (this.selectedFiles.length === 0) {
       this.errorMessage.set('Select at least one file first.');
       return;
@@ -59,7 +53,6 @@ export class UploadPage {
         this.successMessage.set(`Uploading batch ${index + 1} of ${batches.length}...`);
 
         const uploaded = await this.mediaService.upload({
-          userId: this.userId().trim(),
           albumIds,
           files: batches[index],
         });

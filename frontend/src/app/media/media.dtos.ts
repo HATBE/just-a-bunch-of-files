@@ -8,41 +8,36 @@ export interface MediaAlbumReferenceDto {
 }
 
 export interface MediaListResponseDto {
-  fileId: string;
-  user: UserListResponseDto;
+  mediaFileId: string;
+  owner: UserListResponseDto;
   kind: MediaKindDto;
+  processingStatus: string;
   originalFilename: string;
-  bucket: string;
-  objectKey: string;
   contentType: string;
-  sizeBytes: number;
-  capturedAt: string | null;
-  uploadedAt: string;
 }
 
-export interface MediaPagedResponseDto {
-  items: MediaListResponseDto[];
-  limit: number;
-  offset: number;
-  hasMore: boolean;
+export interface PageResponseDto<T> {
+  content: T[];
+  number: number;
+  size: number;
+  totalPages: number;
+  totalElements: number;
+  last: boolean;
 }
 
 export interface MediaDetailResponseDto {
-  fileId: string;
-  user: UserListResponseDto;
+  mediaFileId: string;
+  owner: UserListResponseDto;
   kind: MediaKindDto;
+  processingStatus: string;
   originalFilename: string;
   bucket: string;
   objectKey: string;
   contentType: string;
-  sizeBytes: number;
-  capturedAt: string | null;
-  uploadedAt: string;
   albums: MediaAlbumReferenceDto[];
 }
 
 export interface UploadMediaRequestDto {
-  userId: string;
   albumIds?: string[];
   files: File[];
 }

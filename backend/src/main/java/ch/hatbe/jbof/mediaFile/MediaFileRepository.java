@@ -12,8 +12,8 @@ import java.util.UUID;
 
 public interface MediaFileRepository extends JpaRepository<MediaFile, UUID> {
     @EntityGraph(attributePaths = { "owner" })
-    Page<MediaFile> findAllByProcessingStatusOrderByMetadataUploadedAtDesc(MediaProcessingStatus processingStatus, Pageable pageable);
+    Page<MediaFile> findAllByOwnerUserIdAndProcessingStatusOrderByMetadataUploadedAtDesc(UUID ownerUserId, MediaProcessingStatus processingStatus, Pageable pageable);
 
     @EntityGraph(attributePaths = { "owner", "metadata", "derivatives", "albums" })
-    Optional<MediaFile> findByMediaFileIdAndProcessingStatus(UUID mediaFileId, MediaProcessingStatus processingStatus);
+    Optional<MediaFile> findByMediaFileIdAndOwnerUserIdAndProcessingStatus(UUID mediaFileId, UUID ownerUserId, MediaProcessingStatus processingStatus);
 }
