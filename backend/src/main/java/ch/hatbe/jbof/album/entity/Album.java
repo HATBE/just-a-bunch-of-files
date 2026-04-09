@@ -36,7 +36,7 @@ public class Album {
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
     @Basic(fetch = FetchType.LAZY) // Fetch only when needed
-    @Formula("SELECT COUNT(*) FROM album_media_files amf WHERE amf.album_id = album_id")
+    @Formula("(SELECT COUNT(*) FROM album_media_files amf WHERE amf.album_id = album_id)")
     private long mediaFileCount;
 
     @ManyToMany(fetch = FetchType.LAZY)

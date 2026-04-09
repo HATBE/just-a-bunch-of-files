@@ -1,0 +1,74 @@
+{
+  "realm": "jbof",
+  "enabled": true,
+  "displayName": "Just a bunch of files",
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "rememberMe": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "create_mediafile",
+        "description": "Allows uploading media files"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "jbof-backend",
+      "name": "JBOF Backend",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "bearerOnly": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:8080/*"
+      ],
+      "webOrigins": [
+        "http://localhost:8080"
+      ]
+    },
+    {
+      "clientId": "jbof-dev",
+      "name": "JBOF Dev Client",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "bearerOnly": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "media-admin",
+      "enabled": true,
+      "firstName": "Media",
+      "lastName": "Admin",
+      "email": "media-admin@example.local",
+      "emailVerified": true,
+      "realmRoles": [
+        "create_mediafile"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}

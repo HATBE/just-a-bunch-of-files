@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,7 @@ public class MediaFileController {
     private final MediaFileService mediaFileService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('get_mediafile')")
     public Page<MediaFileListDto> findAll(Pageable pageable) {
         return this.mediaFileService.findAll(pageable);
     }
@@ -38,6 +40,7 @@ public class MediaFileController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('create_mediafile')")
     public ResponseEntity<List<UUID>> create(@Valid @ModelAttribute CreateMediaFileRequest request) throws Exception {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(this.mediaFileService.create(request));

@@ -1,6 +1,7 @@
 package ch.hatbe.jbof.mediaFile;
 
 import ch.hatbe.jbof.mediaFile.entity.MediaFile;
+import ch.hatbe.jbof.mediaFile.entity.MediaProcessingStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -11,8 +12,8 @@ import java.util.UUID;
 
 public interface MediaFileRepository extends JpaRepository<MediaFile, UUID> {
     @EntityGraph(attributePaths = { "owner" })
-    Page<MediaFile> findAllByOrderByMetadataUploadedAtDesc(Pageable pageable);
+    Page<MediaFile> findAllByProcessingStatusOrderByMetadataUploadedAtDesc(MediaProcessingStatus processingStatus, Pageable pageable);
 
     @EntityGraph(attributePaths = { "owner", "metadata", "derivatives", "albums" })
-    Optional<MediaFile> findByMediaFileId(UUID mediaFileId);
+    Optional<MediaFile> findByMediaFileIdAndProcessingStatus(UUID mediaFileId, MediaProcessingStatus processingStatus);
 }

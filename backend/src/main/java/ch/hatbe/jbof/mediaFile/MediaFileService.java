@@ -37,13 +37,13 @@ public class MediaFileService {
 
     @Transactional(readOnly = true)
     public Page<MediaFileListDto> findAll(Pageable pageable) {
-        return mediaFileRepository.findAllByOrderByMetadataUploadedAtDesc(pageable)
+        return mediaFileRepository.findAllByProcessingStatusOrderByMetadataUploadedAtDesc(MediaProcessingStatus.READY, pageable)
                 .map(MediaFileMapper::toListDto);
     }
 
     @Transactional(readOnly = true)
     public Optional<MediaFileDetailDto> findById(UUID id) {
-        return mediaFileRepository.findByMediaFileId(id)
+        return mediaFileRepository.findByMediaFileIdAndProcessingStatus(id, MediaProcessingStatus.READY)
                 .map(MediaFileMapper::toDetailDto);
     }
 
