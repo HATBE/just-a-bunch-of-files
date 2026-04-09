@@ -14,6 +14,7 @@ export class Header {
 
   protected readonly isAuthenticated = this.authService.isAuthenticated;
   protected readonly username = this.authService.username;
+  protected readonly canUpload = () => this.authService.hasPermission('create_mediafile');
 
   protected login(): void {
     void this.authService.startLoginRedirect();

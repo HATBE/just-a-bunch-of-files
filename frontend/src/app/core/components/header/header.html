@@ -1,7 +1,12 @@
 <header class="header">
   <nav class="nav">
-    <a routerLink="/images" routerLinkActive="active" ariaCurrentWhenActive="page">All images</a>
-    <a routerLink="/upload" routerLinkActive="active" ariaCurrentWhenActive="page">Upload image</a>
+    @if (isAuthenticated()) {
+      <a routerLink="/images" routerLinkActive="active" ariaCurrentWhenActive="page">All images</a>
+    }
+
+    @if (canUpload()) {
+      <a routerLink="/upload" routerLinkActive="active" ariaCurrentWhenActive="page">Upload image</a>
+    }
   </nav>
 
   <div class="auth-actions">

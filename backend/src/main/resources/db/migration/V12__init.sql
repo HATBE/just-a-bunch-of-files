@@ -62,7 +62,7 @@ create table if not exists media_derivatives (
     constraint chk_media_derivatives_width_positive check (width > 0),
     constraint chk_media_derivatives_height_positive check (height > 0),
     constraint chk_media_derivatives_size_bytes_nonnegative check (size_bytes is null or size_bytes >= 0),
-    constraint uq_media_derivatives_variant unique (media_file_id, kind, width, height)
+    constraint uq_media_derivatives_kind unique (media_file_id, kind)
 );
 
 create table if not exists media_metadata (

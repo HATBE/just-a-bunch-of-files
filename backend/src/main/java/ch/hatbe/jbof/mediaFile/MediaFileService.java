@@ -37,7 +37,7 @@ public class MediaFileService {
 
     @Transactional(readOnly = true)
     public Page<MediaFileListDto> findAll(Pageable pageable) {
-        User currentUser = this.authenticatedUserService.getOrCreateCurrentUser();
+        User currentUser = this.authenticatedUserService.getCurrentUser();
 
         return mediaFileRepository.findAllByOwnerUserIdAndProcessingStatusOrderByMetadataUploadedAtDesc(currentUser.getUserId(), MediaProcessingStatus.READY, pageable)
                 .map(MediaFileMapper::toListDto);
@@ -45,7 +45,7 @@ public class MediaFileService {
 
     @Transactional(readOnly = true)
     public Optional<MediaFileDetailDto> findById(UUID id) {
-        User currentUser = this.authenticatedUserService.getOrCreateCurrentUser();
+        User currentUser = this.authenticatedUserService.getCurrentUser();
 
         return mediaFileRepository.findByMediaFileIdAndOwnerUserIdAndProcessingStatus(id, currentUser.getUserId(), MediaProcessingStatus.READY)
                 .map(MediaFileMapper::toDetailDto);
@@ -53,7 +53,7 @@ public class MediaFileService {
 
     @Transactional
     public List<UUID> create(CreateMediaFileRequest request) throws Exception {
-        User owner = this.authenticatedUserService.getOrCreateCurrentUser();
+        User owner = this.authenticatedUserService.getCurrentUser();
 
         List<Album> albums = this.resolveAlbums(owner, request.albumIds());
 

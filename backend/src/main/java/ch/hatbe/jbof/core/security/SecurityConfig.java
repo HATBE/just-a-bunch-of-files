@@ -16,6 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ import java.util.Set;
 @EnableConfigurationProperties(AuthProperties.class)
 public class SecurityConfig {
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, AuthProperties authProperties) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, AuthProperties authProperties, CurrentUserSyncFilter currentUserSyncFilter) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(Customizer.withDefaults());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -44,6 +45,7 @@ public class SecurityConfig {
                 .authenticationEntryPoint((request, response, ex) -> writeError(response, HttpStatus.UNAUTHORIZED, "Authentication required", "UNAUTHORIZED"))
                 .accessDeniedHandler((request, response, ex) -> writeError(response, HttpStatus.FORBIDDEN, "Missing permission", "FORBIDDEN"))
         );
+        http.addFilterAfter(currentUserSyncFilter, BearerTokenAuthenticationFilter.class);
 
         return http.build();
     }

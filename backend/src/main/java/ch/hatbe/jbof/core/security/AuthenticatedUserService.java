@@ -3,11 +3,7 @@ package ch.hatbe.jbof.core.security;
 import ch.hatbe.jbof.user.UserRepository;
 import ch.hatbe.jbof.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,10 +13,10 @@ import java.time.OffsetDateTime;
 @RequiredArgsConstructor
 public class AuthenticatedUserService {
     private final UserRepository userRepository;
+    private final CurrentUserContext currentUserContext;
 
     @Transactional
-    public User getOrCreateCurrentUser() {
-        Jwt jwt = this.currentJwt();
+    public User synchronize(Jwt jwt) {
         String keycloakUserId = this.requiredClaim(jwt, "sub");
         String username = this.resolveUsername(jwt);
 
@@ -29,19 +25,14 @@ public class AuthenticatedUserService {
                 .orElseGet(() -> this.createUser(keycloakUserId, username));
     }
 
-    private Jwt currentJwt() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication instanceof JwtAuthenticationToken jwtAuthenticationToken)) {
-            throw new AccessDeniedException("missing authenticated user");
-        }
-
-        return jwtAuthenticationToken.getToken();
+    public User getCurrentUser() {
+        return this.currentUserContext.getRequiredUser();
     }
 
     private String requiredClaim(Jwt jwt, String claimName) {
         String value = jwt.getClaimAsString(claimName);
         if (value == null || value.isBlank()) {
-            throw new AccessDeniedException("missing token claim: " + claimName);
+            throw new IllegalStateException("missing token claim: " + claimName);
         }
 
         return value;

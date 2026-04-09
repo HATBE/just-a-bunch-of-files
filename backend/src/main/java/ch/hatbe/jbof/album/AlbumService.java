@@ -25,7 +25,7 @@ public class AlbumService {
     private final AuthenticatedUserService authenticatedUserService;
 
     public List<AlbumListDto> findAll(Pageable pageable) {
-        User currentUser = this.authenticatedUserService.getOrCreateCurrentUser();
+        User currentUser = this.authenticatedUserService.getCurrentUser();
 
         return this.albumRepository.findAllByOwnerUserIdOrderByCreatedAtDesc(currentUser.getUserId(), pageable)
                 .stream()
@@ -34,14 +34,14 @@ public class AlbumService {
     }
 
     public Optional<AlbumDetailDto> findById(UUID id) {
-        User currentUser = this.authenticatedUserService.getOrCreateCurrentUser();
+        User currentUser = this.authenticatedUserService.getCurrentUser();
 
         return this.albumRepository.findByAlbumIdAndOwnerUserId(id, currentUser.getUserId())
                 .map(AlbumMapper::toDetailDto);
     }
 
     public UUID create(CreateAlbumRequest request) {
-        User owner = this.authenticatedUserService.getOrCreateCurrentUser();
+        User owner = this.authenticatedUserService.getCurrentUser();
 
         Album album = new Album();
         album.setOwner(owner);
@@ -54,7 +54,7 @@ public class AlbumService {
     }
 
     public void delete(UUID id) {
-        User currentUser = this.authenticatedUserService.getOrCreateCurrentUser();
+        User currentUser = this.authenticatedUserService.getCurrentUser();
 
         Album album = this.albumRepository.findByAlbumIdAndOwnerUserId(id, currentUser.getUserId())
                 .orElseThrow(() -> new NotFoundException("album not found: " + id));
