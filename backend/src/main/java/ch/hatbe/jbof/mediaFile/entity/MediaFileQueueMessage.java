@@ -1,4 +1,4 @@
-package ch.hatbe.jbof.mediaFile;
+package ch.hatbe.jbof.mediaFile.entity;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;

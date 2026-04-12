@@ -13,20 +13,42 @@
   } @else {
     <div #gallerySurface class="gallery">
       @for (section of sections(); track section.key) {
-        <section class="gallery-section" [style.width.px]="section.width">
-          <div class="section-break" [class.section-break-empty]="!section.showLabel">
+        <section class="gallery-section">
+          <div class="section-break">
             <h2>{{ section.label }}</h2>
           </div>
 
-          <div class="gallery-row" [style.height.px]="section.row.height">
-            @for (entry of section.row.items; track entry.item.mediaFileId) {
-              <article class="gallery-item" [style.width.px]="entry.width">
-                <div class="media-placeholder">
-                  <strong>{{ entry.item.kind }}</strong>
-                  <span>{{ entry.item.originalFilename }}</span>
-                  <small>{{ entry.item.contentType }}</small>
-                </div>
-              </article>
+          <div class="gallery-rows">
+            @for (row of section.rows; track row.key) {
+              <div class="gallery-row" [style.height.px]="row.height">
+                @for (entry of row.items; track entry.item.mediaFileId) {
+                  <article class="gallery-item" [style.width.px]="entry.width">
+                    @if (entry.item.kind === 'IMAGE') {
+                      @if (thumbnailUrl(entry.item.mediaFileId); as url) {
+                        <img
+                          [src]="url"
+                          [alt]="entry.item.originalFilename"
+                          loading="lazy"
+                          (load)="onThumbnailLoad(entry.item.mediaFileId, $event)"
+                          (error)="onThumbnailError(entry.item.mediaFileId)"
+                        />
+                      } @else {
+                        <div class="media-placeholder">
+                          <strong>{{ entry.item.kind }}</strong>
+                          <span>{{ entry.item.originalFilename }}</span>
+                          <small>Loading thumbnail...</small>
+                        </div>
+                      }
+                    } @else {
+                      <div class="media-placeholder">
+                        <strong>{{ entry.item.kind }}</strong>
+                        <span>{{ entry.item.originalFilename }}</span>
+                        <small>{{ entry.item.contentType }}</small>
+                      </div>
+                    }
+                  </article>
+                }
+              </div>
             }
           </div>
         </section>

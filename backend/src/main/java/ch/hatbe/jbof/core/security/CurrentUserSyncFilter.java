@@ -21,8 +21,7 @@ public class CurrentUserSyncFilter extends OncePerRequestFilter {
     private final CurrentUserContext currentUserContext;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof JwtAuthenticationToken jwtAuthenticationToken) {
             User user = this.authenticatedUserService.synchronize(jwtAuthenticationToken.getToken());

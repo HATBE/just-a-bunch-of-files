@@ -94,5 +94,6 @@ create table if not exists media_metadata (
 create index if not exists idx_albums_owner_user_id on albums(owner_user_id);
 create index if not exists idx_media_derivatives_file_kind on media_derivatives(media_file_id, kind);
 create index if not exists idx_album_media_files_file_id on album_media_files(media_file_id);
+create index if not exists idx_media_metadata_captured_uploaded_at on media_metadata(captured_at desc, uploaded_at desc, media_file_id asc);
 create index if not exists idx_media_metadata_uploaded_at on media_metadata(uploaded_at desc, media_file_id asc);
 create index if not exists idx_media_metadata_gps_lat_lon on media_metadata(gps_lat, gps_lon);

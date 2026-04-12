@@ -52,4 +52,12 @@ export class MediaService extends HttpService {
     return this.delete<void>([fileId]);
   }
 
+  public async getThumbnailBlobUrl(fileId: string): Promise<string> {
+    const blob = await firstValueFrom(
+      this.http.get(this.createUrl([fileId, 'thumbnail']), { responseType: 'blob' })
+    );
+
+    return URL.createObjectURL(blob);
+  }
+
 }

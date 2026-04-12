@@ -19,6 +19,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -32,7 +34,7 @@ import java.util.Set;
 @EnableConfigurationProperties(AuthProperties.class)
 public class SecurityConfig {
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, AuthProperties authProperties, CurrentUserSyncFilter currentUserSyncFilter) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, AuthProperties authProperties, CurrentUserSyncFilter currentUserSyncFilter) {
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(Customizer.withDefaults());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -72,15 +74,7 @@ public class SecurityConfig {
         }
 
         Object roles = realmAccess.get("roles");
-        if (!(roles instanceof Collection<?> roleCollection)) {
-            return List.of();
-        }
-
-        return roleCollection.stream()
-                .filter(String.class::isInstance)
-                .map(String.class::cast)
-                .map(SimpleGrantedAuthority::new)
-                .toList();
+        return this.extractAuthorities(roles);
     }
 
     private Collection<? extends GrantedAuthority> extractClientAuthorities(Jwt jwt, String clientId) {
@@ -99,6 +93,10 @@ public class SecurityConfig {
         }
 
         Object roles = clientAccessMap.get("roles");
+        return this.extractAuthorities(roles);
+    }
+
+    private Collection<? extends GrantedAuthority> extractAuthorities( Object roles ) {
         if (!(roles instanceof Collection<?> roleCollection)) {
             return List.of();
         }
@@ -110,7 +108,7 @@ public class SecurityConfig {
                 .toList();
     }
 
-    private void writeError(jakarta.servlet.http.HttpServletResponse response, HttpStatus status, String message, String code) throws IOException {
+    private void writeError(HttpServletResponse response, HttpStatus status, String message, String code) throws IOException {
         response.setStatus(status.value());
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

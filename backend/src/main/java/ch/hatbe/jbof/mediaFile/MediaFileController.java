@@ -5,6 +5,7 @@ import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileDetailDto;
 import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileListDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,17 @@ public class MediaFileController {
     public ResponseEntity<MediaFileDetailDto> findById(@PathVariable UUID id) {
         return this.mediaFileService.findById(id)
                 .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/thumbnail")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> thumbnail(@PathVariable UUID id) {
+        return this.mediaFileService.findThumbnailContent(id)
+                .map(content -> ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(content.contentType()))
+                    .body(content.resource())
+                )
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

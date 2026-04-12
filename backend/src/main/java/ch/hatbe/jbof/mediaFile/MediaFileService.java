@@ -8,11 +8,13 @@ import ch.hatbe.jbof.mediaFile.entity.*;
 import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileDetailDto;
 import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileListDto;
 import ch.hatbe.jbof.mediaFile.entity.requests.CreateMediaFileRequest;
+import ch.hatbe.jbof.messaging.MessagingService;
 import ch.hatbe.jbof.storage.FileService;
 import ch.hatbe.jbof.storage.StorageService;
 import ch.hatbe.jbof.user.entity.User;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,12 +36,13 @@ public class MediaFileService {
     private final FileService fileService;
     private final StorageService storageService;
     private final AuthenticatedUserService authenticatedUserService;
+    private final MessagingService messagingService;
 
     @Transactional(readOnly = true)
     public Page<MediaFileListDto> findAll(Pageable pageable) {
         User currentUser = this.authenticatedUserService.getCurrentUser();
 
-        return mediaFileRepository.findAllByOwnerUserIdAndProcessingStatusOrderByMetadataUploadedAtDesc(currentUser.getUserId(), MediaProcessingStatus.READY, pageable)
+        return mediaFileRepository.findAllVisibleForOwner(currentUser.getUserId(), MediaProcessingStatus.READY, pageable)
                 .map(MediaFileMapper::toListDto);
     }
 
@@ -49,6 +52,14 @@ public class MediaFileService {
 
         return mediaFileRepository.findByMediaFileIdAndOwnerUserIdAndProcessingStatus(id, currentUser.getUserId(), MediaProcessingStatus.READY)
                 .map(MediaFileMapper::toDetailDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<StoredMediaContent> findThumbnailContent(UUID id) {
+        User currentUser = this.authenticatedUserService.getCurrentUser();
+
+        return mediaFileRepository.findByMediaFileIdAndOwnerUserIdAndProcessingStatus(id, currentUser.getUserId(), MediaProcessingStatus.READY)
+                .flatMap(this::resolveThumbnailContent);
     }
 
     @Transactional
@@ -112,6 +123,8 @@ public class MediaFileService {
             MediaFile createdFile = mediaFileRepository.save(mediaFile);
             this.attachToAlbums(createdFile, albums);
 
+            this.messagingService.sendToQueue(new MediaFileQueueMessage(createdFile.getMediaFileId(), OffsetDateTime.now()));
+
             return new UploadResult(createdFile.getMediaFileId(), storedObject);
         } catch (Exception e) {
             this.storageService.deleteQuietly(storedObject.bucket(), storedObject.key());
@@ -154,7 +167,31 @@ public class MediaFileService {
         }
     }
 
+    private Optional<StoredMediaContent> resolveThumbnailContent(MediaFile mediaFile) {
+        return mediaFile.getDerivatives().stream()
+                .filter(derivative -> derivative.getKind() == MediaDerivativeKind.THUMBNAIL)
+                .findFirst()
+                .map(derivative -> new StoredMediaContent(
+                        new InputStreamResource(this.storageService.download(derivative.getBucket(), derivative.getObjectKey())),
+                        derivative.getContentType()
+                ))
+                .or(() -> this.originalImageContent(mediaFile));
+    }
+
+    private Optional<StoredMediaContent> originalImageContent(MediaFile mediaFile) {
+        if (mediaFile.getKind() != MediaKind.IMAGE) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new StoredMediaContent(
+                new InputStreamResource(this.storageService.download(mediaFile.getBucket(), mediaFile.getObjectKey())),
+                mediaFile.getContentType()
+        ));
+    }
+
     private record StoredObject(String bucket, String key) {}
 
     private record UploadResult(UUID mediaFileId, StoredObject storedObject) {}
+
+    public record StoredMediaContent(InputStreamResource resource, String contentType) {}
 }

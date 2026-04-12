@@ -10,13 +10,14 @@ import { MediaListResponseDto } from '../../media.dtos';
 })
 export class GalleryPage implements OnDestroy {
   private static readonly PAGE_SIZE = 24;
-  private static readonly MIN_ROW_HEIGHT = 110;
+  private static readonly MAX_ITEMS_PER_ROW = 10;
+  private static readonly MAX_ITEMS_PER_SMALL_ROW = 4;
   private static readonly ROW_GAP = 12;
-  private static readonly SECTION_GAP = 20;
-  private static readonly SECTION_MIN_WIDTH = 260;
-  private static readonly SECTION_MAX_WIDTH_RATIO = 0.78;
-  private static readonly MIN_ASPECT_RATIO = 0.65;
-  private static readonly MAX_ASPECT_RATIO = 1.8;
+  private static readonly MIN_SPARSE_ROW_HEIGHT = 72;
+  private static readonly MAX_SPARSE_ROW_HEIGHT = 180;
+  private static readonly SMALL_SECTION_ITEM_COUNT = 6;
+  private static readonly MIN_ASPECT_RATIO = 0.45;
+  private static readonly MAX_ASPECT_RATIO = 2.4;
   private static readonly LOAD_MORE_THRESHOLD_PX = 1000;
   private static readonly MIN_PAGE_OVERFLOW_PX = 280;
   private static readonly SECTION_DATE_FORMAT = new Intl.DateTimeFormat(undefined, {
@@ -28,6 +29,7 @@ export class GalleryPage implements OnDestroy {
   private readonly mediaService = inject(MediaService);
   private resizeObserver?: ResizeObserver;
   private readonly aspectRatios = new Map<string, number>();
+  private readonly thumbnailUrls = new Map<string, string>();
   private autofillScheduled = false;
   private autofillInFlight = false;
 
@@ -52,7 +54,7 @@ export class GalleryPage implements OnDestroy {
   private gallerySurface?: ElementRef<HTMLElement>;
 
   protected readonly items = signal<MediaListResponseDto[]>([]);
-  protected readonly sections = signal<GallerySectionSlice[]>([]);
+  protected readonly sections = signal<GallerySection[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly isLoadingMore = signal(false);
   protected readonly hasMore = signal(false);
@@ -64,11 +66,34 @@ export class GalleryPage implements OnDestroy {
 
   public ngOnDestroy(): void {
     this.resizeObserver?.disconnect();
+    for (const url of this.thumbnailUrls.values()) {
+      URL.revokeObjectURL(url);
+    }
   }
 
   @HostListener('window:scroll')
   protected onWindowScroll(): void {
     this.scheduleAutofillCheck();
+  }
+
+  protected thumbnailUrl(fileId: string): string | null {
+    return this.thumbnailUrls.get(fileId) ?? null;
+  }
+
+  protected onThumbnailLoad(fileId: string, event: Event): void {
+    const image = event.target as HTMLImageElement | null;
+    if (!image || image.naturalWidth <= 0 || image.naturalHeight <= 0) {
+      return;
+    }
+
+    const aspectRatio = image.naturalWidth / image.naturalHeight;
+    this.aspectRatios.set(fileId, this.normalizeAspectRatio(aspectRatio));
+    this.rebuildSections();
+    this.scheduleAutofillCheck();
+  }
+
+  protected onThumbnailError(fileId: string): void {
+    this.thumbnailUrls.delete(fileId);
   }
 
   protected async refresh(): Promise<void> {
@@ -100,6 +125,7 @@ export class GalleryPage implements OnDestroy {
 
       this.items.set(nextItems);
       this.hasMore.set(!response.last);
+      this.primeThumbnailUrls(nextItems);
       this.rebuildSections();
       this.scheduleAutofillCheck();
     } catch (error) {
@@ -147,123 +173,166 @@ export class GalleryPage implements OnDestroy {
       groupedItems.set(sectionKey, sectionItems);
     }
 
-    this.sections.set(this.buildPackedSlices(groupedItems, surfaceWidth));
+    this.sections.set(this.buildSections(groupedItems, surfaceWidth));
   }
 
-  private buildPackedSlices(
+  private buildSections(
     groupedItems: Map<string, MediaListResponseDto[]>,
     surfaceWidth: number,
-  ): GallerySectionSlice[] {
-    const slices: GallerySectionSlice[] = [];
-    let remainingShelfWidth = surfaceWidth;
-    const shelfHeight = this.targetRowHeight(surfaceWidth);
+  ): GallerySection[] {
+    const sections: GallerySection[] = [];
 
     for (const [sectionKey, sectionItems] of groupedItems.entries()) {
-      const queue = [...sectionItems];
-      const label = this.sectionLabelFor(sectionItems[0]);
-      let sliceIndex = 0;
-
-      while (queue.length > 0) {
-        if (remainingShelfWidth < GalleryPage.SECTION_MIN_WIDTH) {
-          remainingShelfWidth = surfaceWidth;
-        }
-
-        const desiredWidth = Math.min(
-          remainingShelfWidth,
-          this.estimateSectionWidth(queue, surfaceWidth, shelfHeight),
-        );
-        const slice = this.buildSectionSlice(
-          `${sectionKey}-${sliceIndex}`,
-          label,
-          queue,
-          desiredWidth,
-          shelfHeight,
-          sliceIndex === 0,
-        );
-
-        if (slice.width > remainingShelfWidth && remainingShelfWidth < surfaceWidth) {
-          remainingShelfWidth = surfaceWidth;
-          continue;
-        }
-
-        slices.push(slice);
-        queue.splice(0, slice.row.items.length);
-        sliceIndex += 1;
-        remainingShelfWidth -= slice.width + GalleryPage.SECTION_GAP;
-      }
+      sections.push({
+        key: sectionKey,
+        label: this.sectionLabelFor(sectionItems[0]),
+        rows: this.buildJustifiedRows(sectionItems, surfaceWidth, sectionKey),
+      });
     }
 
-    return slices;
+    return sections;
   }
 
-  private buildSectionSlice(
-    key: string,
-    label: string,
+  private buildJustifiedRows(
     items: MediaListResponseDto[],
-    desiredWidth: number,
-    rowHeight: number,
-    showLabel: boolean,
-  ): GallerySectionSlice {
-    const rowItems: MediaListResponseDto[] = [];
-    let projectedWidth = 0;
+    containerWidth: number,
+    sectionKey: string,
+  ): GalleryRow[] {
+    if (items.length <= GalleryPage.SMALL_SECTION_ITEM_COUNT) {
+      return this.buildSmallSectionRows(items, containerWidth, sectionKey);
+    }
+
+    const rows: GalleryRow[] = [];
+    const targetRowHeight = this.targetRowHeight(containerWidth);
+    let rowItems: MediaListResponseDto[] = [];
+    let aspectSum = 0;
+    let rowIndex = 0;
 
     for (const item of items) {
-      const itemWidth = this.itemWidth(item, rowHeight);
-      const nextWidth = rowItems.length === 0
-        ? itemWidth
-        : projectedWidth + GalleryPage.ROW_GAP + itemWidth;
+      rowItems.push(item);
+      aspectSum += this.resolveAspectRatio(item);
 
-      if (rowItems.length > 0 && nextWidth > desiredWidth) {
-        break;
+      const projectedWidth = this.projectedRowWidth(rowItems.length, aspectSum, targetRowHeight);
+      const reachedTarget = projectedWidth >= containerWidth;
+      const reachedItemLimit = rowItems.length >= GalleryPage.MAX_ITEMS_PER_ROW;
+
+      if (!reachedTarget && !reachedItemLimit) {
+        continue;
       }
 
-      rowItems.push(item);
-      projectedWidth = nextWidth;
+      rows.push(this.buildRow(
+        rowItems,
+        this.computeExactRowHeight(containerWidth, rowItems),
+        containerWidth,
+        `${sectionKey}-${rowIndex}`,
+        true,
+      ));
+      rowItems = [];
+      aspectSum = 0;
+      rowIndex += 1;
     }
 
-    if (rowItems.length === 0 && items.length > 0) {
-      rowItems.push(items[0]);
+    if (rowItems.length > 0) {
+      const sparseRowHeight = Math.min(this.computeExactRowHeight(containerWidth, rowItems), targetRowHeight);
+      rows.push(this.buildRow(
+        rowItems,
+        rowItems.length <= 3
+          ? Math.max(GalleryPage.MIN_SPARSE_ROW_HEIGHT, sparseRowHeight)
+          : sparseRowHeight,
+        containerWidth,
+        `${sectionKey}-${rowIndex}`,
+        false,
+      ));
     }
 
-    const row = this.buildRow(rowItems, rowHeight);
+    return rows;
+  }
+
+  private buildSmallSectionRows(
+    items: MediaListResponseDto[],
+    containerWidth: number,
+    sectionKey: string,
+  ): GalleryRow[] {
+    const rows: GalleryRow[] = [];
+
+    for (let index = 0; index < items.length; index += GalleryPage.MAX_ITEMS_PER_SMALL_ROW) {
+      const rowItems = items.slice(index, index + GalleryPage.MAX_ITEMS_PER_SMALL_ROW);
+      const rowHeight = Math.min(
+        GalleryPage.MAX_SPARSE_ROW_HEIGHT,
+        Math.max(
+          GalleryPage.MIN_SPARSE_ROW_HEIGHT,
+          this.computeExactRowHeight(containerWidth, rowItems),
+        ),
+      );
+      rows.push(this.buildRow(
+        rowItems,
+        rowHeight,
+        containerWidth,
+        `${sectionKey}-small-${index}`,
+        rowItems.length > 1,
+      ));
+    }
+
+    return rows;
+  }
+
+  private buildRow(
+    items: MediaListResponseDto[],
+    rowHeight: number,
+    containerWidth: number,
+    key: string,
+    justify: boolean,
+  ): GalleryRow {
+    const availableWidth = containerWidth - GalleryPage.ROW_GAP * Math.max(0, items.length - 1);
+    const widths = items.map((item) => this.resolveAspectRatio(item) * rowHeight);
+    const finalWidths = justify
+      ? this.justifyWidths(widths, availableWidth)
+      : widths;
+
     return {
       key,
-      label,
-      showLabel,
-      width: this.rowWidth(row),
-      row,
-    };
-  }
-
-  private estimateSectionWidth(items: MediaListResponseDto[], surfaceWidth: number, rowHeight: number): number {
-    const maxWidth = Math.floor(surfaceWidth * GalleryPage.SECTION_MAX_WIDTH_RATIO);
-    const visibleItems = items.slice(0, Math.min(items.length, 6));
-    const preferredWidth = Math.round(
-      visibleItems.reduce((sum, item) => sum + this.itemWidth(item, rowHeight), 0)
-      + Math.max(0, visibleItems.length - 1) * GalleryPage.ROW_GAP,
-    );
-
-    return Math.min(maxWidth, Math.max(GalleryPage.SECTION_MIN_WIDTH, preferredWidth));
-  }
-
-  private buildRow(items: MediaListResponseDto[], rowHeight: number): GalleryRow {
-    const height = Math.max(GalleryPage.MIN_ROW_HEIGHT, Math.round(rowHeight));
-    return {
-      items: items.map((item) => ({
+      items: items.map((item, index) => ({
         item,
-        width: this.itemWidth(item, height),
+        width: finalWidths[index],
       })),
-      height,
+      height: rowHeight,
     };
   }
 
-  private itemWidth(item: MediaListResponseDto, rowHeight: number): number {
-    return Math.max(90, Math.round(rowHeight * this.resolveAspectRatio(item)));
+  private justifyWidths(widths: number[], availableWidth: number): number[] {
+    const totalWidth = widths.reduce((sum, width) => sum + width, 0);
+    if (totalWidth <= 0) {
+      return widths;
+    }
+
+    const scale = availableWidth / totalWidth;
+    return widths.map((width) => width * scale);
   }
 
-  private rowWidth(row: GalleryRow): number {
-    return row.items.reduce((sum, entry) => sum + entry.width, 0)
-      + GalleryPage.ROW_GAP * Math.max(0, row.items.length - 1);
+  private computeExactRowHeight(containerWidth: number, items: MediaListResponseDto[]): number {
+    const aspectSum = items.reduce((sum, item) => sum + this.resolveAspectRatio(item), 0);
+    const availableWidth = containerWidth - GalleryPage.ROW_GAP * Math.max(0, items.length - 1);
+    return availableWidth / Math.max(0.1, aspectSum);
+  }
+
+  private projectedRowWidth(itemCount: number, aspectSum: number, rowHeight: number): number {
+    return aspectSum * rowHeight + GalleryPage.ROW_GAP * Math.max(0, itemCount - 1);
+  }
+
+  private targetRowHeight(containerWidth: number): number {
+    if (containerWidth >= 1500) {
+      return 50;
+    }
+
+    if (containerWidth >= 1100) {
+      return 45;
+    }
+
+    if (containerWidth >= 800) {
+      return 40;
+    }
+
+    return 34;
   }
 
   private scheduleAutofillCheck(): void {
@@ -316,11 +385,7 @@ export class GalleryPage implements OnDestroy {
       return known;
     }
 
-    if (item.kind === 'VIDEO') {
-      return 16 / 9;
-    }
-
-    return 4 / 3;
+    return item.kind === 'VIDEO' ? 16 / 9 : 4 / 3;
   }
 
   private normalizeAspectRatio(aspectRatio: number): number {
@@ -330,40 +395,83 @@ export class GalleryPage implements OnDestroy {
     );
   }
 
-  private targetRowHeight(containerWidth: number): number {
-    if (containerWidth >= 520) {
-      return 264;
-    }
-
-    if (containerWidth >= 420) {
-      return 276;
-    }
-
-    if (containerWidth >= 340) {
-      return 250;
-    }
-
-    return 166;
-  }
-
   private sectionKeyFor(item: MediaListResponseDto): string {
-    return 'media';
+    const date = this.displayDateFor(item);
+    return [
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+    ].join('-');
   }
 
   private sectionLabelFor(item: MediaListResponseDto): string {
-    return 'Your media';
+    const date = this.displayDateFor(item);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    if (this.isSameDay(date, today)) {
+      return 'Today';
+    }
+
+    if (this.isSameDay(date, yesterday)) {
+      return 'Yesterday';
+    }
+
+    return GalleryPage.SECTION_DATE_FORMAT.format(date);
+  }
+
+  private displayDateFor(item: MediaListResponseDto): Date {
+    const capturedDate = item.capturedAt ? new Date(item.capturedAt) : null;
+    if (capturedDate && Number.isFinite(capturedDate.getTime())) {
+      return capturedDate;
+    }
+
+    const uploadedDate = item.uploadedAt ? new Date(item.uploadedAt) : null;
+    const parsedDate = uploadedDate;
+
+    if (parsedDate && Number.isFinite(parsedDate.getTime())) {
+      return parsedDate;
+    }
+
+    return new Date(0);
+  }
+
+  private isSameDay(left: Date, right: Date): boolean {
+    return left.getFullYear() === right.getFullYear()
+      && left.getMonth() === right.getMonth()
+      && left.getDate() === right.getDate();
+  }
+
+  private primeThumbnailUrls(items: MediaListResponseDto[]): void {
+    for (const item of items) {
+      if (item.kind !== 'IMAGE' || this.thumbnailUrls.has(item.mediaFileId)) {
+        continue;
+      }
+
+      void this.mediaService.getThumbnailBlobUrl(item.mediaFileId)
+        .then((url) => {
+          const previous = this.thumbnailUrls.get(item.mediaFileId);
+          if (previous) {
+            URL.revokeObjectURL(previous);
+          }
+          this.thumbnailUrls.set(item.mediaFileId, url);
+        })
+        .catch(() => {
+          this.thumbnailUrls.delete(item.mediaFileId);
+        });
+    }
   }
 }
 
-type GallerySectionSlice = {
+type GallerySection = {
   key: string;
   label: string;
-  showLabel: boolean;
-  width: number;
-  row: GalleryRow;
+  rows: GalleryRow[];
 };
 
 type GalleryRow = {
+  key: string;
   items: GalleryRowItem[];
   height: number;
 };

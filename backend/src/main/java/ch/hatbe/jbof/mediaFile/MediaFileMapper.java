@@ -16,6 +16,8 @@ public final class MediaFileMapper {
                 entity.getProcessingStatus(),
                 entity.getOriginalFilename(),
                 entity.getContentType(),
+                entity.getMetadata().getCapturedAt(),
+                entity.getMetadata().getUploadedAt(),
                 UserMapper.toListDto(entity.getOwner())
         );
     }

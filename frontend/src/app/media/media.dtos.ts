@@ -14,6 +14,8 @@ export interface MediaListResponseDto {
   processingStatus: string;
   originalFilename: string;
   contentType: string;
+  capturedAt: string | null;
+  uploadedAt: string;
 }
 
 export interface PageResponseDto<T> {
