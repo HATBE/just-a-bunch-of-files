@@ -19,7 +19,7 @@ public class ImageFinder {
     );
 
     private static final Set<String> DELETE_FILE_EXTENSION = Set.of(
-            "db", "ini", "thm"
+            "db", "ini", "thm", "info"
     );
 
     private final Path rootPath;
@@ -126,7 +126,6 @@ public class ImageFinder {
         AtomicInteger counter = new AtomicInteger();
 
         deleteCandidates.parallelStream().forEach(file -> {
-
             int current = counter.incrementAndGet();
 
             try {
