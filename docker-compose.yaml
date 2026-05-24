@@ -1,7 +1,7 @@
 services:
-  maindatabase:
-    image: postgres:18
-    container_name: maindatabase
+  appdb:
+    image: postgres:18.4
+    container_name: appdb
     ports:
       - "35432:5432"
     environment:
@@ -9,16 +9,17 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     volumes:
-      - "./docker/postgres:/var/lib/postgresql"
+      - "./docker/appdb:/var/lib/postgresql"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user -d jbof"]
       interval: 5s
       timeout: 5s
       retries: 20
     restart: unless-stopped
-  keycloak-postgres:
-    image: postgres:18
-    container_name: keycloak-postgres
+
+  authdb:
+    image: postgres:18.4
+    container_name: authdb
     ports:
       - "35433:5432"
     environment:
@@ -26,39 +27,42 @@ services:
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: keycloak
     volumes:
-      - "./docker/keycloak/postgres:/var/lib/postgresql"
+      - "./docker/authdb:/var/lib/postgresql"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
       interval: 5s
       timeout: 5s
       retries: 20
     restart: unless-stopped
-  keycloak:
+
+  auth:
     image: quay.io/keycloak/keycloak:26.6.0
-    container_name: keycloak
+    container_name: auth
     depends_on:
-      keycloak-postgres:
+      authdb:
         condition: service_healthy
     ports:
       - "8081:8080"
     environment:
       KC_DB: postgres
-      KC_DB_URL_HOST: keycloak-postgres
+      KC_DB_URL_HOST: authdb
       KC_DB_URL_PORT: 5432
       KC_DB_URL_DATABASE: keycloak
       KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD: keycloak
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HTTP_ENABLED: "true"
     volumes:
-      - "./keycloak/import:/opt/keycloak/data/import:ro"
+      - "./keycloak:/opt/keycloak/data/import:ro"
     command:
       - start-dev
       - --import-realm
     restart: unless-stopped
-  rabbitmq:
+
+  queue:
     image: rabbitmq:4-management
-    container_name: rabbitmq
+    container_name: queue
     ports:
       - "5672:5672" # RabbitMQ AMQP
       - "15672:15672" # RabbitMQ Web UI # TODO: delete for prod
@@ -66,14 +70,15 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
     restart: unless-stopped
-  minio:
+
+  data:
     image: minio/minio
-    container_name: minio
+    container_name: data
     ports:
       - "9002:9000" # MinIO S3 API
       - "9003:9001" # MinIO Console UI TODO: DELETE FOR PROD
     volumes:
-      - ./docker/minio:/data
+      - ./docker/data:/data
     environment:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123

@@ -1,30 +1,19 @@
 package ch.hatbe.jbof.user;
 
-import ch.hatbe.jbof.user.entity.dto.UserDetailDto;
-import ch.hatbe.jbof.user.entity.dto.UserListDto;
+import ch.hatbe.jbof.core.exception.ResourceNotFoundException;
+import ch.hatbe.jbof.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
 
-    public List<UserListDto> findAll() {
-        return userRepository.findAllByOrderByCreatedAtDesc()
-                .stream()
-                .map(UserMapper::toListDto)
-                .toList();
-    }
-
-    public Optional<UserDetailDto> findById(UUID id) {
-        return userRepository.findByUserId(id)
-                .map(UserMapper::toDetailDto);
+    public User findByKeycloakUserId(UUID id) {
+        return this.userRepository.findByKeycloakUserId(id).orElseThrow(() -> new ResourceNotFoundException("Not User found!"));
     }
 }

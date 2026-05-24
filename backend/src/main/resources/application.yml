@@ -1,0 +1,63 @@
+spring:
+  config:
+    import: optional:file:../.env[.properties]
+
+    devtools:
+      restart:
+        enabled: true
+      livereload:
+        enabled: true
+
+  application:
+    name: jbof
+
+  datasource:
+    url: ${BACKEND_DB_DATASOURCE}
+    username: ${BACKEND_DB_USERNAME}
+    password: ${BACKEND_DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AUTH_JWT_ISSUER_URI}
+
+server:
+  port: ${BACKEND_PORT}
+
+app:
+  cors:
+    allowed-origins:
+      - ${FRONTEND_URL:http://localhost:4200}
+
+  security:
+    public-paths:
+      - /error
+      - /actuator/health
+      - /actuator/info
+
+  auth:
+    base-url: ${AUTH_BASE_URL:http://localhost:8081}
+    realm: ${AUTH_REALM:jbof}
+    admin-client-id: ${AUTH_ADMIN_CLIENT_ID:jbof-backend}
+    admin-client-secret: ${AUTH_ADMIN_CLIENT_SECRET}
+
+  pagination:
+    max-page-size: ${BACKEND_PAGINATION_MAX_SIZE:100}
+    default-page-size: ${BACKEND_PAGINATION_DEFAULT_SIZE:20}

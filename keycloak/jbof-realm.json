@@ -1,0 +1,86 @@
+{
+  "realm": "jbof",
+  "enabled": true,
+  "displayName": "Just a bunch of files",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": false,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "rememberMe": true,
+  "roles": {
+    "realm": [
+      { "name": "admin", "description": "Full application administration" },
+      { "name": "user", "description": "Full application administration" }
+    ]
+  },
+  "groups": [
+    {
+      "name": "admin",
+      "realmRoles": ["admin"]
+    },
+    {
+      "name": "user",
+      "realmRoles": ["user"]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "frontend",
+      "name": "JBOF Angular",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["http://localhost:4200/*"],
+      "webOrigins": ["http://localhost:4200"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:4200/*"
+      }
+    },
+    {
+      "clientId": "test",
+      "name": "Test for testing",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "authorizationServicesEnabled": false,
+      "redirectUris": [],
+      "webOrigins": [],
+      "attributes": {}
+    },
+    {
+      "clientId": "backend-admin",
+      "name": "JBOF Backend Admin Client",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "change-me-in-prod",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": false,
+      "redirectUris": [],
+      "webOrigins": []
+    }
+  ],
+  "users": [
+    {
+      "username": "hatbe",
+      "enabled": true,
+      "firstName": "HATBE",
+      "lastName": "HATBE",
+      "email": "hatbe@example.local",
+      "emailVerified": true,
+      "groups": ["/admin"],
+      "credentials": [
+        { "type": "password", "value": "admin123", "temporary": false }
+      ]
+    }
+  ]
+}

@@ -1,31 +1,30 @@
 package ch.hatbe.jbof.user.entity;
 
-import jakarta.persistence.*;
+import ch.hatbe.jbof.core.entity.AuditableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
 @Table(name = "users")
-public class User {
+@Getter
+public class User extends AuditableEntity {
     @Id
     @UuidGenerator
-    @Column(name = "user_id", nullable = false, updatable = false, length = 36)
+    @Column(name = "user_id", nullable = false, updatable = false, length = 36, unique = true)
     private UUID userId;
 
-    @Column(name = "username", nullable = false, unique = true, length = 255)
+    @Column(name = "keycloak_user_id", nullable = false, unique = true)
+    private UUID keycloakUserId;
+
+    @Column(name = "username", nullable = false, unique = true, length = 80)
     private String username;
 
-    @Column(name = "keycloak_user_id", nullable = false, unique = true, length = 255)
-    private String keycloakUserId;
-
-    @Column(name = "created_at", nullable = false)
-    private OffsetDateTime createdAt = OffsetDateTime.now();
+    @Column(name = "email", unique = true, length = 320)
+    private String email;
 }
