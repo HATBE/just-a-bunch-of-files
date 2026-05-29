@@ -16,7 +16,7 @@
   "groups": [
     {
       "name": "admin",
-      "realmRoles": ["admin"]
+      "realmRoles": ["admin", "user"]
     },
     {
       "name": "user",
