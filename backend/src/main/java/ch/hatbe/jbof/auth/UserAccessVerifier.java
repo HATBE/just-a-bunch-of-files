@@ -1,5 +1,6 @@
 package ch.hatbe.jbof.auth;
 
+import ch.hatbe.jbof.auth.entity.JwtKeycloakUser;
 import ch.hatbe.jbof.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -14,7 +15,7 @@ public class UserAccessVerifier {
 
     @Transactional(readOnly = true)
     public void requireExistingAppUser(Jwt token) {
-        KeycloakUser keycloakUser = KeycloakUser.fromJwt(token);
+        JwtKeycloakUser keycloakUser = JwtKeycloakUser.fromJwt(token);
 
         if (!userRepository.existsByKeycloakUserId(keycloakUser.sub())) {
             throw new AccessDeniedException("User is not registered in this application");

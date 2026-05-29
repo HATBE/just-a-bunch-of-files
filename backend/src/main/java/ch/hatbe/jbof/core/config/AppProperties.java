@@ -10,7 +10,6 @@ import java.util.List;
 @Setter
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
-
     private Cors cors;
     private Security security;
     private Auth auth;

@@ -1,5 +1,6 @@
 {
   "realm": "jbof",
+  "accessTokenLifespan": 864000,
   "enabled": true,
   "displayName": "Just a bunch of files",
   "registrationAllowed": false,
@@ -81,6 +82,14 @@
       "credentials": [
         { "type": "password", "value": "admin123", "temporary": false }
       ]
+    },
+    {
+      "username": "service-account-backend-admin",
+      "enabled": true,
+      "serviceAccountClientId": "backend-admin",
+      "clientRoles": {
+        "realm-management": ["manage-users", "view-users", "query-users"]
+      }
     }
   ]
 }

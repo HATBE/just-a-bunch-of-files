@@ -1,18 +1,18 @@
-package ch.hatbe.jbof.auth;
+package ch.hatbe.jbof.auth.entity;
 
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.UUID;
 
-public record KeycloakUser(
+public record JwtKeycloakUser(
         UUID sub,
         String email,
         String preferredUsername,
         String givenName,
         String familyName
 ) {
-    public static KeycloakUser fromJwt(Jwt jwt) {
+    public static JwtKeycloakUser fromJwt(Jwt jwt) {
         String subject = jwt.getSubject();
 
         if (subject == null || subject.isBlank()) {
@@ -31,7 +31,7 @@ public record KeycloakUser(
         String givenName = jwt.getClaimAsString("given_name");
         String familyName = jwt.getClaimAsString("family_name");
 
-        return new KeycloakUser(
+        return new JwtKeycloakUser(
                 sub,
                 email,
                 preferredUsername,

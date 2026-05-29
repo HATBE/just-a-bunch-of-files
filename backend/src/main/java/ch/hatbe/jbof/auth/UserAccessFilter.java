@@ -33,7 +33,7 @@ public class UserAccessFilter extends OncePerRequestFilter {
             try {
                 userAccessVerifier.requireExistingAppUser(jwtAuthenticationToken.getToken());
             } catch (AccessDeniedException ex) {
-                accessDeniedHandler.handle(request, response, new AccessDeniedException("No enough Permission!"));
+                accessDeniedHandler.handle(request, response, ex);
                 return;
             }
         }

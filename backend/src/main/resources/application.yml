@@ -51,6 +51,7 @@ app:
       - /error
       - /actuator/health
       - /actuator/info
+      - /api/v1/auth/register
 
   auth:
     base-url: ${AUTH_BASE_URL:http://localhost:8081}

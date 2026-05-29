@@ -11,7 +11,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.OffsetDateTime;
 
 @Getter
-@Setter
 @MappedSuperclass
 public abstract class AuditableEntity {
     @CreationTimestamp
@@ -26,6 +25,7 @@ public abstract class AuditableEntity {
     @Column(name = "version", nullable = false)
     private long version;
 
+    @Setter // TODO: make method, and also soft delete everithing else from the user
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
 }
