@@ -11,7 +11,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
-    Optional<User> findUByKeycloakUserId(UUID keycloakUserId);
+    Optional<User> findByKeycloakUserId(UUID keycloakUserId);
+
     boolean existsByKeycloakUserId(UUID keycloakUserId);
 
     @Query("SELECT u FROM User u WHERE u.deletedAt IS NULL ORDER BY u.createdAt DESC")

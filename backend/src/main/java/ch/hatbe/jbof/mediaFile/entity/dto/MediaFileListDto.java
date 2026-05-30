@@ -1,11 +1,13 @@
 package ch.hatbe.jbof.mediaFile.entity.dto;
 
+import ch.hatbe.jbof.album.entity.Album;
 import ch.hatbe.jbof.mediaFile.entity.MediaFileKind;
 import ch.hatbe.jbof.user.entity.dto.UserListDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -25,4 +27,7 @@ public class MediaFileListDto {
 
     @JsonProperty("metadata")
     private MediaFileMetadataListDto metadata;
+
+    @JsonProperty("albums")
+    private Set<Album> albums;
 }

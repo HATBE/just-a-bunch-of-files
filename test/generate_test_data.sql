@@ -50,7 +50,87 @@ inserted_media AS (
     CROSS JOIN owner o
     RETURNING
         media_file_id,
-        kind
+        kind,
+        storage_bucket_object_key
+),
+
+inserted_albums AS (
+    INSERT INTO album (
+        created_at,
+        deleted_at,
+        updated_at,
+        version,
+        album_id,
+        owner_user_id,
+        name
+    )
+    SELECT
+        CURRENT_TIMESTAMP,
+        NULL,
+        CURRENT_TIMESTAMP,
+        0,
+        gen_random_uuid(),
+        o.user_id,
+        album_name
+    FROM owner o
+    CROSS JOIN (
+        VALUES
+            ('Favorites'),
+            ('Zurich'),
+            ('Videos'),
+            ('Archive')
+    ) AS albums(album_name)
+    RETURNING
+        album_id,
+        name
+),
+
+inserted_album_media_files AS (
+    INSERT INTO album_media_files (
+        album_id,
+        media_file_id
+    )
+    SELECT
+        ia.album_id,
+        im.media_file_id
+    FROM inserted_albums ia
+    JOIN inserted_media im
+        ON (
+            ia.name = 'Favorites'
+            AND im.media_file_id IN (
+                SELECT media_file_id
+                FROM inserted_media
+                ORDER BY media_file_id
+                LIMIT 12
+            )
+        )
+        OR (
+            ia.name = 'Zurich'
+            AND im.media_file_id IN (
+                SELECT media_file_id
+                FROM inserted_media
+                ORDER BY media_file_id
+                OFFSET 12
+                LIMIT 15
+            )
+        )
+        OR (
+            ia.name = 'Videos'
+            AND im.kind = 'VIDEO'::MediaFileKind
+        )
+        OR (
+            ia.name = 'Archive'
+            AND im.media_file_id IN (
+                SELECT media_file_id
+                FROM inserted_media
+                ORDER BY media_file_id
+                OFFSET 27
+                LIMIT 10
+            )
+        )
+    RETURNING
+        album_id,
+        media_file_id
 ),
 
 inserted_metadata AS (

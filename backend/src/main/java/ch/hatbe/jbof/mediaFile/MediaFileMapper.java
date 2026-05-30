@@ -1,5 +1,6 @@
 package ch.hatbe.jbof.mediaFile;
 
+import ch.hatbe.jbof.album.AlbumMapper;
 import ch.hatbe.jbof.mediaFile.entity.MediaFile;
 import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileDetailDto;
 import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileListDto;
@@ -11,7 +12,8 @@ import org.mapstruct.Mapper;
         uses = {
                 UserMapper.class,
                 MediaFileMetadataMapper.class,
-                MediaFileThumbnailMapper.class
+                MediaFileThumbnailMapper.class,
+                AlbumMapper.class
         }
 )
 public interface MediaFileMapper {

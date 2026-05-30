@@ -1,6 +1,5 @@
 package ch.hatbe.jbof.mediaFile;
 
-import ch.hatbe.jbof.mediaFile.entity.MediaFileMetadata;
 import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileDetailDto;
 import ch.hatbe.jbof.mediaFile.entity.dto.MediaFileListDto;
 import lombok.RequiredArgsConstructor;

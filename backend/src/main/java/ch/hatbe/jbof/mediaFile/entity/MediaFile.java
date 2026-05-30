@@ -1,5 +1,6 @@
 package ch.hatbe.jbof.mediaFile.entity;
 
+import ch.hatbe.jbof.album.entity.Album;
 import ch.hatbe.jbof.core.entity.AuditableEntity;
 import ch.hatbe.jbof.user.entity.User;
 import jakarta.persistence.*;
@@ -8,6 +9,8 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -48,5 +51,6 @@ public class MediaFile extends AuditableEntity {
     @Column(name = "storage_bucket_object_key", nullable = false, length = 1024, unique = true)
     private String storageBucketObjectKey;
 
-    // TODO: albums
+    @ManyToMany(mappedBy = "mediaFiles", fetch = FetchType.LAZY)
+    private Set<Album> albums = new LinkedHashSet<>();
 }

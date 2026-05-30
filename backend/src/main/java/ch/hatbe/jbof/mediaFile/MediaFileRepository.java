@@ -17,7 +17,7 @@ public interface MediaFileRepository extends JpaRepository<MediaFile, UUID> {
         SELECT m FROM MediaFile m
             WHERE m.deletedAt IS NULL
             AND m.processingState = MediaFileProcessingState.READY
-            ORDER BY m.metadata.capturedAt, m.updatedAt DESC, m.createdAt DESC
+            ORDER BY m.metadata.capturedAt DESC, m.updatedAt DESC, m.createdAt DESC
     """)
     Page<MediaFile> findAllMediaFiles(Pageable pageable);
 
