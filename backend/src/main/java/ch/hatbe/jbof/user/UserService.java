@@ -23,9 +23,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public User findByKeycloakUserId(UUID id) {
+    public UserDetailDto findDtoByKeycloakUserId(UUID id) {
         return this.userRepository.findUByKeycloakUserId(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Not User found!"));
+                .map(this.userMapper::toDetailDto)
+                .orElseThrow(() -> new ResourceNotFoundException("No user found!"));
     }
 
     public Page<UserListDto> findAll(Pageable pageable) {
@@ -48,5 +49,13 @@ public class UserService {
         User savedUser = this.userRepository.save(user);
 
         return this.userMapper.toListDto(savedUser);
+    }
+
+    public boolean existsByUsername(String username) {
+        return this.userRepository.existsByUsername(username);
+    }
+
+    public boolean existsByEmail(String email) {
+        return this.userRepository.existsByEmail(email);
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -22,36 +23,41 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     ResponseEntity<ApiError> notFound(ResourceNotFoundException ex) {
-        return error(HttpStatus.NOT_FOUND, ex.getMessage(), List.of());
+        return this.error(HttpStatus.NOT_FOUND, ex.getMessage(), List.of());
     }
 
     @ExceptionHandler(ConflictException.class)
     ResponseEntity<ApiError> conflict(ConflictException ex) {
-        return error(HttpStatus.CONFLICT, ex.getMessage(), List.of());
+        return this.error(HttpStatus.CONFLICT, ex.getMessage(), List.of());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     ResponseEntity<ApiError> illegalArgument(IllegalArgumentException ex) {
-        return error(HttpStatus.BAD_REQUEST, ex.getMessage(), List.of());
+        return this.error(HttpStatus.BAD_REQUEST, ex.getMessage(), List.of());
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
     ResponseEntity<ApiError> denied(AuthorizationDeniedException ex) {
-        return error(HttpStatus.FORBIDDEN, "Access denied", List.of());
+        return this.error(HttpStatus.FORBIDDEN, "Access denied", List.of());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<ApiError> validation(MethodArgumentNotValidException ex) {
-        return error(
+        return this.error(
                 HttpStatus.BAD_REQUEST,
                 "Validation failed",
                 fieldViolations(ex.getBindingResult().getFieldErrors())
         );
     }
 
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    ResponseEntity<ApiError> validation(HttpRequestMethodNotSupportedException ex) {
+        return this.error(HttpStatus.METHOD_NOT_ALLOWED, ex.getMessage(), List.of());
+    }
+
     @ExceptionHandler(BindException.class)
     ResponseEntity<ApiError> bind(BindException ex) {
-        return error(
+        return this.error(
                 HttpStatus.BAD_REQUEST,
                 "Validation failed",
                 fieldViolations(ex.getBindingResult().getFieldErrors())
@@ -60,7 +66,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     ResponseEntity<ApiError> constraintViolation(ConstraintViolationException ex) {
-        return error(
+        return this.error(
                 HttpStatus.BAD_REQUEST,
                 "Validation failed",
                 constraintViolations(ex.getConstraintViolations().stream().toList())
@@ -75,7 +81,7 @@ public class GlobalExceptionHandler {
                 ? (maxUploadSize / (1024 * 1024)) + " MB"
                 : "configured server limit";
 
-        return error(
+        return this.error(
                 HttpStatus.PAYLOAD_TOO_LARGE,
                 "Upload too large",
                 List.of(new ApiError.FieldViolation(
@@ -87,7 +93,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ResponseEntity<ApiError> malformedJson(HttpMessageNotReadableException ex) {
-        return error(
+        return this.error(
                 HttpStatus.BAD_REQUEST,
                 "Malformed request body",
                 List.of(new ApiError.FieldViolation(
@@ -99,7 +105,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RestClientResponseException.class)
     ResponseEntity<ApiError> restClient(RestClientResponseException ex) {
-        return error(
+        return this.error(
                 HttpStatus.BAD_GATEWAY,
                 "External service request failed: " + ex.getStatusCode(),
                 List.of()
@@ -108,7 +114,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     ResponseEntity<ApiError> fallback(Exception ex) {
-        return error(
+        return this.error(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Internal server error",
                 List.of()

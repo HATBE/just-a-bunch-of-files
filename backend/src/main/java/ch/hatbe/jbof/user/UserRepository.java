@@ -19,4 +19,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("SELECT u FROM User u WHERE u.deletedAt IS NULL AND u.userId = :id")
     Optional<User> findUserById(UUID id);
+
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
 }

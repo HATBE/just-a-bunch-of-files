@@ -1,0 +1,28 @@
+spring:
+  main:
+    web-application-type: none
+    lazy-initialization: true
+
+  flyway:
+    enabled: false
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      jakarta:
+        persistence:
+          schema-generation:
+            database:
+              action: none
+            scripts:
+              action: create
+              create-target: target/generated-schema/V1__init.sql
+            create-source: metadata
+
+app:
+  auth:
+    base-url: http://localhost:8081
+    realm: jbof
+    admin-client-id: jbof-backend
+    admin-client-secret: dummy

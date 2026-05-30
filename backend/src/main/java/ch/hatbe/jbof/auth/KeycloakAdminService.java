@@ -48,6 +48,12 @@ public class KeycloakAdminService {
         }
     }
 
+    public void delete(UUID keycloakUserId) {
+        this.usersResource()
+                .get(keycloakUserId.toString())
+                .remove();
+    }
+
     private UsersResource usersResource() {
         return this.keycloak
                 .realm(props.getAuth().realm())

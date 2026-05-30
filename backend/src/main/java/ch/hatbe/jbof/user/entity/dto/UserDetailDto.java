@@ -1,7 +1,6 @@
 package ch.hatbe.jbof.user.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +15,6 @@ public class UserDetailDto {
     @JsonProperty("username")
     private String username;
 
-    @Email
     @JsonProperty("email")
     private String email;
 }

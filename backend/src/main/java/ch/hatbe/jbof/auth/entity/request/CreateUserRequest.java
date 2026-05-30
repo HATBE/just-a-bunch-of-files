@@ -18,9 +18,11 @@ public record CreateUserRequest (
         String email,
 
         @Size(max = 50, min = 1, message = "Firstname must be between 1 and 50 characters!")
+        @NotNull(message = "Firstname must not be null")
         String firstname,
 
         @Size(max = 50, min = 1, message = "Lastname must be between 1 and 50 characters!")
+        @NotNull(message = "Lastname must not be null")
         String lastname,
 
         @NotBlank(message = "Password must not be Empty")
